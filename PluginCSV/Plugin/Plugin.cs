@@ -1,0 +1,533 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Grpc.Core;
+using Newtonsoft.Json;
+using PluginCSV.API.CSV;
+using PluginCSV.API.Discover;
+using PluginCSV.API.Factory;
+using PluginCSV.API.Write;
+using PluginCSV.DataContracts;
+using PluginCSV.Helper;
+using Pub;
+using SQLDatabase.Net.SQLDatabaseClient;
+
+namespace PluginCSV.Plugin
+{
+    public class Plugin : Publisher.PublisherBase
+    {
+        private readonly ServerStatus _server;
+        private TaskCompletionSource<bool> _tcs;
+        private IImportExportFactory _importExportFactory;
+
+        public Plugin()
+        {
+            _server = new ServerStatus();
+            _importExportFactory = new CsvImportExportFactory();
+        }
+
+        /// <summary>
+        /// Establishes a connection with an odbc data source
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns>A message indicating connection success</returns>
+        public override Task<ConnectResponse> Connect(ConnectRequest request, ServerCallContext context)
+        {
+            _server.Connected = false;
+
+            Logger.Info("Connecting...");
+
+            var settings = JsonConvert.DeserializeObject<Settings>(request.SettingsJson);
+
+            // validate settings passed in
+            try
+            {
+                _server.Settings = settings;
+                _server.Settings.Validate();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                return Task.FromResult(new ConnectResponse
+                {
+                    OauthStateJson = request.OauthStateJson,
+                    ConnectionError = "",
+                    OauthError = "",
+                    SettingsError = e.Message
+                });
+            }
+
+            _server.Connected = true;
+
+            Logger.Info("Connected.");
+
+            return Task.FromResult(new ConnectResponse
+            {
+                OauthStateJson = "",
+                ConnectionError = "",
+                OauthError = "",
+                SettingsError = ""
+            });
+        }
+
+        /// <summary>
+        /// Connects the session by forwarding requests to Connect
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="responseStream"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override async Task ConnectSession(ConnectRequest request,
+            IServerStreamWriter<ConnectResponse> responseStream, ServerCallContext context)
+        {
+            Logger.Info("Connecting session...");
+
+            // create task to wait for disconnect to be called
+            _tcs?.SetResult(true);
+            _tcs = new TaskCompletionSource<bool>();
+
+            // call connect method
+            var response = await Connect(request, context);
+
+            await responseStream.WriteAsync(response);
+
+            Logger.Info("Session connected.");
+
+            // wait for disconnect to be called
+            await _tcs.Task;
+        }
+
+
+        /// <summary>
+        /// Discovers schemas based on a query
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns>Discovered schemas</returns>
+        public override Task<DiscoverSchemasResponse> DiscoverSchemas(DiscoverSchemasRequest request,
+            ServerCallContext context)
+        {
+            Logger.Info("Discovering Schemas...");
+
+            DiscoverSchemasResponse discoverSchemasResponse = new DiscoverSchemasResponse();
+
+            // only return requested schemas if refresh mode selected
+            if (request.Mode == DiscoverSchemasRequest.Types.Mode.All)
+            {
+                // get all schemas
+                try
+                {
+                    var files = _server.Settings.GetAllFiles();
+                    Logger.Info($"Schemas attempted: {files.Count}");
+
+                    var schemas = files.Select(p => Discover.GetSchemaForFilePath(_importExportFactory, _server.Settings, p))
+                        .ToArray();
+                    
+                    discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
+                    
+                    Logger.Info($"Schemas returned: {discoverSchemasResponse.Schemas.Count}");
+                    
+                    return Task.FromResult(discoverSchemasResponse);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e.Message);
+                    throw;
+                }
+            }
+
+            try
+            {
+                var refreshSchemas = request.ToRefresh;
+            
+                Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
+            
+                var schemas = refreshSchemas.Select(s =>
+                    {
+                        var schemaMetaJson = JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(s.PublisherMetaJson);
+                        return Discover.GetSchemaForFilePath(_importExportFactory, _server.Settings, schemaMetaJson.Path);
+                    })
+                    .ToArray();
+
+                discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
+
+                // return all schemas 
+                Logger.Info($"Schemas returned: {discoverSchemasResponse.Schemas.Count}");
+                return Task.FromResult(discoverSchemasResponse);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Publishes a stream of data for a given schema
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="responseStream"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override async Task ReadStream(ReadRequest request, IServerStreamWriter<Record> responseStream,
+            ServerCallContext context)
+        {
+            var schema = request.Schema;
+            var limit = request.Limit;
+            var limitFlag = request.Limit != 0;
+
+            Logger.Info($"Publishing records for schema: {schema.Name}");
+
+            try
+            {
+                var recordsCount = 0;
+                
+                // // Check if query is empty
+                // if (string.IsNullOrWhiteSpace(schema.Query))
+                // {
+                //     Logger.Info("Query not defined.");
+                //     return;
+                // }
+                //
+                // // create new db connection and command
+                // var connection = _connService.MakeConnectionObject();       
+                // var command = _connService.MakeCommandObject(schema.Query, connection);
+                //
+                // // open the connection
+                // connection.Open();
+                //
+                // // get a reader object for the query
+                // var reader = command.ExecuteReader();
+                //
+                // if (reader.HasRows)
+                // {
+                //     while (reader.Read() && _server.Connected)
+                //     {
+                //         // build record map
+                //         var recordMap = new Dictionary<string, object>();
+                //
+                //         foreach (var property in schema.Properties)
+                //         {
+                //             try
+                //             {
+                //                 switch (property.Type)
+                //                 {
+                //                     case PropertyType.String:
+                //                         recordMap[property.Id] = reader[property.Id].ToString();
+                //                         break;
+                //                     default:
+                //                         recordMap[property.Id] = reader[property.Id];
+                //                         break;
+                //                 }
+                //             }
+                //             catch (Exception e)
+                //             {
+                //                 Logger.Error($"No column with property Id: {property.Id}");
+                //                 Logger.Error(e.Message);
+                //                 recordMap[property.Id] = "";
+                //             }
+                //         }
+                //     
+                //         // create record
+                //         var record = new Record
+                //         {
+                //             Action = Record.Types.Action.Upsert,
+                //             DataJson = JsonConvert.SerializeObject(recordMap)
+                //         };
+                //     
+                //         // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
+                //         if ((limitFlag && recordsCount == limit) || !_server.Connected)
+                //         {
+                //             break;
+                //         }
+                //
+                //         // publish record
+                //         await responseStream.WriteAsync(record);
+                //         recordsCount++;
+                //     }
+                // }
+                //
+                // // close reader and connection
+                // reader.Close();
+                // connection.Close();
+                
+                Logger.Info($"Published {recordsCount} records");
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
+        }
+        
+        /// <summary>
+        /// Creates a form and handles form updates for write backs
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override Task<ConfigureWriteResponse> ConfigureWrite(ConfigureWriteRequest request, ServerCallContext context)
+        {
+            Logger.Info("Configuring write...");
+            
+            var schemaJsonObj = new Dictionary<string, object>
+            {
+                {"type", "object"},
+                {"properties", new Dictionary<string, object>
+                {
+                    {"Query", new Dictionary<string, string>
+                    {
+                        {"type", "string"},
+                        {"title", "Query"},
+                        {"description", "Query to execute for write back with parameter place holders"},
+                    }},
+                    {"Parameters", new Dictionary<string, object>
+                    {
+                        {"type", "array"},
+                        {"title", "Parameters"},
+                        {"description", "Parameters to replace the place holders in the query"},
+                        {"items", new Dictionary<string, object>
+                        {
+                            {"type", "object"},
+                            {"properties", new Dictionary<string, object>
+                            {
+                                {"ParamName", new Dictionary<string, object>
+                                {
+                                    {"type", "string"},
+                                    {"title", "Name"}
+                                }},
+                                {"ParamType", new Dictionary<string, object>
+                                {
+                                    {"type", "string"},
+                                    {"title", "Type"},
+                                    {"enum", new []
+                                    {
+                                        "string", "bool", "int", "float", "decimal"
+                                    }},
+                                    {"enumNames", new []
+                                    {
+                                        "String", "Bool", "Int", "Float", "Decimal"
+                                    }},
+                                }},
+                            }},
+                            {"required", new []
+                            {
+                                "ParamName", "ParamType"
+                            }}
+                        }}
+                    }},
+                }},
+                {"required", new []
+                {
+                    "Query"
+                }}
+            };
+            
+            var uiJsonObj = new Dictionary<string, object>
+            {
+                {"ui:order", new []
+                {
+                    "Query", "Parameters"
+                }},
+                {"Query", new Dictionary<string, object>
+                {
+                    {"ui:widget", "textarea"}
+                }}
+            };
+
+            var schemaJson = JsonConvert.SerializeObject(schemaJsonObj);
+            var uiJson = JsonConvert.SerializeObject(uiJsonObj);
+            
+            // if first call 
+            if (request.Form == null || request.Form.DataJson == "")
+            {
+                return Task.FromResult(new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = "",
+                        DataErrorsJson = "",
+                        Errors = { },
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = ""
+                    },
+                    Schema = null
+                });
+            }
+
+            try
+            {
+                // get form data
+                var formData = JsonConvert.DeserializeObject<ConfigureWriteFormData>(request.Form.DataJson);
+            
+                // base schema to return
+                var schema = new Schema
+                {
+                    Id = "",
+                    Name = "",
+                    Query = formData.Query,
+                    DataFlowDirection = Schema.Types.DataFlowDirection.Write
+                };
+            
+                // add parameters to properties
+                foreach (var param in formData.Parameters)
+                {
+                    schema.Properties.Add(new Property
+                    {
+                        Id = param.ParamName,
+                        Name = param.ParamName,
+                        Type = Write.GetWritebackType(param.ParamType)
+                    });
+                }
+            
+                return Task.FromResult(new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = request.Form.DataJson,
+                        Errors = { },
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = request.Form.StateJson
+                    },
+                    Schema = schema
+                });
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                return Task.FromResult(new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = request.Form.DataJson,
+                        Errors = { e.Message },
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = request.Form.StateJson
+                    },
+                    Schema = null
+                });
+            }
+        }
+
+        /// <summary>
+        /// Prepares the plugin to handle a write request
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override Task<PrepareWriteResponse> PrepareWrite(PrepareWriteRequest request, ServerCallContext context)
+        {
+            Logger.Info("Preparing write...");
+            _server.WriteConfigured = false;
+
+            var writeSettings = new WriteSettings
+            {
+                CommitSLA = request.CommitSlaSeconds,
+                Schema = request.Schema
+            };
+
+            _server.WriteSettings = writeSettings;
+            _server.WriteConfigured = true;
+
+            Logger.Info("Write prepared.");
+            return Task.FromResult(new PrepareWriteResponse());
+        }
+
+        /// <summary>
+        /// Takes in records and writes them out then sends acks back to the client
+        /// </summary>
+        /// <param name="requestStream"></param>
+        /// <param name="responseStream"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override async Task WriteStream(IAsyncStreamReader<Record> requestStream,
+            IServerStreamWriter<RecordAck> responseStream, ServerCallContext context)
+        {
+            // try
+            // {
+            //     Logger.Info("Writing records...");
+            //     var schema = _server.WriteSettings.Schema;
+            //     var sla = _server.WriteSettings.CommitSLA;
+            //     var inCount = 0;
+            //     var outCount = 0;
+            //
+            //     // get next record to publish while connected and configured
+            //     while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
+            //            _server.WriteConfigured)
+            //     {
+            //         var record = requestStream.Current;
+            //         inCount++;
+            //         
+            //         Logger.Debug($"Got Record {record.DataJson}");
+            //
+            //         // send record to source system
+            //         // timeout if it takes longer than the sla
+            //         var task = Task.Run(() => PutRecord(schema, record));
+            //         if (task.Wait(TimeSpan.FromSeconds(sla)))
+            //         {
+            //             // send ack
+            //             var ack = new RecordAck
+            //             {
+            //                 CorrelationId = record.CorrelationId,
+            //                 Error = task.Result
+            //             };
+            //             await responseStream.WriteAsync(ack);
+            //
+            //             if (String.IsNullOrEmpty(task.Result))
+            //             {
+            //                 outCount++;
+            //             }
+            //         }
+            //         else
+            //         {
+            //             // send timeout ack
+            //             var ack = new RecordAck
+            //             {
+            //                 CorrelationId = record.CorrelationId,
+            //                 Error = "timed out"
+            //             };
+            //             await responseStream.WriteAsync(ack);
+            //         }
+            //     }
+            //
+            //     Logger.Info($"Wrote {outCount} of {inCount} records.");
+            // }
+            // catch (Exception e)
+            // {
+            //     Logger.Error(e.Message);
+            //     throw;
+            // }
+        }
+
+        /// <summary>
+        /// Handles disconnect requests from the agent
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override Task<DisconnectResponse> Disconnect(DisconnectRequest request, ServerCallContext context)
+        {
+            // clear connection
+            _server.Connected = false;
+            _server.Settings = null;
+            _server.WriteSettings = null;
+
+            // alert connection session to close
+            if (_tcs != null)
+            {
+                _tcs.SetResult(true);
+                _tcs = null;
+            }
+
+            Logger.Info("Disconnected");
+            return Task.FromResult(new DisconnectResponse());
+        }
+    }
+}

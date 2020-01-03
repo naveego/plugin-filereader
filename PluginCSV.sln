@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginCSV", "PluginCSV\PluginCSV.csproj", "{87B85A40-A254-489E-A01E-23BD2AB43499}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginCSVTest", "PluginCSVTest\PluginCSVTest.csproj", "{B40AC2FF-FCDF-45E4-8632-7E315C5CEC56}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{87B85A40-A254-489E-A01E-23BD2AB43499}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87B85A40-A254-489E-A01E-23BD2AB43499}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87B85A40-A254-489E-A01E-23BD2AB43499}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87B85A40-A254-489E-A01E-23BD2AB43499}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B40AC2FF-FCDF-45E4-8632-7E315C5CEC56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B40AC2FF-FCDF-45E4-8632-7E315C5CEC56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B40AC2FF-FCDF-45E4-8632-7E315C5CEC56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B40AC2FF-FCDF-45E4-8632-7E315C5CEC56}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

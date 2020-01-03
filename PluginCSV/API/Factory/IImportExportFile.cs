@@ -1,0 +1,21 @@
+namespace PluginCSV.API.Factory
+{
+    public interface IImportExportFile
+    {
+        /// <summary>
+        /// Exports to the given FilePathAndName
+        /// </summary>
+        /// <param name="filePathAndName"></param>
+        /// <param name="appendToFile"></param>
+        /// <returns>Number of rows written out</returns>
+        int ExportTable(string filePathAndName, bool appendToFile = false);
+        
+        /// <summary>
+        /// Imports the given FilePathAndName to the in memory database
+        /// </summary>
+        /// <param name="filePathAndName"></param>
+        /// <param name="isFirstLineHeader"></param>
+        /// <returns>Number of rows written</returns>
+        int ImportTable(string filePathAndName, bool isFirstLineHeader);
+    }
+}

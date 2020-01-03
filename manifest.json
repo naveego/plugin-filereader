@@ -1,98 +1,91 @@
 {
-    "id": "plugin-pub-csv",
-    "displayName": "CSV Publisher",
-    "description": "Publisher which extracts data from CSV (RFC 4180) files.",
-    "versionDescription": "Version 3",
-    "version": "3.0.2",
-    "iconFile": "icon.png",
-    "executable": "plugin-pub-csv",
-    "kind": "publisher",
-    "os":"$GOOS",
-    "arch":"$GOARCH",
-    "canConfigureRealTime": true,
-    "configSchema": {
-        "ui": {
-            "ui:order":["rootPath", "hasHeader", "delimiter","filters","cleanupAction","archivePath"]
-        },
-        "schema": {
-            "$id": "https://github.com/naveego/plugin-pub-csv",
-            "type": "object",
-            "properties": {
-                "rootPath": {
-                    "$id": "/properties/rootPath",
-                    "type": "string",
-                    "title": "Root Path",
-                    "description": "The folder containing CSV files.",
-                    "default": "",
-                    "examples": [
-                        "string"
-                    ]
-                },
-                "filters": {
-                    "$id": "/properties/filters",
-                    "type": "array",
-                    "description": "Filters used to select files beneath the root path. Each filter should be a regular expression.",
-                    "items": {
-                        "$id": "/properties/filters/items",
-                        "type": "string",
-                        "default": "\\.csv$",
-                        "examples": [
-                            "\\.csv$"
-                        ]
-                    }
-                },
-                "cleanupAction": {
-                    "$id": "/properties/cleanupAction",
-                    "type": "string",
-                    "title": "Cleanup Action",
-                    "description": "Action taken to clean up after processing.",
-                    "default": "nothing",
-                    "examples": [
-                        "string"
-                    ],
-                    "enum": [
-                        "nothing",
-                        "delete",
-                        "archive"
-                    ]
-                },
-                "archivePath": {
-                    "$id": "/properties/archivePath",
-                    "type": "string",
-                    "title": "Archive Folder",
-                    "description": "The folder to move files to after processing, if cleanup action is \"archive\".",
-                    "default": "",
-                    "examples": [
-                        "string"
-                    ]
-                },
-                "hasHeader": {
-                    "$id": "/properties/hasHeader",
-                    "type": "boolean",
-                    "title": "Has Header ",
-                    "description": "Does the file have a header row?",
-                    "default": false,
-                    "examples": [
-                        true
-                    ]
-                },
-                "delimiter": {
-                    "$id": "/properties/delimiter",
-                    "type": "string",
-                    "title": "Delimiter",
-                    "description": "The delimiter for CSV files.",
-                    "default": ",",
-                    "examples": [
-                        ","
-                    ],
-                    "minLength": 1,
-                    "maxLength": 1,
-                    "pattern": ""
-                }
-            },
-            "required": [
-                "rootPath"
-            ]
-        }
+  "id": "plugin-pub-csv",
+  "displayName": "CSV Publisher",
+  "description": "Publisher which extracts data from CSV (RFC 4180) files.",
+  "apiVersion": "2",
+  "versionDescription": "Version 4",
+  "version": "4.0.0",
+  "iconFile": "icon.png",
+  "executable": "PluginCSV",
+  "kind": "publisher",
+  "os": "$GOOS",
+  "arch": "$GOARCH",
+  "canConfigureRealTime": true,
+  "canProduceMultipleSchemas": true,
+  "canAcceptQueryBasedSchemas": true,
+  "canUseOAuth": false,
+  "canWrite": true,
+  "canConfigureReplication": true,
+  "canWriteReplication": true,
+  "querySchema": {
+    "ui": {
+      "ui:widget": "code",
+      "ui:options": {
+        "language": "sql"
+      }
+    },
+    "schema": {
+      "type": "string"
     }
+  },
+  "configSchema": {
+    "ui": {
+      "ui:order": ["RootPath", "HasHeader", "Delimiter", "Filters", "CleanupAction", "ArchivePath"]
+    },
+    "schema": {
+      "type": "object",
+      "properties": {
+        "RootPath": {
+          "type": "string",
+          "title": "Root Path",
+          "description": "The folder containing CSV files.",
+          "default": "",
+          "examples": ["string"]
+        },
+        "Filters": {
+          "type": "array",
+          "description": "Filters used to select files beneath the root path. Each filter should be a regular expression.",
+          "items": {
+            "$id": "/properties/filters/items",
+            "type": "string",
+            "default": "\\.csv$",
+            "examples": ["\\.csv$"]
+          }
+        },
+        "CleanupAction": {
+          "type": "string",
+          "title": "Cleanup Action",
+          "description": "Action taken to clean up after processing.",
+          "default": "nothing",
+          "examples": ["string"],
+          "enum": ["nothing", "delete", "archive"]
+        },
+        "ArchivePath": {
+          "type": "string",
+          "title": "Archive Folder",
+          "description": "The folder to move files to after processing, if cleanup action is \"archive\".",
+          "default": "",
+          "examples": ["string"]
+        },
+        "HasHeader": {
+          "type": "boolean",
+          "title": "Has Header ",
+          "description": "Does the file have a header row?",
+          "default": false,
+          "examples": [true]
+        },
+        "Delimiter": {
+          "type": "string",
+          "title": "Delimiter",
+          "description": "The delimiter for CSV files.",
+          "default": ",",
+          "examples": [","],
+          "minLength": 1,
+          "maxLength": 1,
+          "pattern": ""
+        }
+      },
+      "required": ["RootPath"]
+    }
+  }
 }
