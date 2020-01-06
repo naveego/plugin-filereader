@@ -3,6 +3,7 @@ using System.Data;
 using System.IO;
 using Newtonsoft.Json;
 using PluginCSV.API.Factory;
+using PluginCSV.API.Utility;
 using PluginCSV.DataContracts;
 using PluginCSV.Helper;
 using Pub;
@@ -17,20 +18,10 @@ namespace PluginCSV.API.Discover
             var schemaName = Constants.SchemaName;
             var tableName = Path.GetFileNameWithoutExtension(path);
             var schemaId = $"[{schemaName}].[{tableName}]";
-
-            var connBuilder = new SqlDatabaseConnectionStringBuilder
-            {
-                DatabaseFileMode = DatabaseFileMode.OpenOrCreate,
-                DatabaseMode = DatabaseMode.ReadOnly,
-                SchemaName = Constants.SchemaName,
-                Uri = "@memory"
-            };
-            var conn = new SqlDatabaseConnection(connBuilder.ConnectionString);
-            conn.Open();
-
-            var importExportFile = factory.MakeImportExportFile(conn, tableName, schemaName, settings.Delimiter);
-
-            var rowsWritten = importExportFile.ImportTable(path, settings.HasHeader);
+            
+            var conn = Utility.Utility.GetSqlConnection();
+            var rowsWritten =
+                Utility.Utility.ImportRecordsForPath(factory, conn, settings, tableName, schemaName, path);
             
             var schema = new Schema
             {
@@ -48,7 +39,7 @@ namespace PluginCSV.API.Discover
             
             var schemaTable = conn.GetSchema("Columns", new string[]
             {
-                $"[{schemaName}].[{tableName}]"
+                schemaId
             });
 
             foreach (DataColumn column in schemaTable.Columns)

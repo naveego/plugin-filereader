@@ -137,8 +137,8 @@ namespace PluginCSV.API.CSV
                 if (SQLDatabaseTransaction != null)
                     cmd.Transaction = SQLDatabaseTransaction;
 
-                //cmd.CommandText = string.Format("DROP TABLE IF EXISTS [{0}].[{1}]", SchemaName, TableName);
-                //cmd.ExecuteNonQuery();
+                cmd.CommandText = $"DROP TABLE IF EXISTS [{SchemaName}].[{TableName}]";
+                cmd.ExecuteNonQuery();
 
                 var dt = SQLDatabaseConnection.GetSchema("Columns", new string[]
                 {

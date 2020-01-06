@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using PluginCSV.API.CSV;
 using PluginCSV.API.Discover;
 using PluginCSV.API.Factory;
+using PluginCSV.API.Read;
+using PluginCSV.API.Utility;
 using PluginCSV.API.Write;
 using PluginCSV.DataContracts;
 using PluginCSV.Helper;
@@ -185,77 +187,37 @@ namespace PluginCSV.Plugin
             try
             {
                 var recordsCount = 0;
-                
-                // // Check if query is empty
-                // if (string.IsNullOrWhiteSpace(schema.Query))
-                // {
-                //     Logger.Info("Query not defined.");
-                //     return;
-                // }
-                //
-                // // create new db connection and command
-                // var connection = _connService.MakeConnectionObject();       
-                // var command = _connService.MakeCommandObject(schema.Query, connection);
-                //
-                // // open the connection
-                // connection.Open();
-                //
-                // // get a reader object for the query
-                // var reader = command.ExecuteReader();
-                //
-                // if (reader.HasRows)
-                // {
-                //     while (reader.Read() && _server.Connected)
-                //     {
-                //         // build record map
-                //         var recordMap = new Dictionary<string, object>();
-                //
-                //         foreach (var property in schema.Properties)
-                //         {
-                //             try
-                //             {
-                //                 switch (property.Type)
-                //                 {
-                //                     case PropertyType.String:
-                //                         recordMap[property.Id] = reader[property.Id].ToString();
-                //                         break;
-                //                     default:
-                //                         recordMap[property.Id] = reader[property.Id];
-                //                         break;
-                //                 }
-                //             }
-                //             catch (Exception e)
-                //             {
-                //                 Logger.Error($"No column with property Id: {property.Id}");
-                //                 Logger.Error(e.Message);
-                //                 recordMap[property.Id] = "";
-                //             }
-                //         }
-                //     
-                //         // create record
-                //         var record = new Record
-                //         {
-                //             Action = Record.Types.Action.Upsert,
-                //             DataJson = JsonConvert.SerializeObject(recordMap)
-                //         };
-                //     
-                //         // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
-                //         if ((limitFlag && recordsCount == limit) || !_server.Connected)
-                //         {
-                //             break;
-                //         }
-                //
-                //         // publish record
-                //         await responseStream.WriteAsync(record);
-                //         recordsCount++;
-                //     }
-                // }
-                //
-                // // close reader and connection
-                // reader.Close();
-                // connection.Close();
-                
+
+                var records = Read.ReadRecords(_importExportFactory, _server.Settings, schema);
+
+                foreach (var record in records)
+                {
+                    // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
+                    if ((limitFlag && recordsCount == limit) || !_server.Connected)
+                    {
+                        break;
+                    }
+                    
+                    // publish record
+                    await responseStream.WriteAsync(record);
+                    recordsCount++;
+                }
+
                 Logger.Info($"Published {recordsCount} records");
+
+                var schemaPublisherMetaJson =
+                    JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
+                switch (_server.Settings.ArchivePath)
+                {
+                    case "delete":
+                        Logger.Info($"Deleting file {schemaPublisherMetaJson.Path}");
+                        Utility.DeleteFileAtPath(schemaPublisherMetaJson.Path);
+                        break;
+                    case "archive":
+                        Logger.Info($"Archiving file {schemaPublisherMetaJson.Path} to {_server.Settings.ArchivePath}");
+                        Utility.ArchiveFileAtPath(schemaPublisherMetaJson.Path, _server.Settings.ArchivePath);
+                        break;
+                }
             }
             catch (Exception e)
             {

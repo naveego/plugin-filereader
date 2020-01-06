@@ -55,7 +55,7 @@
         "CleanupAction": {
           "type": "string",
           "title": "Cleanup Action",
-          "description": "Action taken to clean up after processing.",
+          "description": "Action taken to clean up after reading.",
           "default": "nothing",
           "examples": ["string"],
           "enum": ["nothing", "delete", "archive"]
