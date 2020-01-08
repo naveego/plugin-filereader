@@ -35,6 +35,7 @@ namespace PluginCSV.API.Read
 
             var cmd = new SqlDatabaseCommand
             {
+                Connection = conn,
                 CommandText = $"SELECT * FROM {schema.Id}"
             };
 

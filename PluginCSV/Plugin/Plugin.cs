@@ -23,7 +23,7 @@ namespace PluginCSV.Plugin
     {
         private readonly ServerStatus _server;
         private TaskCompletionSource<bool> _tcs;
-        private IImportExportFactory _importExportFactory;
+        private readonly IImportExportFactory _importExportFactory;
 
         public Plugin()
         {
@@ -148,11 +148,7 @@ namespace PluginCSV.Plugin
             
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
             
-                var schemas = refreshSchemas.Select(s =>
-                    {
-                        var schemaMetaJson = JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(s.PublisherMetaJson);
-                        return Discover.GetSchemaForFilePath(_importExportFactory, _server.Settings, schemaMetaJson.Path);
-                    })
+                var schemas = refreshSchemas.Select(Discover.GetSchemaForQuery)
                     .ToArray();
 
                 discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
@@ -236,73 +232,12 @@ namespace PluginCSV.Plugin
         {
             Logger.Info("Configuring write...");
             
-            var schemaJsonObj = new Dictionary<string, object>
-            {
-                {"type", "object"},
-                {"properties", new Dictionary<string, object>
-                {
-                    {"Query", new Dictionary<string, string>
-                    {
-                        {"type", "string"},
-                        {"title", "Query"},
-                        {"description", "Query to execute for write back with parameter place holders"},
-                    }},
-                    {"Parameters", new Dictionary<string, object>
-                    {
-                        {"type", "array"},
-                        {"title", "Parameters"},
-                        {"description", "Parameters to replace the place holders in the query"},
-                        {"items", new Dictionary<string, object>
-                        {
-                            {"type", "object"},
-                            {"properties", new Dictionary<string, object>
-                            {
-                                {"ParamName", new Dictionary<string, object>
-                                {
-                                    {"type", "string"},
-                                    {"title", "Name"}
-                                }},
-                                {"ParamType", new Dictionary<string, object>
-                                {
-                                    {"type", "string"},
-                                    {"title", "Type"},
-                                    {"enum", new []
-                                    {
-                                        "string", "bool", "int", "float", "decimal"
-                                    }},
-                                    {"enumNames", new []
-                                    {
-                                        "String", "Bool", "Int", "Float", "Decimal"
-                                    }},
-                                }},
-                            }},
-                            {"required", new []
-                            {
-                                "ParamName", "ParamType"
-                            }}
-                        }}
-                    }},
-                }},
-                {"required", new []
-                {
-                    "Query"
-                }}
-            };
             
-            var uiJsonObj = new Dictionary<string, object>
-            {
-                {"ui:order", new []
-                {
-                    "Query", "Parameters"
-                }},
-                {"Query", new Dictionary<string, object>
-                {
-                    {"ui:widget", "textarea"}
-                }}
-            };
+            
+            
 
-            var schemaJson = JsonConvert.SerializeObject(schemaJsonObj);
-            var uiJson = JsonConvert.SerializeObject(uiJsonObj);
+            var schemaJson = Write.GetSchemaJson();
+            var uiJson = Write.GetUIJson();
             
             // if first call 
             if (request.Form == null || request.Form.DataJson == "")

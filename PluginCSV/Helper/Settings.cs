@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace PluginCSV.Helper
 {
     public class Settings
     {
-        public string RootPath { get; set; }
+        public List<string> RootPaths { get; set; }
         public List<string> Filters { get; set; }
         public bool HasHeader { get; set; }
         public char Delimiter { get; set; }
@@ -20,14 +21,14 @@ namespace PluginCSV.Helper
         /// <exception cref="Exception"></exception>
         public void Validate()
         {
-            if (String.IsNullOrEmpty(RootPath))
+            if (RootPaths.Count == 0)
             {
-                throw new Exception("the RootPath property must be set");
+                throw new Exception("At least one RootPath must be defined");
             }
 
-            if (!RootPathIsDirectory())
+            if (!RootPathsAreDirectories())
             {
-                throw new Exception("RootPath is not a directory");
+                throw new Exception("A RootPath is not a directory");
             }
 
             if (!FilesExistAtRootPathAndFilters())
@@ -43,23 +44,26 @@ namespace PluginCSV.Helper
         public List<string> GetAllFiles()
         {
             var files = new List<string>();
-            foreach (var fileFilter in Filters)
+            foreach (var rootPath in RootPaths)
             {
-                files.AddRange(Directory.GetFiles(RootPath, fileFilter));
+                foreach (var fileFilter in Filters)
+                {
+                    files.AddRange(Directory.GetFiles(rootPath, fileFilter));
+                }
             }
-
+            
             return files;
         }
         
         /// <summary>
-        /// Checks if RootPath is a directory
+        /// Checks if RootPaths are directories
         /// </summary>
         /// <returns></returns>
-        private bool RootPathIsDirectory()
+        private bool RootPathsAreDirectories()
         {
             try
             {
-                return (File.GetAttributes(RootPath) & FileAttributes.Directory) == FileAttributes.Directory;
+                return RootPaths.All(rootPath => (File.GetAttributes(rootPath) & FileAttributes.Directory) == FileAttributes.Directory);
             }
             catch (Exception e)
             {
@@ -74,18 +78,7 @@ namespace PluginCSV.Helper
         /// <returns></returns>
         private bool FilesExistAtRootPathAndFilters()
         {
-            var files = new List<string>();
-            foreach (var fileFilter in Filters)
-            {
-                files.AddRange(Directory.GetFiles(RootPath, fileFilter));
-            }
-                    
-            if (files.Count == 0)
-            {
-                return false;
-            }
-
-            return true;
+            return GetAllFiles().Count != 0;
         }
     }
 }

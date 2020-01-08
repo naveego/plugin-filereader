@@ -14,9 +14,9 @@
   "canProduceMultipleSchemas": true,
   "canAcceptQueryBasedSchemas": true,
   "canUseOAuth": false,
-  "canWrite": true,
-  "canConfigureReplication": true,
-  "canWriteReplication": true,
+  "canWrite": false,
+  "canConfigureReplication": false,
+  "canWriteReplication": false,
   "querySchema": {
     "ui": {
       "ui:widget": "code",
@@ -35,12 +35,15 @@
     "schema": {
       "type": "object",
       "properties": {
-        "RootPath": {
-          "type": "string",
-          "title": "Root Path",
-          "description": "The folder containing CSV files.",
-          "default": "",
-          "examples": ["string"]
+        "RootPaths": {
+          "title": "Root Paths",
+          "description": "The folder(s) containing CSV files.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "default": "",
+            "examples": ["path/to/folder"]
+          }
         },
         "Filters": {
           "type": "array",
