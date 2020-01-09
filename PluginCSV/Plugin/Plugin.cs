@@ -203,7 +203,7 @@ namespace PluginCSV.Plugin
 
                 var schemaPublisherMetaJson =
                     JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
-                switch (_server.Settings.ArchivePath)
+                switch (_server.Settings.CleanupAction)
                 {
                     case "delete":
                         Logger.Info($"Deleting file {schemaPublisherMetaJson.Path}");

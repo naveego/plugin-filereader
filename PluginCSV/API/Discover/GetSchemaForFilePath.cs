@@ -34,33 +34,12 @@ namespace PluginCSV.API.Discover
                 },
                 DataFlowDirection = Schema.Types.DataFlowDirection.ReadWrite,
                 PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson{Path = path}),
+                Query = $"SELECT * FROM {schemaId}",
                 Properties = {},
             };
+
+            schema = GetSchemaForQuery(schema);
             
-            var schemaTable = conn.GetSchema("Columns", new string[]
-            {
-                schemaId
-            });
-
-            foreach (DataColumn column in schemaTable.Columns)
-            {
-                var property = new Property
-                {
-                    Id = column.ColumnName,
-                    Name = column.ColumnName,
-                    Description = column.Caption,
-                    Type = GetPropertyType(column),
-                    TypeAtSource = column.DataType.ToString(),
-                    IsKey = false,
-                    IsNullable = column.AllowDBNull,
-                    IsCreateCounter = false,
-                    IsUpdateCounter = false,
-                    PublisherMetaJson = ""
-                };
-                
-                schema.Properties.Add(property);
-            }
-
             return schema;
         }
     }

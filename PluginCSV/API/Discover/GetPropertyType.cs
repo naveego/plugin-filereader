@@ -6,9 +6,9 @@ namespace PluginCSV.API.Discover
 {
     public static partial class Discover
     {
-        private static PropertyType GetPropertyType(DataColumn column)
+        private static PropertyType GetPropertyType(DataRow row)
         {
-            var type = column.DataType;
+            var type = Type.GetType(row["DataType"].ToString());
             switch (true)
             {
                 case bool _ when type == typeof(bool):
@@ -22,11 +22,10 @@ namespace PluginCSV.API.Discover
                 case bool _ when type == typeof(DateTime):
                     return PropertyType.Datetime;
                 case bool _ when type == typeof(string):
-                    if (column.MaxLength > 1024)
+                    if (Int64.Parse(row["ColumnSize"].ToString()) > 1024)
                     {
                         return PropertyType.Text;
                     }
-
                     return PropertyType.String;
                 default:
                     return PropertyType.String;

@@ -31,9 +31,9 @@ namespace PluginCSV.Helper
                 throw new Exception("A RootPath is not a directory");
             }
 
-            if (!FilesExistAtRootPathAndFilters())
+            if (!FilesExistAtRootPathsAndFilters())
             {
-                throw new Exception("No files in specified RootPath under given Filters");
+                throw new Exception("No files in given RootPaths with given Filters");
             }
         }
 
@@ -61,22 +61,21 @@ namespace PluginCSV.Helper
         /// <returns></returns>
         private bool RootPathsAreDirectories()
         {
-            try
+            foreach (var rootPath in RootPaths)
             {
-                return RootPaths.All(rootPath => (File.GetAttributes(rootPath) & FileAttributes.Directory) == FileAttributes.Directory);
+                if (!Directory.Exists(rootPath))
+                {
+                    throw new Exception($"{rootPath} is not a directory");
+                }
             }
-            catch (Exception e)
-            {
-                Logger.Error(e.Message);
-                throw;
-            }
+            return true;
         }
 
         /// <summary>
         /// Checks if files exist for the root path under the filters
         /// </summary>
         /// <returns></returns>
-        private bool FilesExistAtRootPathAndFilters()
+        private bool FilesExistAtRootPathsAndFilters()
         {
             return GetAllFiles().Count != 0;
         }

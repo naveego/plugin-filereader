@@ -1,6 +1,5 @@
+using System;
 using System.Data;
-using PluginCSV.API.Factory;
-using PluginCSV.Helper;
 using Pub;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -24,22 +23,35 @@ namespace PluginCSV.API.Discover
 
             if (schemaTable != null)
             {
-                foreach (DataColumn column in schemaTable.Columns)
+                var unnamedColIndex = 0;
+                    
+                // get each column and create a property for the column
+                foreach (DataRow row in schemaTable.Rows)
                 {
+                    // get the column name
+                    var colName = row["ColumnName"].ToString();
+                    if (string.IsNullOrWhiteSpace(colName))
+                    {
+                        colName = $"UNKNOWN_{unnamedColIndex}";
+                        unnamedColIndex++;
+                    }
+                    
+                    // create property
                     var property = new Property
                     {
-                        Id = column.ColumnName,
-                        Name = column.ColumnName,
-                        Description = column.Caption,
-                        Type = GetPropertyType(column),
-                        TypeAtSource = column.DataType.ToString(),
-                        IsKey = false,
-                        IsNullable = column.AllowDBNull,
+                        Id = colName,
+                        Name = colName,
+                        Description = "",
+                        Type = GetPropertyType(row),
+                        TypeAtSource = row["DataType"].ToString(),
+                        IsKey = Boolean.Parse(row["IsKey"].ToString()),
+                        IsNullable = Boolean.Parse(row["AllowDBNull"].ToString()),
                         IsCreateCounter = false,
                         IsUpdateCounter = false,
                         PublisherMetaJson = ""
                     };
-                
+                    
+                    // add property to schema
                     schema.Properties.Add(property);
                 }
             }

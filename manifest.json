@@ -48,11 +48,11 @@
         "Filters": {
           "type": "array",
           "description": "Filters used to select files beneath the root path. Each filter should be a regular expression.",
+          "minItems": 1,
           "items": {
-            "$id": "/properties/filters/items",
             "type": "string",
-            "default": "\\.csv$",
-            "examples": ["\\.csv$"]
+            "default": "*.csv",
+            "examples": ["*.csv"]
           }
         },
         "CleanupAction": {

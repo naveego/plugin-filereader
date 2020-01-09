@@ -1,3 +1,4 @@
+using System.IO;
 using SQLDatabase.Net.SQLDatabaseClient;
 
 namespace PluginCSV.API.Utility
@@ -10,12 +11,14 @@ namespace PluginCSV.API.Utility
         /// <returns>An open sql connection</returns>
         public static SqlDatabaseConnection GetSqlConnection()
         {
+            Directory.CreateDirectory(Constants.DbFolder);
+            
             var connBuilder = new SqlDatabaseConnectionStringBuilder
             {
                 DatabaseFileMode = DatabaseFileMode.OpenOrCreate,
-                DatabaseMode = DatabaseMode.ReadOnly,
+                DatabaseMode = DatabaseMode.ReadWrite,
                 SchemaName = Constants.SchemaName,
-                Uri = "@memory"
+                Uri = $"file://{Constants.DbFolder}/{Constants.DbFile}"
             };
             var conn = new SqlDatabaseConnection(connBuilder.ConnectionString);
             conn.Open();
