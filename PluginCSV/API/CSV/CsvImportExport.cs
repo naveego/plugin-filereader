@@ -137,8 +137,8 @@ namespace PluginCSV.API.CSV
                 if (SQLDatabaseTransaction != null)
                     cmd.Transaction = SQLDatabaseTransaction;
 
-                cmd.CommandText = $"DROP TABLE IF EXISTS [{SchemaName}].[{TableName}]";
-                cmd.ExecuteNonQuery();
+                // cmd.CommandText = $"DROP TABLE IF EXISTS [{SchemaName}].[{TableName}]";
+                // cmd.ExecuteNonQuery();
 
                 var dt = SQLDatabaseConnection.GetSchema("Columns", new string[]
                 {
@@ -223,20 +223,5 @@ namespace PluginCSV.API.CSV
 
             return rowCount;
         }
-
-        // private void CreateSchema()
-        // {
-        //     using (SqlDatabaseCommand cmd = new SqlDatabaseCommand(SQLDatabaseConnection))
-        //     {
-        //         try
-        //         {
-        //             cmd.CommandText = $"CREATE SCHEMA [{SchemaName}]";
-        //         }
-        //         catch
-        //         {
-        //             Logger.Info($"Schema {SchemaName} already exists");
-        //         }
-        //     }
-        // }
     }
 }

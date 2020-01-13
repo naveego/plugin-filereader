@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using PluginCSV.API.Factory;
 using PluginCSV.API.Utility;
@@ -14,29 +15,18 @@ namespace PluginCSV.API.Read
     public static partial class Read
     {
         /// <summary>
-        /// Reads records from file at the given path
+        /// Reads records for schema
         /// </summary>
-        /// <param name="factory"></param>
-        /// <param name="settings"></param>
         /// <param name="schema"></param>
         /// <returns>Records from the file</returns>
-        public static IEnumerable<Record> ReadRecords(IImportExportFactory factory, Settings settings, Schema schema)
+        public static IEnumerable<Record> ReadRecords(Schema schema)
         {
-            var schemaPublisherMetaJson =
-                JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
-
-            var path = schemaPublisherMetaJson.Path;
-            var schemaName = Constants.SchemaName;
-            var tableName = Path.GetFileNameWithoutExtension(path);
-
             var conn = Utility.Utility.GetSqlConnection();
-            var rowsWritten =
-                Utility.Utility.ImportRecordsForPath(factory, conn, settings, tableName, schemaName, path);
 
             var cmd = new SqlDatabaseCommand
             {
                 Connection = conn,
-                CommandText = $"SELECT * FROM {schema.Id}"
+                CommandText = schema.Query
             };
 
             var reader = cmd.ExecuteReader();

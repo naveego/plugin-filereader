@@ -38,7 +38,7 @@ namespace PluginCSV.Helper
         }
 
         /// <summary>
-        /// Gets all files from location defined by RootPath and Filters
+        /// Gets all files from location defined by RootPath and Filters and returns in a flat list
         /// </summary>
         /// <returns></returns>
         public List<string> GetAllFiles()
@@ -53,6 +53,26 @@ namespace PluginCSV.Helper
             }
             
             return files;
+        }
+        
+        /// <summary>
+        /// Gets all files from location defined by RootPath and Filters and returns in a dictionary by directory
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, List<string>> GetAllFilesByDirectory()
+        {
+            var filesByDirectory = new Dictionary<string, List<string>>();
+            foreach (var rootPath in RootPaths)
+            {
+                var files = new List<string>();
+                foreach (var fileFilter in Filters)
+                {
+                    files.AddRange(Directory.GetFiles(rootPath, fileFilter));
+                }
+                filesByDirectory.Add(rootPath, files);
+            }
+            
+            return filesByDirectory;
         }
         
         /// <summary>

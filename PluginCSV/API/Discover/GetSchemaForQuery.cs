@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Linq;
 using Pub;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -7,13 +8,12 @@ namespace PluginCSV.API.Discover
 {
     public static partial class Discover
     {
-        public static Schema GetSchemaForQuery(Schema schema)
+        public static Schema GetSchemaForQuery(Schema schema, int sampleSize = 5)
         {
             var conn = Utility.Utility.GetSqlConnection();
 
             var cmd = new SqlDatabaseCommand
             {
-                
                 Connection = conn,
                 CommandText = schema.Query
             };
@@ -24,7 +24,7 @@ namespace PluginCSV.API.Discover
             if (schemaTable != null)
             {
                 var unnamedColIndex = 0;
-                    
+
                 // get each column and create a property for the column
                 foreach (DataRow row in schemaTable.Rows)
                 {
@@ -35,7 +35,7 @@ namespace PluginCSV.API.Discover
                         colName = $"UNKNOWN_{unnamedColIndex}";
                         unnamedColIndex++;
                     }
-                    
+
                     // create property
                     var property = new Property
                     {
@@ -50,11 +50,17 @@ namespace PluginCSV.API.Discover
                         IsUpdateCounter = false,
                         PublisherMetaJson = ""
                     };
-                    
+
                     // add property to schema
                     schema.Properties.Add(property);
                 }
             }
+
+            var records = Read.Read.ReadRecords(schema).Take(sampleSize);
+            schema.Sample.AddRange(records);
+
+            schema.Count = Read.Read.GetCountOfRecords(schema);
+            schema.PublisherMetaJson = "";
 
             return schema;
         }

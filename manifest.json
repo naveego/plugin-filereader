@@ -82,7 +82,7 @@
           "title": "Delimiter",
           "description": "The delimiter for CSV files.",
           "default": ",",
-          "examples": [","],
+          "examples": [",", "|"],
           "minLength": 1,
           "maxLength": 1,
           "pattern": ""

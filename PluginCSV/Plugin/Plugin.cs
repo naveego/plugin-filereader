@@ -115,6 +115,8 @@ namespace PluginCSV.Plugin
         {
             Logger.Info("Discovering Schemas...");
 
+            var sampleSize = checked((int) request.SampleSize);
+
             DiscoverSchemasResponse discoverSchemasResponse = new DiscoverSchemasResponse();
 
             // only return requested schemas if refresh mode selected
@@ -123,16 +125,18 @@ namespace PluginCSV.Plugin
                 // get all schemas
                 try
                 {
-                    var files = _server.Settings.GetAllFiles();
+                    var files = _server.Settings.GetAllFilesByDirectory();
                     Logger.Info($"Schemas attempted: {files.Count}");
 
-                    var schemas = files.Select(p => Discover.GetSchemaForFilePath(_importExportFactory, _server.Settings, p))
+                    var schemas = files.Select(p =>
+                            Discover.GetSchemaForDirectory(_importExportFactory, _server.Settings, p.Key, p.Value,
+                                sampleSize))
                         .ToArray();
-                    
+
                     discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
-                    
+
                     Logger.Info($"Schemas returned: {discoverSchemasResponse.Schemas.Count}");
-                    
+
                     return Task.FromResult(discoverSchemasResponse);
                 }
                 catch (Exception e)
@@ -145,10 +149,10 @@ namespace PluginCSV.Plugin
             try
             {
                 var refreshSchemas = request.ToRefresh;
-            
+
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
-            
-                var schemas = refreshSchemas.Select(Discover.GetSchemaForQuery)
+
+                var schemas = refreshSchemas.Select(s => Discover.GetSchemaForQuery(s, sampleSize))
                     .ToArray();
 
                 discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
@@ -182,9 +186,25 @@ namespace PluginCSV.Plugin
 
             try
             {
+                var paths = new List<string>();
+                var conn = Utility.GetSqlConnection();
+            
+                var schemaMetaJson = JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
+
+                if (!string.IsNullOrEmpty(schemaMetaJson.Directory))
+                {
+                    var pathsDictionary = _server.Settings.GetAllFilesByDirectory();
+                    paths.AddRange(pathsDictionary[schemaMetaJson.Directory]);
+                
+                    var schemaName = Constants.SchemaName;
+                    var tableName = Directory.GetParent(paths.First()).Name;
+            
+                    Utility.LoadDirectoryFilesIntoDb(_importExportFactory, conn, _server.Settings, tableName, schemaName, paths);
+                }
+                
                 var recordsCount = 0;
 
-                var records = Read.ReadRecords(_importExportFactory, _server.Settings, schema);
+                var records = Read.ReadRecords(schema);
 
                 foreach (var record in records)
                 {
@@ -193,7 +213,7 @@ namespace PluginCSV.Plugin
                     {
                         break;
                     }
-                    
+
                     // publish record
                     await responseStream.WriteAsync(record);
                     recordsCount++;
@@ -206,12 +226,18 @@ namespace PluginCSV.Plugin
                 switch (_server.Settings.CleanupAction)
                 {
                     case "delete":
-                        Logger.Info($"Deleting file {schemaPublisherMetaJson.Path}");
-                        Utility.DeleteFileAtPath(schemaPublisherMetaJson.Path);
+                        foreach (var path in paths)
+                        {
+                            Logger.Info($"Deleting file {path}");
+                            Utility.DeleteFileAtPath(path); 
+                        }
                         break;
                     case "archive":
-                        Logger.Info($"Archiving file {schemaPublisherMetaJson.Path} to {_server.Settings.ArchivePath}");
-                        Utility.ArchiveFileAtPath(schemaPublisherMetaJson.Path, _server.Settings.ArchivePath);
+                        foreach (var path in paths)
+                        {
+                            Logger.Info($"Archiving file {path} to {_server.Settings.ArchivePath}");
+                            Utility.ArchiveFileAtPath(path, _server.Settings.ArchivePath);
+                        }
                         break;
                 }
             }
@@ -221,24 +247,22 @@ namespace PluginCSV.Plugin
                 throw;
             }
         }
-        
+
         /// <summary>
         /// Creates a form and handles form updates for write backs
         /// </summary>
         /// <param name="request"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public override Task<ConfigureWriteResponse> ConfigureWrite(ConfigureWriteRequest request, ServerCallContext context)
+        public override Task<ConfigureWriteResponse> ConfigureWrite(ConfigureWriteRequest request,
+            ServerCallContext context)
         {
             Logger.Info("Configuring write...");
-            
-            
-            
-            
+
 
             var schemaJson = Write.GetSchemaJson();
             var uiJson = Write.GetUIJson();
-            
+
             // if first call 
             if (request.Form == null || request.Form.DataJson == "")
             {
@@ -261,7 +285,7 @@ namespace PluginCSV.Plugin
             {
                 // get form data
                 var formData = JsonConvert.DeserializeObject<ConfigureWriteFormData>(request.Form.DataJson);
-            
+
                 // base schema to return
                 var schema = new Schema
                 {
@@ -270,7 +294,7 @@ namespace PluginCSV.Plugin
                     Query = formData.Query,
                     DataFlowDirection = Schema.Types.DataFlowDirection.Write
                 };
-            
+
                 // add parameters to properties
                 foreach (var param in formData.Parameters)
                 {
@@ -281,7 +305,7 @@ namespace PluginCSV.Plugin
                         Type = Write.GetWritebackType(param.ParamType)
                     });
                 }
-            
+
                 return Task.FromResult(new ConfigureWriteResponse
                 {
                     Form = new ConfigurationFormResponse
@@ -303,7 +327,7 @@ namespace PluginCSV.Plugin
                     Form = new ConfigurationFormResponse
                     {
                         DataJson = request.Form.DataJson,
-                        Errors = { e.Message },
+                        Errors = {e.Message},
                         SchemaJson = schemaJson,
                         UiJson = uiJson,
                         StateJson = request.Form.StateJson

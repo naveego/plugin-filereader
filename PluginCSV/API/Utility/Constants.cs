@@ -5,5 +5,9 @@ namespace PluginCSV.API.Utility
         public static string SchemaName = "plugincsv";
         public static string DbFolder = "db";
         public static string DbFile = "plugincsv.db";
+        
+        public static string ImportMetaDataTableName = "naveego_import_metadata";
+        public static string ImportMetaDataPathColumn = "path";
+        public static string ImportMetaDataLastModifiedDate = "last_modified";
     }
 }
