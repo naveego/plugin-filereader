@@ -29,8 +29,17 @@ namespace PluginCSV.API.Read
                 CommandText = schema.Query
             };
 
-            var reader = cmd.ExecuteReader();
-
+            SqlDatabaseDataReader reader;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                yield break;
+            }
+            
             if (reader.HasRows)
             {
                 while (reader.Read())

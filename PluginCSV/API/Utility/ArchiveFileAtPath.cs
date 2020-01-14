@@ -10,8 +10,9 @@ namespace PluginCSV.API.Utility
         {
             try
             {
-                var archiveFilePath = $"{archivePath.TrimEnd('/')}/{Path.GetFileNameWithoutExtension(path)}";
+                var archiveFilePath = $"{archivePath.TrimEnd('/')}/{Path.GetFileName(path)}";
                 File.Copy(path, archiveFilePath, true);
+                DeleteFileAtPath(path);
             }
             catch (Exception e)
             {

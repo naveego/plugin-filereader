@@ -191,17 +191,26 @@ namespace PluginCSV.Plugin
             
                 var schemaMetaJson = JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
 
-                if (!string.IsNullOrEmpty(schemaMetaJson.Directory))
+                if (schemaMetaJson != null)
                 {
-                    var pathsDictionary = _server.Settings.GetAllFilesByDirectory();
-                    paths.AddRange(pathsDictionary[schemaMetaJson.Directory]);
-                
-                    var schemaName = Constants.SchemaName;
-                    var tableName = Directory.GetParent(paths.First()).Name;
-            
-                    Utility.LoadDirectoryFilesIntoDb(_importExportFactory, conn, _server.Settings, tableName, schemaName, paths);
+                    if (!string.IsNullOrEmpty(schemaMetaJson.Directory))
+                    {
+                        var pathsDictionary = _server.Settings.GetAllFilesByDirectory();
+                        paths.AddRange(pathsDictionary[schemaMetaJson.Directory]);
+                        
+                        var schemaName = Constants.SchemaName;
+                        var tableName = new DirectoryInfo(schemaMetaJson.Directory).Name;
+                        if (paths.Count > 0)
+                        {
+                            Utility.LoadDirectoryFilesIntoDb(_importExportFactory, conn, _server.Settings, tableName, schemaName, paths);
+                        }
+                        else
+                        {
+                            Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
+                        }
+                    }
                 }
-                
+
                 var recordsCount = 0;
 
                 var records = Read.ReadRecords(schema);
@@ -220,9 +229,7 @@ namespace PluginCSV.Plugin
                 }
 
                 Logger.Info($"Published {recordsCount} records");
-
-                var schemaPublisherMetaJson =
-                    JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
+                
                 switch (_server.Settings.CleanupAction)
                 {
                     case "delete":

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Newtonsoft.Json;
 using PluginCSV.API.Utility;
+using PluginCSV.DataContracts;
 using PluginCSV.Helper;
 using Pub;
 using Xunit;
@@ -395,6 +396,242 @@ namespace PluginCSVTest.Plugin
 
             // assert
             Assert.Equal(2000, records.Count);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamInvalidQueryBasedSchemaTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+            
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+
+            var request = new ReadRequest()
+            {
+                Schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[NOPE]")
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverAllRequest);
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            Assert.Empty(records);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamDirectoryBasedSchemaTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+            
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                Directory = ReadPath
+            });
+
+            var request = new ReadRequest()
+            {
+                Schema = schema
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverAllRequest);
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(2000, records.Count);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamCleanUpArchiveTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings("archive");
+            
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                Directory = ReadPath
+            });
+
+            var request = new ReadRequest()
+            {
+                Schema = schema
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverAllRequest);
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+            
+            var readFiles = Directory.GetFiles(ReadPath, DefaultFilters.First());
+            var archiveFiles = Directory.GetFiles(ArchivePath, DefaultFilters.First());
+            
+            var secondResponse = client.ReadStream(request);
+            var secondResponseStream = secondResponse.ResponseStream;
+            var secondRecords = new List<Record>();
+            while (await secondResponseStream.MoveNext())
+            {
+                secondRecords.Add(secondResponseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(2000, records.Count);
+            Assert.Empty(secondRecords);
+            Assert.Empty(readFiles);
+            Assert.Equal(2, archiveFiles.Length);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamCleanUpDeleteTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings("delete");
+            
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                Directory = ReadPath
+            });
+
+            var request = new ReadRequest()
+            {
+                Schema = schema
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverAllRequest);
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+            
+            var readFiles = Directory.GetFiles(ReadPath, DefaultFilters.First());
+            var archiveFiles = Directory.GetFiles(ArchivePath, DefaultFilters.First());
+            
+            var secondResponse = client.ReadStream(request);
+            var secondResponseStream = secondResponse.ResponseStream;
+            var secondRecords = new List<Record>();
+            while (await secondResponseStream.MoveNext())
+            {
+                secondRecords.Add(secondResponseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(2000, records.Count);
+            Assert.Empty(secondRecords);
+            Assert.Empty(readFiles);
+            Assert.Empty(archiveFiles);
 
             // cleanup
             await channel.ShutdownAsync();
