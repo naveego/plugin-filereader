@@ -30,7 +30,7 @@
   },
   "configSchema": {
     "ui": {
-      "ui:order": ["RootPath", "HasHeader", "Delimiter", "Filters", "CleanupAction", "ArchivePath"]
+      "ui:order": ["RootPaths", "HasHeader", "Delimiter", "Filters", "CleanupAction", "ArchivePath"]
     },
     "schema": {
       "type": "object",
@@ -88,7 +88,7 @@
           "pattern": ""
         }
       },
-      "required": ["RootPath"]
+      "required": ["RootPaths"]
     }
   }
 }

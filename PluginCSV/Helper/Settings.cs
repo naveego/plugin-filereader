@@ -41,7 +41,7 @@ namespace PluginCSV.Helper
         /// Gets all files from location defined by RootPath and Filters and returns in a flat list
         /// </summary>
         /// <returns></returns>
-        public List<string> GetAllFiles()
+        private List<string> GetAllFiles()
         {
             var files = new List<string>();
             foreach (var rootPath in RootPaths)
