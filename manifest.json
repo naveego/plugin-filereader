@@ -1,7 +1,7 @@
 {
   "id": "plugin-pub-csv",
-  "displayName": "CSV Publisher",
-  "description": "Publisher which extracts data from CSV (RFC 4180) files.",
+  "displayName": "Delimited Flat File Reader",
+  "description": "Publisher which extracts data from delimited flat files.",
   "apiVersion": "2",
   "versionDescription": "Version 4",
   "version": "4.0.0",
@@ -37,7 +37,7 @@
       "properties": {
         "RootPaths": {
           "title": "Root Paths",
-          "description": "The folder(s) containing CSV files.",
+          "description": "The folder(s) containing the files.",
           "type": "array",
           "items": {
             "type": "string",
