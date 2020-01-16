@@ -27,15 +27,17 @@ namespace PluginCSVTest.Plugin
         private void PrepareTestEnvironment(bool configureInvalid)
         {
             File.Delete(DatabasePath);
-            
+
             foreach (var filePath in Directory.GetFiles(ArchivePath))
             {
                 File.Delete(filePath);
             }
+
             foreach (var filePath in Directory.GetFiles(ReadPath))
             {
                 File.Delete(filePath);
             }
+
             foreach (var filePath in Directory.GetFiles(ReadDifferentPath))
             {
                 File.Delete(filePath);
@@ -54,16 +56,17 @@ namespace PluginCSVTest.Plugin
                         ? $"{Path.Join(ReadDifferentPath, Path.GetFileName(filePath))}"
                         : $"{Path.Join(ReadPath, Path.GetFileName(filePath))}";
                 }
+
                 File.Copy(filePath, targetPath, true);
             }
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, char delimiter = ',',
-            List<string> filters = null)
+            List<string> filters = null, bool multiRoot = false)
         {
             var settings = new Settings
             {
-                RootPaths = new List<string> {ReadPath},
+                RootPaths = multiRoot ? new List<string> {ReadPath, ReadDifferentPath} : new List<string> {ReadPath},
                 Filters = filters ?? DefaultFilters,
                 Delimiter = delimiter,
                 HasHeader = true,
@@ -78,7 +81,7 @@ namespace PluginCSVTest.Plugin
                 OauthStateJson = ""
             };
         }
-        
+
         private Schema GetTestSchema(string query)
         {
             return new Schema
@@ -208,12 +211,12 @@ namespace PluginCSVTest.Plugin
             Assert.Equal(PropertyType.String, property.Type);
             Assert.False(property.IsKey);
             Assert.True(property.IsNullable);
-            
+
             // cleanup
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasMultipleAllTest()
         {
@@ -231,7 +234,7 @@ namespace PluginCSVTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings();
+            var connectRequest = GetConnectSettings(null, ',', null, true);
 
             var request = new DiscoverSchemasRequest
             {
@@ -246,7 +249,7 @@ namespace PluginCSVTest.Plugin
 
             // assert
             Assert.IsType<DiscoverSchemasResponse>(response);
-            Assert.Single(response.Schemas);
+            Assert.Equal(2, response.Schemas.Count);
 
             var schema = response.Schemas[0];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
@@ -264,12 +267,29 @@ namespace PluginCSVTest.Plugin
             Assert.Equal(PropertyType.String, property.Type);
             Assert.False(property.IsKey);
             Assert.True(property.IsNullable);
-            
+
+            var schema2 = response.Schemas[1];
+            Assert.Equal($"[{Constants.SchemaName}].[ReadDirectoryDifferent]", schema2.Id);
+            Assert.Equal("ReadDirectoryDifferent", schema2.Name);
+            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectoryDifferent]", schema2.Query);
+            Assert.Equal(Count.Types.Kind.Exact, schema2.Count.Kind);
+            Assert.Equal(1000, schema2.Count.Value);
+            Assert.Equal(10, schema2.Sample.Count);
+            Assert.Equal(4, schema2.Properties.Count);
+
+            var property2 = schema2.Properties[0];
+            Assert.Equal("id", property2.Id);
+            Assert.Equal("id", property2.Name);
+            Assert.Equal("", property2.Description);
+            Assert.Equal(PropertyType.String, property2.Type);
+            Assert.False(property2.IsKey);
+            Assert.True(property2.IsNullable);
+
             // cleanup
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasAllDelimiterTest()
         {
@@ -287,7 +307,7 @@ namespace PluginCSVTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings("none", '|', new List<string>{"*.psv"});
+            var connectRequest = GetConnectSettings("none", '|', new List<string> {"*.psv"});
 
             var request = new DiscoverSchemasRequest
             {
@@ -307,7 +327,7 @@ namespace PluginCSVTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasRefreshTest()
         {
@@ -326,7 +346,7 @@ namespace PluginCSVTest.Plugin
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
+
             var discoverAllRequest = new DiscoverSchemasRequest
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
@@ -352,7 +372,7 @@ namespace PluginCSVTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamQueryBasedSchemaTest()
         {
@@ -371,7 +391,7 @@ namespace PluginCSVTest.Plugin
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
+
             var discoverAllRequest = new DiscoverSchemasRequest
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
@@ -401,7 +421,7 @@ namespace PluginCSVTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamInvalidQueryBasedSchemaTest()
         {
@@ -420,7 +440,7 @@ namespace PluginCSVTest.Plugin
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
+
             var discoverAllRequest = new DiscoverSchemasRequest
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
@@ -449,7 +469,7 @@ namespace PluginCSVTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamDirectoryBasedSchemaTest()
         {
@@ -468,7 +488,7 @@ namespace PluginCSVTest.Plugin
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
+
             var discoverAllRequest = new DiscoverSchemasRequest
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
@@ -503,7 +523,7 @@ namespace PluginCSVTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamCleanUpArchiveTest()
         {
@@ -522,7 +542,7 @@ namespace PluginCSVTest.Plugin
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings("archive");
-            
+
             var discoverAllRequest = new DiscoverSchemasRequest
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
@@ -548,10 +568,10 @@ namespace PluginCSVTest.Plugin
             {
                 records.Add(responseStream.Current);
             }
-            
+
             var readFiles = Directory.GetFiles(ReadPath, DefaultFilters.First());
             var archiveFiles = Directory.GetFiles(ArchivePath, DefaultFilters.First());
-            
+
             var secondResponse = client.ReadStream(request);
             var secondResponseStream = secondResponse.ResponseStream;
             var secondRecords = new List<Record>();
@@ -570,7 +590,7 @@ namespace PluginCSVTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamCleanUpDeleteTest()
         {
@@ -589,7 +609,7 @@ namespace PluginCSVTest.Plugin
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings("delete");
-            
+
             var discoverAllRequest = new DiscoverSchemasRequest
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
@@ -615,10 +635,10 @@ namespace PluginCSVTest.Plugin
             {
                 records.Add(responseStream.Current);
             }
-            
+
             var readFiles = Directory.GetFiles(ReadPath, DefaultFilters.First());
             var archiveFiles = Directory.GetFiles(ArchivePath, DefaultFilters.First());
-            
+
             var secondResponse = client.ReadStream(request);
             var secondResponseStream = secondResponse.ResponseStream;
             var secondRecords = new List<Record>();

@@ -1,7 +1,7 @@
 {
   "id": "plugin-pub-csv",
-  "displayName": "Delimited Flat File Reader",
-  "description": "Publisher which extracts data from delimited flat files.",
+  "displayName": "File Reader",
+  "description": "Publisher which extracts data from delimited and fixed width column flat files.",
   "apiVersion": "2",
   "versionDescription": "Version 4",
   "version": "4.0.0",

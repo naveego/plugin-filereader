@@ -160,8 +160,8 @@ namespace PluginCSV.API.CSV
                     cmd.ExecuteNonQuery(); // Create table
 
                     dt = SQLDatabaseConnection.GetSchema("Columns", new string[] {$"[{SchemaName}].[{TableName}]"});
-                    if (dt.Rows.Count != 6)
-                        throw new Exception("Unable to create or find table.");
+                    // if (dt.Rows.Count != 6)
+                    //     throw new Exception("Unable to create or find table.");
                 }
 
 
