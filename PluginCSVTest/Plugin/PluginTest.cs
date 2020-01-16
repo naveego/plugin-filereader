@@ -16,7 +16,7 @@ namespace PluginCSVTest.Plugin
 {
     public class PluginTest
     {
-        private readonly string DatabasePath = $"{Constants.DbFolder}/{Constants.DbFile}";
+        private readonly string DatabasePath = $"{Path.Join(Constants.DbFolder, Constants.DbFile)}";
         private const string BasePath = "../../../MockData/Data";
         private const string ReadPath = "../../../MockData/ReadDirectory";
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
@@ -46,13 +46,13 @@ namespace PluginCSVTest.Plugin
                 var targetPath = "";
                 if (configureInvalid)
                 {
-                    targetPath = $"{ReadPath}/{Path.GetFileName(filePath)}";
+                    targetPath = $"{Path.Join(ReadPath, Path.GetFileName(filePath))}";
                 }
                 else
                 {
                     targetPath = filePath.Contains("DIFFERENT")
-                        ? $"{ReadDifferentPath}/{Path.GetFileName(filePath)}"
-                        : $"{ReadPath}/{Path.GetFileName(filePath)}";
+                        ? $"{Path.Join(ReadDifferentPath, Path.GetFileName(filePath))}"
+                        : $"{Path.Join(ReadPath, Path.GetFileName(filePath))}";
                 }
                 File.Copy(filePath, targetPath, true);
             }

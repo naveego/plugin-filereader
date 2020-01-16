@@ -12,8 +12,10 @@ namespace PluginCSV.API.Utility
             Settings settings,
             string tableName, string schemaName, string path)
         {
+            Logger.Info($"Loading file: {path}");
             var importExportFile = factory.MakeImportExportFile(conn, tableName, schemaName, settings.Delimiter);
             var rowsWritten = importExportFile.ImportTable(path, settings.HasHeader);
+            Logger.Info($"Loaded file {path} with {rowsWritten} rows");
 
             return rowsWritten;
         }

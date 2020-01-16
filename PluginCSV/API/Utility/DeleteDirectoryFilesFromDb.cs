@@ -10,6 +10,7 @@ namespace PluginCSV.API.Utility
         {
             try
             {
+                Logger.Info($"Purging data from table: [{schemaName}].[{tableName}]");
                 var cmd = new SqlDatabaseCommand
                 {
                     Connection = conn,
@@ -22,6 +23,7 @@ namespace PluginCSV.API.Utility
             catch (Exception e)
             {
                 Logger.Error(e.Message);
+                Logger.Error("Skipping delete");
             }
         }
     }

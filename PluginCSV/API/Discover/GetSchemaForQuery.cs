@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Linq;
+using PluginCSV.API.Utility;
 using Pub;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -10,7 +11,7 @@ namespace PluginCSV.API.Discover
     {
         public static Schema GetSchemaForQuery(Schema schema, int sampleSize = 5)
         {
-            var conn = Utility.Utility.GetSqlConnection();
+            var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
             var cmd = new SqlDatabaseCommand
             {
@@ -56,10 +57,10 @@ namespace PluginCSV.API.Discover
                 }
             }
 
-            var records = Read.Read.ReadRecords(schema).Take(sampleSize);
+            var records = Read.Read.ReadRecords(schema, Constants.DiscoverDbPrefix).Take(sampleSize);
             schema.Sample.AddRange(records);
 
-            schema.Count = Read.Read.GetCountOfRecords(schema);
+            schema.Count = Read.Read.GetCountOfRecords(schema, Constants.DiscoverDbPrefix);
             schema.PublisherMetaJson = "";
 
             return schema;

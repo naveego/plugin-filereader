@@ -9,9 +9,9 @@ namespace PluginCSV.API.Read
 {
     public static partial class Read
     {
-        public static Count GetCountOfRecords(Schema schema)
+        public static Count GetCountOfRecords(Schema schema, string dbFilePrefix)
         {
-            var conn = Utility.Utility.GetSqlConnection();
+            var conn = Utility.Utility.GetSqlConnection(dbFilePrefix);
 
             var cmd = new SqlDatabaseCommand
             {

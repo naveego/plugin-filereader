@@ -30,7 +30,15 @@
   },
   "configSchema": {
     "ui": {
-      "ui:order": ["RootPaths", "HasHeader", "Delimiter", "Filters", "CleanupAction", "ArchivePath"]
+      "ui:order": [
+        "RootPaths",
+        "Filters",
+        "CleanupAction",
+        "ArchivePath",
+        "HasHeader",
+        "Delimiter",
+        "Columns"
+      ]
     },
     "schema": {
       "type": "object",
@@ -42,7 +50,9 @@
           "items": {
             "type": "string",
             "default": "",
-            "examples": ["path/to/folder"]
+            "examples": [
+              "path/to/folder"
+            ]
           }
         },
         "Filters": {
@@ -52,7 +62,9 @@
           "items": {
             "type": "string",
             "default": "*.csv",
-            "examples": ["*.csv"]
+            "examples": [
+              "*.csv"
+            ]
           }
         },
         "CleanupAction": {
@@ -60,35 +72,93 @@
           "title": "Cleanup Action",
           "description": "Action taken to clean up after reading.",
           "default": "nothing",
-          "examples": ["string"],
-          "enum": ["nothing", "delete", "archive"]
+          "examples": [
+            "string"
+          ],
+          "enum": [
+            "nothing",
+            "delete",
+            "archive"
+          ]
         },
         "ArchivePath": {
           "type": "string",
           "title": "Archive Folder",
           "description": "The folder to move files to after processing, if cleanup action is \"archive\".",
           "default": "",
-          "examples": ["string"]
-        },
-        "HasHeader": {
-          "type": "boolean",
-          "title": "Has Header ",
-          "description": "Does the file have a header row?",
-          "default": false,
-          "examples": [true]
-        },
-        "Delimiter": {
-          "type": "string",
-          "title": "Delimiter",
-          "description": "The delimiter for CSV files.",
-          "default": ",",
-          "examples": [",", "|"],
-          "minLength": 1,
-          "maxLength": 1,
-          "pattern": ""
+          "examples": [
+            "string"
+          ]
         }
       },
-      "required": ["RootPaths"]
+      "anyOf": [
+        {
+          "title": "Delimited File",
+          "properties": {
+            "HasHeader": {
+              "type": "boolean",
+              "title": "Has Header ",
+              "description": "Does the file have a header row?",
+              "default": false,
+              "examples": [
+                true
+              ]
+            },
+            "Delimiter": {
+              "type": "string",
+              "title": "Delimiter",
+              "description": "The delimiter for delimited files.",
+              "default": ",",
+              "examples": [
+                ",",
+                "|"
+              ],
+              "minLength": 1,
+              "maxLength": 1,
+              "pattern": ""
+            }
+          }
+        },
+        {
+          "title": "Fixed Column Width File",
+          "properties": {
+            "Columns": {
+              "type": "array",
+              "title": "Columns",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "ColumnName": {
+                    "title": "Column Name",
+                    "description": "The name of the column.",
+                    "type": "string"
+                  },
+                  "ColumnStart": {
+                    "title": "Column Start",
+                    "description": "The index of the first character of the column.",
+                    "type": "number"
+                  },
+                  "ColumnEnd": {
+                    "title": "Column End",
+                    "description": "The index of the last character of the column.",
+                    "type": "number"
+                  },
+                  "IsKey": {
+                    "title": "Is Key",
+                    "description": "Is this column the key property?",
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                "required": ["ColumnName", "ColumnStart", "ColumnEnd"]
+              }
+            }
+          }
+        }
+      ],
+      "required": [
+        "RootPaths"
+      ]
     }
   }
 }

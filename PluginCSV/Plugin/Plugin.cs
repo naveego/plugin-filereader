@@ -181,13 +181,14 @@ namespace PluginCSV.Plugin
             var schema = request.Schema;
             var limit = request.Limit;
             var limitFlag = request.Limit != 0;
+            var jobId = request.JobId;
 
             Logger.Info($"Publishing records for schema: {schema.Name}");
 
             try
             {
                 var paths = new List<string>();
-                var conn = Utility.GetSqlConnection();
+                var conn = Utility.GetSqlConnection(jobId);
             
                 var schemaMetaJson = JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
 
@@ -213,7 +214,7 @@ namespace PluginCSV.Plugin
 
                 var recordsCount = 0;
 
-                var records = Read.ReadRecords(schema);
+                var records = Read.ReadRecords(schema, jobId);
 
                 foreach (var record in records)
                 {

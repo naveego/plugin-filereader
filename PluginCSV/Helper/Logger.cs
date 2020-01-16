@@ -25,6 +25,7 @@ namespace PluginCSV.Helper
         /// <param name="message"></param>
         private static void Log(string message)
         {
+            while(_readWriteLock.IsWriteLockHeld){}
             // Set Status to Locked
             _readWriteLock.EnterWriteLock();
             try
@@ -68,7 +69,7 @@ namespace PluginCSV.Helper
                 return;
             }
             
-            Log(message);
+            Log($"VERBOSE: {message}");
         }
         
         /// <summary>
@@ -82,7 +83,7 @@ namespace PluginCSV.Helper
                 return;
             }
             
-            Log(message);
+            Log($"DEBUG: {message}");
         }
         /// <summary>
         /// Logging method for Info messages
@@ -95,7 +96,7 @@ namespace PluginCSV.Helper
                 return;
             }
             
-            Log(message);
+            Log($"INFO: {message}");
         }
         
         /// <summary>
@@ -109,7 +110,7 @@ namespace PluginCSV.Helper
                 return;
             }
             
-            Log(message);
+            Log($"ERROR: {message}");
         }
 
         /// <summary>

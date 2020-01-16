@@ -18,10 +18,11 @@ namespace PluginCSV.API.Read
         /// Reads records for schema
         /// </summary>
         /// <param name="schema"></param>
+        /// <param name="dbFilePrefix"></param>
         /// <returns>Records from the file</returns>
-        public static IEnumerable<Record> ReadRecords(Schema schema)
+        public static IEnumerable<Record> ReadRecords(Schema schema, string dbFilePrefix)
         {
-            var conn = Utility.Utility.GetSqlConnection();
+            var conn = Utility.Utility.GetSqlConnection(dbFilePrefix);
 
             var cmd = new SqlDatabaseCommand
             {

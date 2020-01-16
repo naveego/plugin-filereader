@@ -24,7 +24,7 @@ namespace PluginCSV.API.Discover
             var tableName = Directory.GetParent(paths.First()).Name;
             var schemaId = $"[{schemaName}].[{tableName}]";
             
-            var conn = Utility.Utility.GetSqlConnection();
+            var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
             
             Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, settings, tableName, schemaName, paths);
             

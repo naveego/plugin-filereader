@@ -10,7 +10,7 @@ namespace PluginCSV.API.Utility
         {
             try
             {
-                var archiveFilePath = $"{archivePath.TrimEnd('/')}/{Path.GetFileName(path)}";
+                var archiveFilePath = $"{Path.Join(archivePath, Path.GetFileName(path))}";
                 File.Copy(path, archiveFilePath, true);
                 DeleteFileAtPath(path);
             }

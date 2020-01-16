@@ -9,10 +9,15 @@ namespace PluginCSV.Helper
     {
         public List<string> RootPaths { get; set; }
         public List<string> Filters { get; set; }
-        public bool HasHeader { get; set; }
-        public char Delimiter { get; set; }
         public string CleanupAction { get; set; }
         public string ArchivePath { get; set; }
+        
+        // FLAT FILE MODE SETTINGS
+        public bool HasHeader { get; set; }
+        public char Delimiter { get; set; }
+        
+        // FIXED COLUMN WIDTH MODE SETTINGS
+        public List<Column> Columns { get; set; }
 
 
         /// <summary>
@@ -99,5 +104,13 @@ namespace PluginCSV.Helper
         {
             return GetAllFiles().Count != 0;
         }
+    }
+
+    public class Column
+    {
+        public string ColumnName { get; set; }
+        public bool IsKey { get; set; }
+        public int ColumnStart { get; set; }
+        public int ColumnEnd { get; set; }
     }
 }
