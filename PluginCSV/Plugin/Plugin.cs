@@ -187,28 +187,21 @@ namespace PluginCSV.Plugin
 
             try
             {
-                var paths = new List<string>();
                 var conn = Utility.GetSqlConnection(jobId);
-            
-                var schemaMetaJson = JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
+                var filesByDirectory = _server.Settings.GetAllFilesByDirectory();
 
-                if (schemaMetaJson != null)
+                foreach (var (directory, files) in filesByDirectory)
                 {
-                    if (!string.IsNullOrEmpty(schemaMetaJson.Directory))
+                    var schemaName = Constants.SchemaName;
+                    var tableName = new DirectoryInfo(directory).Name;
+                    
+                    if (files.Count > 0)
                     {
-                        var pathsDictionary = _server.Settings.GetAllFilesByDirectory();
-                        paths.AddRange(pathsDictionary[schemaMetaJson.Directory]);
-                        
-                        var schemaName = Constants.SchemaName;
-                        var tableName = new DirectoryInfo(schemaMetaJson.Directory).Name;
-                        if (paths.Count > 0)
-                        {
-                            Utility.LoadDirectoryFilesIntoDb(_importExportFactory, conn, _server.Settings, tableName, schemaName, paths);
-                        }
-                        else
-                        {
-                            Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
-                        }
+                        Utility.LoadDirectoryFilesIntoDb(_importExportFactory, conn, _server.Settings, tableName, schemaName, files);
+                    }
+                    else
+                    {
+                        Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
                     }
                 }
 
@@ -231,6 +224,7 @@ namespace PluginCSV.Plugin
 
                 Logger.Info($"Published {recordsCount} records");
                 
+                var paths = _server.Settings.GetAllFiles();
                 switch (_server.Settings.CleanupAction)
                 {
                     case "delete":

@@ -32,8 +32,7 @@ namespace PluginCSV.API.Discover
                 .ToArray();
 
             var schema =  schemas.Last();
-            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson {Directory = directoryPath});
-            
+
             return schema;
         }
     }

@@ -61,7 +61,6 @@ namespace PluginCSV.API.Discover
             schema.Sample.AddRange(records);
 
             schema.Count = Read.Read.GetCountOfRecords(schema, Constants.DiscoverDbPrefix);
-            schema.PublisherMetaJson = "";
 
             return schema;
         }

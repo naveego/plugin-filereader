@@ -14,7 +14,7 @@ using Record = Pub.Record;
 
 namespace PluginCSVTest.Plugin
 {
-    public class PluginTest
+    public class DelimitiedPluginTest
     {
         private readonly string DatabasePath = $"{Path.Join(Constants.DbFolder, Constants.DbFile)}";
         private const string BasePath = "../../../MockData/Data";

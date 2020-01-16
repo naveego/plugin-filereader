@@ -10,12 +10,12 @@ namespace PluginCSV.API.Utility
         {
             try
             {
-                Logger.Info($"Purging data from table: [{schemaName}].[{tableName}]");
+                Logger.Info($"Purging table: [{schemaName}].[{tableName}]");
                 var cmd = new SqlDatabaseCommand
                 {
                     Connection = conn,
                     CommandText =
-                        $@"DELETE FROM [{schemaName}].[{tableName}]"
+                        $@"DROP TABLE IF EXISTS [{schemaName}].[{tableName}]"
                 };
             
                 cmd.ExecuteNonQuery();
