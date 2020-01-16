@@ -390,7 +390,7 @@ namespace PluginCSVTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings();
+            var connectRequest = GetConnectSettings(null, ',', null, true);
 
             var discoverAllRequest = new DiscoverSchemasRequest
             {
@@ -399,7 +399,10 @@ namespace PluginCSVTest.Plugin
 
             var request = new ReadRequest()
             {
-                Schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]")
+                Schema = GetTestSchema($@"select a.id, a.first_name, a.last_name, b.car_make
+from ReadDirectory as a
+inner join ReadDirectoryDifferent as b
+on a.id = b.id")
             };
 
             // act
@@ -415,7 +418,7 @@ namespace PluginCSVTest.Plugin
             }
 
             // assert
-            Assert.Equal(2000, records.Count);
+            Assert.Equal(1000, records.Count);
 
             // cleanup
             await channel.ShutdownAsync();
