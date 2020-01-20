@@ -31,13 +31,7 @@
   "configSchema": {
     "ui": {
       "ui:order": [
-        "RootPaths",
-        "Filters",
-        "CleanupAction",
-        "ArchivePath",
-        "HasHeader",
-        "Delimiter",
-        "Columns"
+        "RootPaths"
       ]
     },
     "schema": {
@@ -47,101 +41,102 @@
           "title": "Root Paths",
           "description": "The folder(s) containing the files.",
           "type": "array",
-          "items": {
-            "type": "string",
-            "default": "",
-            "examples": [
-              "path/to/folder"
-            ]
-          }
-        },
-        "Filters": {
-          "type": "array",
-          "description": "Filters used to select files beneath the root path. Each filter should be a regular expression.",
           "minItems": 1,
-          "items": {
-            "type": "string",
-            "default": "*.csv",
-            "examples": [
-              "*.csv"
-            ]
-          }
-        },
-        "CleanupAction": {
-          "type": "string",
-          "title": "Cleanup Action",
-          "description": "Action taken to clean up after reading.",
-          "default": "nothing",
-          "examples": [
-            "string"
-          ],
-          "enum": [
-            "nothing",
-            "delete",
-            "archive"
-          ]
-        },
-        "ArchivePath": {
-          "type": "string",
-          "title": "Archive Folder",
-          "description": "The folder to move files to after processing, if cleanup action is \"archive\".",
-          "default": "",
-          "examples": [
-            "string"
-          ]
-        },
-        "HasHeader": {
-          "type": "boolean",
-          "title": "Has Header ",
-          "description": "Does the file have a header row?",
-          "default": false,
-          "examples": [
-            true
-          ]
-        },
-        "Delimiter": {
-          "type": "string",
-          "title": "Delimiter",
-          "description": "The delimiter for delimited files.",
-          "default": ",",
-          "examples": [
-            ",",
-            "|"
-          ],
-          "minLength": 1,
-          "maxLength": 1,
-          "pattern": ""
-        },
-        "Columns": {
-          "type": "array",
-          "title": "Columns",
-          "description": "Columns for fixed column width files",
           "items": {
             "type": "object",
             "properties": {
-              "ColumnName": {
-                "title": "Column Name",
-                "description": "The name of the column.",
+              "RootPath": {
+                "title": "Root Path",
+                "description": "The folder containing the files",
                 "type": "string"
               },
-              "ColumnStart": {
-                "title": "Column Start",
-                "description": "The index of the first character of the column.",
-                "type": "number"
+              "Filter": {
+                "type": "string",
+                "description": "Filters used to select files beneath the root path. Each filter should be a regular expression.",
+                "default": "*.csv"
               },
-              "ColumnEnd": {
-                "title": "Column End",
-                "description": "The index of the last character of the column.",
-                "type": "number"
+              "CleanupAction": {
+                "type": "string",
+                "title": "Cleanup Action",
+                "description": "Action taken to clean up after reading.",
+                "default": "nothing",
+                "examples": [
+                  "string"
+                ],
+                "enum": [
+                  "Nothing",
+                  "Delete",
+                  "Archive"
+                ]
               },
-              "IsKey": {
-                "title": "Is Key",
-                "description": "Is this column the key property?",
+              "ArchivePath": {
+                "type": "string",
+                "title": "Archive Folder",
+                "description": "The folder to move files to after processing, if cleanup action is \"archive\".",
+                "default": "",
+                "examples": [
+                  "string"
+                ]
+              },
+              "HasHeader": {
+                "type": "boolean",
+                "title": "Has Header ",
+                "description": "Does the file have a header row?",
                 "default": false,
-                "type": "boolean"
+                "examples": [
+                  true
+                ]
+              },
+              "Delimiter": {
+                "type": "string",
+                "title": "Delimiter",
+                "description": "The delimiter for delimited files.",
+                "default": ",",
+                "examples": [
+                  ",",
+                  "|"
+                ],
+                "minLength": 1,
+                "maxLength": 1,
+                "pattern": ""
+              },
+              "Columns": {
+                "type": "array",
+                "title": "Columns",
+                "description": "Columns for fixed column width files",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ColumnName": {
+                      "title": "Column Name",
+                      "description": "The name of the column.",
+                      "type": "string"
+                    },
+                    "ColumnStart": {
+                      "title": "Column Start",
+                      "description": "The index of the first character of the column.",
+                      "type": "number"
+                    },
+                    "ColumnEnd": {
+                      "title": "Column End",
+                      "description": "The index of the last character of the column.",
+                      "type": "number"
+                    },
+                    "IsKey": {
+                      "title": "Is Key",
+                      "description": "Is this column the key property?",
+                      "default": false,
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["ColumnName", "ColumnStart", "ColumnEnd"]
+                }
               }
             },
-            "required": ["ColumnName", "ColumnStart", "ColumnEnd"]
+            "required": [
+              "RootPath",
+              "Filter"
+            ]
           }
         }
       },

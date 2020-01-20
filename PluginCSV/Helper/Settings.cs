@@ -7,18 +7,7 @@ namespace PluginCSV.Helper
 {
     public class Settings
     {
-        public List<string> RootPaths { get; set; }
-        public List<string> Filters { get; set; }
-        public string CleanupAction { get; set; }
-        public string ArchivePath { get; set; }
-        
-        // FLAT FILE MODE SETTINGS
-        public bool HasHeader { get; set; }
-        public char Delimiter { get; set; }
-        
-        // FIXED COLUMN WIDTH MODE SETTINGS
-        public List<Column> Columns { get; set; }
-
+        public List<RootPathObject> RootPaths { get; set; }
 
         /// <summary>
         /// Validates the settings input object
@@ -46,15 +35,12 @@ namespace PluginCSV.Helper
         /// Gets all files from location defined by RootPath and Filters and returns in a flat list
         /// </summary>
         /// <returns></returns>
-        public List<string> GetAllFiles()
+        private List<string> GetAllFiles()
         {
             var files = new List<string>();
             foreach (var rootPath in RootPaths)
             {
-                foreach (var fileFilter in Filters)
-                {
-                    files.AddRange(Directory.GetFiles(rootPath, fileFilter));
-                }
+                files.AddRange(Directory.GetFiles(rootPath.RootPath, rootPath.Filter));
             }
             
             return files;
@@ -69,12 +55,16 @@ namespace PluginCSV.Helper
             var filesByDirectory = new Dictionary<string, List<string>>();
             foreach (var rootPath in RootPaths)
             {
-                var files = new List<string>();
-                foreach (var fileFilter in Filters)
+                if (filesByDirectory.TryGetValue(rootPath.RootPath, out var existingFiles))
                 {
-                    files.AddRange(Directory.GetFiles(rootPath, fileFilter));
+                    existingFiles.AddRange(Directory.GetFiles(rootPath.RootPath, rootPath.Filter));
                 }
-                filesByDirectory.Add(rootPath, files);
+                else
+                {
+                    var files = new List<string>();
+                    files.AddRange(Directory.GetFiles(rootPath.RootPath, rootPath.Filter));
+                    filesByDirectory.Add(rootPath.RootPath, files);
+                }
             }
             
             return filesByDirectory;
@@ -88,9 +78,9 @@ namespace PluginCSV.Helper
         {
             foreach (var rootPath in RootPaths)
             {
-                if (!Directory.Exists(rootPath))
+                if (!Directory.Exists(rootPath.RootPath))
                 {
-                    throw new Exception($"{rootPath} is not a directory");
+                    throw new Exception($"{rootPath.RootPath} is not a directory");
                 }
             }
             return true;
@@ -104,6 +94,21 @@ namespace PluginCSV.Helper
         {
             return GetAllFiles().Count != 0;
         }
+    }
+
+    public class RootPathObject
+    {
+        public string RootPath { get; set; }
+        public string Filter { get; set; }
+        public string CleanupAction { get; set; }
+        public string ArchivePath { get; set; }
+        
+        // FLAT FILE MODE SETTINGS
+        public bool HasHeader { get; set; }
+        public char Delimiter { get; set; }
+        
+        // FIXED COLUMN WIDTH MODE SETTINGS
+        public List<Column> Columns { get; set; }
     }
 
     public class Column

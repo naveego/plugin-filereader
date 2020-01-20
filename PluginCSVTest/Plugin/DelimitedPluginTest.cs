@@ -22,7 +22,7 @@ namespace PluginCSVTest.Plugin
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
         private const string ArchivePath = "../../../MockData/ArchiveDirectory";
         private const string DefaultCleanupAction = "none";
-        private readonly List<string> DefaultFilters = new List<string> {"*.csv"};
+        private const string DefaultFilter = "*.csv";
 
         private void PrepareTestEnvironment(bool configureInvalid)
         {
@@ -62,16 +62,43 @@ namespace PluginCSVTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, char delimiter = ',',
-            List<string> filters = null, bool multiRoot = false)
+            string filter = null, bool multiRoot = false)
         {
             var settings = new Settings
             {
-                RootPaths = multiRoot ? new List<string> {ReadPath, ReadDifferentPath} : new List<string> {ReadPath},
-                Filters = filters ?? DefaultFilters,
-                Delimiter = delimiter,
-                HasHeader = true,
-                CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                ArchivePath = ArchivePath
+                RootPaths = multiRoot? new List<RootPathObject>
+                {
+                    new RootPathObject
+                    {
+                        RootPath = ReadPath,
+                        Filter = filter ?? DefaultFilter,
+                        Delimiter = delimiter,
+                        HasHeader = true,
+                        CleanupAction = cleanupAction ?? DefaultCleanupAction,
+                        ArchivePath = ArchivePath
+                    },
+                    new RootPathObject
+                    {
+                        RootPath = ReadDifferentPath,
+                        Filter = filter ?? DefaultFilter,
+                        Delimiter = delimiter,
+                        HasHeader = true,
+                        CleanupAction = cleanupAction ?? DefaultCleanupAction,
+                        ArchivePath = ArchivePath
+                    }
+                } :
+                    new List<RootPathObject>
+                    {
+                        new RootPathObject
+                        {
+                            RootPath = ReadPath,
+                            Filter = filter ?? DefaultFilter,
+                            Delimiter = delimiter,
+                            HasHeader = true,
+                            CleanupAction = cleanupAction ?? DefaultCleanupAction,
+                            ArchivePath =ArchivePath
+                        }
+                    }
             };
 
             return new ConnectRequest
@@ -307,7 +334,7 @@ namespace PluginCSVTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings("none", '|', new List<string> {"*.psv"});
+            var connectRequest = GetConnectSettings("none", '|', "*.psv");
 
             var request = new DiscoverSchemasRequest
             {
@@ -544,7 +571,7 @@ on a.id = b.id")
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings("archive");
+            var connectRequest = GetConnectSettings("Archive");
 
             var discoverAllRequest = new DiscoverSchemasRequest
             {
@@ -572,8 +599,8 @@ on a.id = b.id")
                 records.Add(responseStream.Current);
             }
 
-            var readFiles = Directory.GetFiles(ReadPath, DefaultFilters.First());
-            var archiveFiles = Directory.GetFiles(ArchivePath, DefaultFilters.First());
+            var readFiles = Directory.GetFiles(ReadPath, DefaultFilter);
+            var archiveFiles = Directory.GetFiles(ArchivePath, DefaultFilter);
 
             var secondResponse = client.ReadStream(request);
             var secondResponseStream = secondResponse.ResponseStream;
@@ -611,7 +638,7 @@ on a.id = b.id")
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings("delete");
+            var connectRequest = GetConnectSettings("Delete");
 
             var discoverAllRequest = new DiscoverSchemasRequest
             {
@@ -639,8 +666,8 @@ on a.id = b.id")
                 records.Add(responseStream.Current);
             }
 
-            var readFiles = Directory.GetFiles(ReadPath, DefaultFilters.First());
-            var archiveFiles = Directory.GetFiles(ArchivePath, DefaultFilters.First());
+            var readFiles = Directory.GetFiles(ReadPath, DefaultFilter);
+            var archiveFiles = Directory.GetFiles(ArchivePath, DefaultFilter);
 
             var secondResponse = client.ReadStream(request);
             var secondResponseStream = secondResponse.ResponseStream;

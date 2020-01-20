@@ -9,12 +9,12 @@ namespace PluginCSV.API.Utility
     public static partial class Utility
     {
         private static int ImportRecordsForPath(IImportExportFactory factory, SqlDatabaseConnection conn,
-            Settings settings,
+            RootPathObject rootPath,
             string tableName, string schemaName, string path)
         {
-            Logger.Info($"Loading file: {path} Has Header: \"{settings.HasHeader}\" Delimiter: \"{settings.Delimiter}\"");
-            var importExportFile = factory.MakeImportExportFile(conn, tableName, schemaName, settings.Delimiter);
-            var rowsWritten = importExportFile.ImportTable(path, settings.HasHeader);
+            Logger.Info($"Loading file: {path} Has Header: \"{rootPath.HasHeader}\" Delimiter: \"{rootPath.Delimiter}\"");
+            var importExportFile = factory.MakeImportExportFile(conn, tableName, schemaName, rootPath.Delimiter);
+            var rowsWritten = importExportFile.ImportTable(path, rootPath.HasHeader);
             Logger.Info($"Loaded file {path} with {rowsWritten} rows");
 
             return rowsWritten;

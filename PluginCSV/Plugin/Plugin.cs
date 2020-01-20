@@ -128,9 +128,8 @@ namespace PluginCSV.Plugin
                     var files = _server.Settings.GetAllFilesByDirectory();
                     Logger.Info($"Schemas attempted: {files.Count}");
 
-                    var schemas = files.Select(p =>
-                            Discover.GetSchemaForDirectory(_importExportFactory, _server.Settings, p.Key, p.Value,
-                                sampleSize))
+                    var schemas = _server.Settings.RootPaths.Select(p =>
+                            Discover.GetSchemaForDirectory(_importExportFactory, p, files[p.RootPath], sampleSize))
                         .ToArray();
 
                     discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
@@ -190,14 +189,14 @@ namespace PluginCSV.Plugin
                 var conn = Utility.GetSqlConnection(jobId);
                 var filesByDirectory = _server.Settings.GetAllFilesByDirectory();
 
-                foreach (var (directory, files) in filesByDirectory)
+                foreach (var rootPath in _server.Settings.RootPaths)
                 {
+                    var files = filesByDirectory[rootPath.RootPath];
                     var schemaName = Constants.SchemaName;
-                    var tableName = new DirectoryInfo(directory).Name;
-                    
+                    var tableName = new DirectoryInfo(rootPath.RootPath).Name;
                     if (files.Count > 0)
                     {
-                        Utility.LoadDirectoryFilesIntoDb(_importExportFactory, conn, _server.Settings, tableName, schemaName, files);
+                        Utility.LoadDirectoryFilesIntoDb(_importExportFactory, conn, rootPath, tableName, schemaName, files);
                     }
                     else
                     {
@@ -224,23 +223,26 @@ namespace PluginCSV.Plugin
 
                 Logger.Info($"Published {recordsCount} records");
                 
-                var paths = _server.Settings.GetAllFiles();
-                switch (_server.Settings.CleanupAction)
+                foreach (var rootPath in _server.Settings.RootPaths)
                 {
-                    case "delete":
-                        foreach (var path in paths)
-                        {
-                            Logger.Info($"Deleting file {path}");
-                            Utility.DeleteFileAtPath(path); 
-                        }
-                        break;
-                    case "archive":
-                        foreach (var path in paths)
-                        {
-                            Logger.Info($"Archiving file {path} to {_server.Settings.ArchivePath}");
-                            Utility.ArchiveFileAtPath(path, _server.Settings.ArchivePath);
-                        }
-                        break;
+                    var files = filesByDirectory[rootPath.RootPath];
+                    switch (rootPath.CleanupAction)
+                    {
+                        case "Delete":
+                            foreach (var file in files)
+                            {
+                                Logger.Info($"Deleting file {file}");
+                                Utility.DeleteFileAtPath(file); 
+                            }
+                            break;
+                        case "Archive":
+                            foreach (var file in files)
+                            {
+                                Logger.Info($"Archiving file {file} to {rootPath.ArchivePath}");
+                                Utility.ArchiveFileAtPath(file, rootPath.ArchivePath);
+                            }
+                            break;
+                    }
                 }
             }
             catch (Exception e)
