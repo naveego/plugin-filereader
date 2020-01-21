@@ -55,11 +55,21 @@
                 "description": "Filters used to select files beneath the root path. Each filter should be a regular expression.",
                 "default": "*.csv"
               },
+              "Mode": {
+                "type": "string",
+                "title": "Mode",
+                "description": "Mode to use when reading target files.",
+                "default": "Delimited",
+                "enum": [
+                  "Delimited",
+                  "Fixed Width Columns"
+                ]
+              },
               "CleanupAction": {
                 "type": "string",
                 "title": "Cleanup Action",
                 "description": "Action taken to clean up after reading.",
-                "default": "nothing",
+                "default": "Nothing",
                 "examples": [
                   "string"
                 ],
@@ -96,7 +106,6 @@
                   ",",
                   "|"
                 ],
-                "minLength": 1,
                 "maxLength": 1,
                 "pattern": ""
               },

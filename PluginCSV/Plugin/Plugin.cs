@@ -23,12 +23,11 @@ namespace PluginCSV.Plugin
     {
         private readonly ServerStatus _server;
         private TaskCompletionSource<bool> _tcs;
-        private readonly IImportExportFactory _importExportFactory;
+        // private IImportExportFactory _importExportFactory;
 
         public Plugin()
         {
             _server = new ServerStatus();
-            _importExportFactory = new CsvImportExportFactory();
         }
 
         /// <summary>
@@ -66,6 +65,13 @@ namespace PluginCSV.Plugin
             _server.Connected = true;
 
             Logger.Info("Connected.");
+            
+            // TODO: switch case for which factory to use
+            switch(settings)
+            {
+                
+            }
+            // _importExportFactory = new CsvImportExportFactory();
 
             return Task.FromResult(new ConnectResponse
             {
@@ -129,7 +135,7 @@ namespace PluginCSV.Plugin
                     Logger.Info($"Schemas attempted: {files.Count}");
 
                     var schemas = _server.Settings.RootPaths.Select(p =>
-                            Discover.GetSchemaForDirectory(_importExportFactory, p, files[p.RootPath], sampleSize))
+                            Discover.GetSchemaForDirectory(Utility.GetImportExportFactory(p), p, files[p.RootPath], sampleSize))
                         .ToArray();
 
                     discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
@@ -196,7 +202,7 @@ namespace PluginCSV.Plugin
                     var tableName = new DirectoryInfo(rootPath.RootPath).Name;
                     if (files.Count > 0)
                     {
-                        Utility.LoadDirectoryFilesIntoDb(_importExportFactory, conn, rootPath, tableName, schemaName, files);
+                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath), conn, rootPath, tableName, schemaName, files);
                     }
                     else
                     {

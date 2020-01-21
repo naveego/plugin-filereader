@@ -23,6 +23,7 @@ namespace PluginCSVTest.Plugin
         private const string ArchivePath = "../../../MockData/ArchiveDirectory";
         private const string DefaultCleanupAction = "none";
         private const string DefaultFilter = "*.csv";
+        private const string DelimitedMode = "Delimited";
 
         private void PrepareTestEnvironment(bool configureInvalid)
         {
@@ -72,6 +73,7 @@ namespace PluginCSVTest.Plugin
                     {
                         RootPath = ReadPath,
                         Filter = filter ?? DefaultFilter,
+                        Mode = DelimitedMode,
                         Delimiter = delimiter,
                         HasHeader = true,
                         CleanupAction = cleanupAction ?? DefaultCleanupAction,
@@ -81,6 +83,7 @@ namespace PluginCSVTest.Plugin
                     {
                         RootPath = ReadDifferentPath,
                         Filter = filter ?? DefaultFilter,
+                        Mode = DelimitedMode,
                         Delimiter = delimiter,
                         HasHeader = true,
                         CleanupAction = cleanupAction ?? DefaultCleanupAction,
@@ -94,6 +97,7 @@ namespace PluginCSVTest.Plugin
                             RootPath = ReadPath,
                             Filter = filter ?? DefaultFilter,
                             Delimiter = delimiter,
+                            Mode = DelimitedMode,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath =ArchivePath

@@ -29,6 +29,11 @@ namespace PluginCSV.Helper
             {
                 throw new Exception("No files in given RootPaths with given Filters");
             }
+
+            if (!ModeIsSetOnAllRootPaths())
+            {
+                throw new Exception("A RootPath does not have a Mode set");
+            }
         }
 
         /// <summary>
@@ -94,12 +99,27 @@ namespace PluginCSV.Helper
         {
             return GetAllFiles().Count != 0;
         }
+
+        private bool ModeIsSetOnAllRootPaths()
+        {
+            foreach (var rootPath in RootPaths)
+            {
+                if (string.IsNullOrEmpty(rootPath.Mode))
+                {
+                    throw new Exception($"{rootPath.RootPath} does not have a Mode set");
+                }
+            }
+
+            return true;
+        }
     }
 
     public class RootPathObject
     {
         public string RootPath { get; set; }
         public string Filter { get; set; }
+        
+        public string Mode { get; set; }
         public string CleanupAction { get; set; }
         public string ArchivePath { get; set; }
         
