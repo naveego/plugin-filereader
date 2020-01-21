@@ -1,3 +1,5 @@
+using PluginCSV.Helper;
+
 namespace PluginCSV.API.Factory
 {
     public interface IImportExportFile
@@ -14,8 +16,8 @@ namespace PluginCSV.API.Factory
         /// Imports the given FilePathAndName to the in memory database
         /// </summary>
         /// <param name="filePathAndName"></param>
-        /// <param name="isFirstLineHeader"></param>
+        /// <param name="rootPath"></param>
         /// <returns>Number of rows written</returns>
-        int ImportTable(string filePathAndName, bool isFirstLineHeader);
+        int ImportTable(string filePathAndName, RootPathObject rootPath);
     }
 }

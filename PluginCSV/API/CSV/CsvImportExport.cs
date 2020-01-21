@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using PluginCSV.API.Factory;
+using PluginCSV.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
 namespace PluginCSV.API.CSV
@@ -100,7 +101,7 @@ namespace PluginCSV.API.CSV
             return rowCount;
         }
 
-        public int ImportTable(string filePathAndName, bool isFirstLineHeader)
+        public int ImportTable(string filePathAndName, RootPathObject rootPath)
         {
             var rowCount = 0;
             List<string> headerColumns = new List<string>();
@@ -116,7 +117,7 @@ namespace PluginCSV.API.CSV
                     foreach (string field in CsvReader.Fields)
                     {
                         columnCount++;
-                        if (isFirstLineHeader)
+                        if (rootPath.HasHeader)
                             headerColumns.Add(field);
                         else
                             headerColumns.Add("Column" + columnCount);
@@ -202,7 +203,7 @@ namespace PluginCSV.API.CSV
                     CsvReader.OnEmptyLine = BlankLine.SkipEntireLine;
 
                     //Skip the header line.
-                    if (isFirstLineHeader)
+                    if (rootPath.HasHeader)
                         CsvReader.SkipLines = 1;
 
                     while (CsvReader.ReadLine())
