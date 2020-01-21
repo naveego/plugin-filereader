@@ -9,7 +9,7 @@ namespace PluginCSV.API.FixedWidthColumns
         public IImportExportFile MakeImportExportFile(SqlDatabaseConnection sqlDatabaseConnection, RootPathObject rootPath,
             string tableName, string schemaName)
         {
-            throw new System.NotImplementedException();
+            return new FixedWidthColumnsImportExport(sqlDatabaseConnection, rootPath, tableName, schemaName);
         }
     }
 }

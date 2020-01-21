@@ -17,7 +17,7 @@ namespace PluginCSVTest.Plugin
     public class DelimitiedPluginTest
     {
         private readonly string DatabasePath = $"{Path.Join(Constants.DbFolder, Constants.DbFile)}";
-        private const string BasePath = "../../../MockData/Data";
+        private const string BasePath = "../../../MockData/DelimitedData";
         private const string ReadPath = "../../../MockData/ReadDirectory";
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
         private const string ArchivePath = "../../../MockData/ArchiveDirectory";

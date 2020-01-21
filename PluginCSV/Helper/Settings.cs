@@ -34,6 +34,11 @@ namespace PluginCSV.Helper
             {
                 throw new Exception("A RootPath does not have a Mode set");
             }
+
+            if (!ColumnsValidOnFixedWidthColumnsRootPaths())
+            {
+                throw new Exception("A RootPath set to Fixed Width Columns has no columns defined");
+            }
         }
 
         /// <summary>
@@ -47,10 +52,10 @@ namespace PluginCSV.Helper
             {
                 files.AddRange(Directory.GetFiles(rootPath.RootPath, rootPath.Filter));
             }
-            
+
             return files;
         }
-        
+
         /// <summary>
         /// Gets all files from location defined by RootPath and Filters and returns in a dictionary by directory
         /// </summary>
@@ -71,10 +76,10 @@ namespace PluginCSV.Helper
                     filesByDirectory.Add(rootPath.RootPath, files);
                 }
             }
-            
+
             return filesByDirectory;
         }
-        
+
         /// <summary>
         /// Checks if RootPaths are directories
         /// </summary>
@@ -88,6 +93,7 @@ namespace PluginCSV.Helper
                     throw new Exception($"{rootPath.RootPath} is not a directory");
                 }
             }
+
             return true;
         }
 
@@ -112,21 +118,38 @@ namespace PluginCSV.Helper
 
             return true;
         }
+
+        private bool ColumnsValidOnFixedWidthColumnsRootPaths()
+        {
+            foreach (var rootPath in RootPaths)
+            {
+                if (rootPath.Mode == "Fixed Width Columns")
+                {
+                    if (rootPath.Columns.Count == 0)
+                    {
+                        throw new Exception(
+                            $"{rootPath.RootPath} is set to Fixed Width Columns and has no Columns defined");
+                    }
+                }
+            }
+
+            return true;
+        }
     }
 
     public class RootPathObject
     {
         public string RootPath { get; set; }
         public string Filter { get; set; }
-        
+
         public string Mode { get; set; }
         public string CleanupAction { get; set; }
         public string ArchivePath { get; set; }
-        
+
         // FLAT FILE MODE SETTINGS
         public bool HasHeader { get; set; }
         public char Delimiter { get; set; }
-        
+
         // FIXED COLUMN WIDTH MODE SETTINGS
         public List<Column> Columns { get; set; }
     }

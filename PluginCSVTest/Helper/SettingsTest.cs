@@ -17,7 +17,7 @@ namespace PluginCSVTest.Helper
                 {
                     new RootPathObject
                     {
-                        RootPath = "../../../MockData/Data",
+                        RootPath = "../../../MockData/DelimitedData",
                         Filter = "*.csv",
                         Mode = "Delimited",
                         Delimiter = ',',
@@ -60,7 +60,7 @@ namespace PluginCSVTest.Helper
                 {
                     new RootPathObject
                     {
-                        RootPath = "../../../MockData/Data",
+                        RootPath = "../../../MockData/DelimitedData",
                         Mode = "Delimited",
                         Filter = "*.csv",
                         Delimiter = ',',
@@ -98,7 +98,7 @@ namespace PluginCSVTest.Helper
                 {
                     new RootPathObject
                     {
-                        RootPath = "../../../MockData/Data",
+                        RootPath = "../../../MockData/DelimitedData",
                         Mode = "Delimited",
                         Filter = "invalid",
                         Delimiter = ',',
@@ -126,7 +126,7 @@ namespace PluginCSVTest.Helper
                 {
                     new RootPathObject
                     {
-                        RootPath = "../../../MockData/Data",
+                        RootPath = "../../../MockData/DelimitedData",
                         Filter = "*.csv",
                         Delimiter = ',',
                         HasHeader = true,
@@ -140,7 +140,36 @@ namespace PluginCSVTest.Helper
             Exception e = Assert.Throws<Exception>(() => settings.Validate());
 
             // assert
-            Assert.Contains("../../../MockData/Data does not have a Mode set", e.Message);
+            Assert.Contains("../../../MockData/DelimitedData does not have a Mode set", e.Message);
+        }
+        
+        [Fact]
+        public void ValidateNoColumnsFixedWidthColumnsTest()
+        {
+            // setup
+            var settings = new Settings
+            {
+                RootPaths = new List<RootPathObject>
+                {
+                    new RootPathObject
+                    {
+                        RootPath = "../../../MockData/DelimitedData",
+                        Filter = "*.csv",
+                        Mode = "Fixed Width Columns",
+                        Delimiter = ',',
+                        HasHeader = true,
+                        CleanupAction = "none",
+                        ArchivePath = "",
+                        Columns = new List<Column>()
+                    }
+                }
+            };
+
+            // act
+            Exception e = Assert.Throws<Exception>(() => settings.Validate());
+
+            // assert
+            Assert.Contains("../../../MockData/DelimitedData is set to Fixed Width Columns and has no Columns defined", e.Message);
         }
     }
 }
