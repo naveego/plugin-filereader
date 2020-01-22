@@ -1,7 +1,592 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Grpc.Core;
+using Newtonsoft.Json;
+using PluginCSV.API.Utility;
+using PluginCSV.DataContracts;
+using PluginCSV.Helper;
+using Pub;
+using Xunit;
+using Record = Pub.Record;
+
 namespace PluginCSVTest.Plugin
 {
     public class FixedWidthColumnsPluginTest
     {
+        private readonly string DatabasePath = $"{Path.Join(Constants.DbFolder, Constants.DbFile)}";
+        private const string BasePath = "../../../MockData/FixedWidthColumnsData";
+        private const string ReadPath = "../../../MockData/ReadDirectory";
+        private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
+        private const string ArchivePath = "../../../MockData/ArchiveDirectory";
+        private const string DefaultCleanupAction = "none";
+        private const string DefaultFilter = "*.txt";
+        private const string FixedWidthColumnsMode = "Fixed Width Columns";
+
+        private void PrepareTestEnvironment(bool configureInvalid)
+        {
+            File.Delete(DatabasePath);
+
+            foreach (var filePath in Directory.GetFiles(ArchivePath))
+            {
+                File.Delete(filePath);
+            }
+
+            foreach (var filePath in Directory.GetFiles(ReadPath))
+            {
+                File.Delete(filePath);
+            }
+
+            foreach (var filePath in Directory.GetFiles(ReadDifferentPath))
+            {
+                File.Delete(filePath);
+            }
+
+            foreach (var filePath in Directory.GetFiles(BasePath))
+            {
+                var targetPath = "";
+                if (configureInvalid)
+                {
+                    targetPath = $"{Path.Join(ReadPath, Path.GetFileName(filePath))}";
+                }
+                else
+                {
+                    targetPath = filePath.Contains("DIFFERENT")
+                        ? $"{Path.Join(ReadDifferentPath, Path.GetFileName(filePath))}"
+                        : $"{Path.Join(ReadPath, Path.GetFileName(filePath))}";
+                }
+
+                File.Copy(filePath, targetPath, true);
+            }
+        }
+
+        private ConnectRequest GetConnectSettings(string cleanupAction = null, char delimiter = ',',
+            string filter = null, bool multiRoot = false)
+        {
+            var settings = new Settings
+            {
+                RootPaths = multiRoot
+                    ? new List<RootPathObject>
+                    {
+                        new RootPathObject
+                        {
+                            RootPath = ReadPath,
+                            Filter = filter ?? DefaultFilter,
+                            Mode = FixedWidthColumnsMode,
+                            Delimiter = delimiter,
+                            HasHeader = true,
+                            CleanupAction = cleanupAction ?? DefaultCleanupAction,
+                            ArchivePath = ArchivePath,
+                            Columns = new List<Column>
+                            {
+                                new Column()
+                                {
+                                    ColumnName = "id",
+                                    ColumnStart = 0,
+                                    ColumnEnd = 40,
+                                    IsKey = true
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "data1",
+                                    ColumnStart = 44,
+                                    ColumnEnd = 46,
+                                    IsKey = false
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "date1",
+                                    ColumnStart = 47,
+                                    ColumnEnd = 56,
+                                    IsKey = false
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "date2",
+                                    ColumnStart = 57,
+                                    ColumnEnd = 66,
+                                    IsKey = false
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "data2",
+                                    ColumnStart = 67,
+                                    ColumnEnd = 76,
+                                    IsKey = false
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "data3",
+                                    ColumnStart = 276,
+                                    ColumnEnd = 297,
+                                    IsKey = false
+                                }
+                            }
+                        },
+                        new RootPathObject
+                        {
+                            RootPath = ReadDifferentPath,
+                            Filter = filter ?? DefaultFilter,
+                            Mode = FixedWidthColumnsMode,
+                            Delimiter = delimiter,
+                            HasHeader = true,
+                            CleanupAction = cleanupAction ?? DefaultCleanupAction,
+                            ArchivePath = ArchivePath,
+                            Columns = new List<Column>
+                            {
+                                new Column()
+                                {
+                                    ColumnName = "id",
+                                    ColumnStart = 0,
+                                    ColumnEnd = 34,
+                                    IsKey = true
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "data1",
+                                    ColumnStart = 36,
+                                    ColumnEnd = 46,
+                                    IsKey = false
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "date1",
+                                    ColumnStart = 47,
+                                    ColumnEnd = 56,
+                                    IsKey = false
+                                }
+                            }
+                        }
+                    }
+                    : new List<RootPathObject>
+                    {
+                        new RootPathObject
+                        {
+                            RootPath = ReadPath,
+                            Filter = filter ?? DefaultFilter,
+                            Delimiter = delimiter,
+                            Mode = FixedWidthColumnsMode,
+                            HasHeader = true,
+                            CleanupAction = cleanupAction ?? DefaultCleanupAction,
+                            ArchivePath = ArchivePath,
+                            Columns = new List<Column>
+                            {
+                                new Column()
+                                {
+                                    ColumnName = "id",
+                                    ColumnStart = 0,
+                                    ColumnEnd = 39,
+                                    IsKey = true
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "data1",
+                                    ColumnStart = 44,
+                                    ColumnEnd = 45,
+                                    IsKey = false
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "date1",
+                                    ColumnStart = 46,
+                                    ColumnEnd = 55,
+                                    IsKey = false
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "date2",
+                                    ColumnStart = 56,
+                                    ColumnEnd = 65,
+                                    IsKey = false
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "data2",
+                                    ColumnStart = 66,
+                                    ColumnEnd = 75,
+                                    IsKey = false
+                                },
+                                new Column()
+                                {
+                                    ColumnName = "data3",
+                                    ColumnStart = 297,
+                                    ColumnEnd = 317,
+                                    IsKey = false
+                                }
+                            }
+                        }
+                    }
+            };
+
+            return new ConnectRequest
+            {
+                SettingsJson = JsonConvert.SerializeObject(settings),
+                OauthConfiguration = new OAuthConfiguration(),
+                OauthStateJson = ""
+            };
+        }
+
+        private Schema GetTestSchema(string query)
+        {
+            return new Schema
+            {
+                Id = "test",
+                Name = "test",
+                Query = query
+            };
+        }
+
+        [Fact]
+        public async Task ConnectSessionTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var request = GetConnectSettings();
+            var disconnectRequest = new DisconnectRequest();
+
+            // act
+            var response = client.ConnectSession(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<ConnectResponse>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+                client.Disconnect(disconnectRequest);
+            }
+
+            // assert
+            Assert.Single(records);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
+        public async Task ConnectTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var request = GetConnectSettings();
+
+            // act
+            var response = client.Connect(request);
+
+            // assert
+            Assert.IsType<ConnectResponse>(response);
+            Assert.Equal("", response.SettingsError);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
         
+        [Fact]
+        public async Task DiscoverSchemasAllTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var request = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+                SampleSize = 10
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var response = client.DiscoverSchemas(request);
+
+            // assert
+            Assert.IsType<DiscoverSchemasResponse>(response);
+            Assert.Single(response.Schemas);
+
+            var schema = response.Schemas[0];
+            Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
+            Assert.Equal("ReadDirectory", schema.Name);
+            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
+            Assert.Equal(1000, schema.Count.Value);
+            Assert.Equal(10, schema.Sample.Count);
+            Assert.Equal(6, schema.Properties.Count);
+
+            var property = schema.Properties[0];
+            Assert.Equal("id", property.Id);
+            Assert.Equal("id", property.Name);
+            Assert.Equal("", property.Description);
+            Assert.Equal(PropertyType.String, property.Type);
+            Assert.True(property.IsKey);
+            Assert.False(property.IsNullable);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task DiscoverSchemasMultipleAllTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings(null, ',', null, true);
+
+            var request = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+                SampleSize = 10
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(request);
+            var response = client.DiscoverSchemas(request);
+
+            // assert
+            Assert.IsType<DiscoverSchemasResponse>(response);
+            Assert.Equal(2, response.Schemas.Count);
+
+            var schema = response.Schemas[0];
+            Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
+            Assert.Equal("ReadDirectory", schema.Name);
+            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
+            Assert.Equal(1000, schema.Count.Value);
+            Assert.Equal(10, schema.Sample.Count);
+            Assert.Equal(6, schema.Properties.Count);
+
+            var property = schema.Properties[0];
+            Assert.Equal("id", property.Id);
+            Assert.Equal("id", property.Name);
+            Assert.Equal("", property.Description);
+            Assert.Equal(PropertyType.String, property.Type);
+            Assert.True(property.IsKey);
+            Assert.False(property.IsNullable);
+
+            var schema2 = response.Schemas[1];
+            Assert.Equal($"[{Constants.SchemaName}].[ReadDirectoryDifferent]", schema2.Id);
+            Assert.Equal("ReadDirectoryDifferent", schema2.Name);
+            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectoryDifferent]", schema2.Query);
+            Assert.Equal(Count.Types.Kind.Exact, schema2.Count.Kind);
+            Assert.Equal(1000, schema2.Count.Value);
+            Assert.Equal(10, schema2.Sample.Count);
+            Assert.Equal(3, schema2.Properties.Count);
+
+            var property2 = schema2.Properties[0];
+            Assert.Equal("id", property2.Id);
+            Assert.Equal("id", property2.Name);
+            Assert.Equal("", property2.Description);
+            Assert.Equal(PropertyType.String, property2.Type);
+            Assert.True(property2.IsKey);
+            Assert.False(property2.IsNullable);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task DiscoverSchemasRefreshTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+                SampleSize = 10
+            };
+
+            var request = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                ToRefresh = {GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]")},
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverAllRequest);
+            var response = client.DiscoverSchemas(request);
+
+            // assert
+            Assert.IsType<DiscoverSchemasResponse>(response);
+            Assert.Single(response.Schemas);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                Directory = ReadPath
+            });
+
+            var request = new ReadRequest()
+            {
+                Schema = schema
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverAllRequest);
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(1000, records.Count);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamLimitTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                Directory = ReadPath
+            });
+
+            var request = new ReadRequest()
+            {
+                Schema = schema,
+                Limit = 10
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverAllRequest);
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(10, records.Count);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
     }
 }

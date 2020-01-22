@@ -123,7 +123,7 @@
                     },
                     "ColumnStart": {
                       "title": "Column Start",
-                      "description": "The index of the first character of the column.",
+                      "description": "The index of the first character of the column (0 is the first index).",
                       "type": "number"
                     },
                     "ColumnEnd": {

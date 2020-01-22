@@ -67,30 +67,31 @@ namespace PluginCSVTest.Plugin
         {
             var settings = new Settings
             {
-                RootPaths = multiRoot? new List<RootPathObject>
-                {
-                    new RootPathObject
+                RootPaths = multiRoot
+                    ? new List<RootPathObject>
                     {
-                        RootPath = ReadPath,
-                        Filter = filter ?? DefaultFilter,
-                        Mode = DelimitedMode,
-                        Delimiter = delimiter,
-                        HasHeader = true,
-                        CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                        ArchivePath = ArchivePath
-                    },
-                    new RootPathObject
-                    {
-                        RootPath = ReadDifferentPath,
-                        Filter = filter ?? DefaultFilter,
-                        Mode = DelimitedMode,
-                        Delimiter = delimiter,
-                        HasHeader = true,
-                        CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                        ArchivePath = ArchivePath
+                        new RootPathObject
+                        {
+                            RootPath = ReadPath,
+                            Filter = filter ?? DefaultFilter,
+                            Mode = DelimitedMode,
+                            Delimiter = delimiter,
+                            HasHeader = true,
+                            CleanupAction = cleanupAction ?? DefaultCleanupAction,
+                            ArchivePath = ArchivePath
+                        },
+                        new RootPathObject
+                        {
+                            RootPath = ReadDifferentPath,
+                            Filter = filter ?? DefaultFilter,
+                            Mode = DelimitedMode,
+                            Delimiter = delimiter,
+                            HasHeader = true,
+                            CleanupAction = cleanupAction ?? DefaultCleanupAction,
+                            ArchivePath = ArchivePath
+                        }
                     }
-                } :
-                    new List<RootPathObject>
+                    : new List<RootPathObject>
                     {
                         new RootPathObject
                         {
@@ -100,7 +101,7 @@ namespace PluginCSVTest.Plugin
                             Mode = DelimitedMode,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath =ArchivePath
+                            ArchivePath = ArchivePath
                         }
                     }
             };
@@ -552,6 +553,61 @@ on a.id = b.id")
 
             // assert
             Assert.Equal(2000, records.Count);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamLimitTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                Directory = ReadPath
+            });
+
+            var request = new ReadRequest()
+            {
+                Schema = schema,
+                Limit = 10
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverAllRequest);
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(10, records.Count);
 
             // cleanup
             await channel.ShutdownAsync();

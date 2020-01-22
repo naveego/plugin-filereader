@@ -26,10 +26,16 @@ namespace PluginCSV.API.Discover
             
             Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths);
             
-            var schemas = paths.Select(p => GetSchemaForFilePath(schemaId, tableName, p, sampleSize))
-                .ToArray();
+            var schema = new Schema
+            {
+                Id = schemaId,
+                Name = tableName,
+                DataFlowDirection = Schema.Types.DataFlowDirection.ReadWrite,
+                Query = $"SELECT * FROM {schemaId}",
+                Properties = {},
+            };
 
-            var schema =  schemas.Last();
+            schema = GetSchemaForQuery(schema, sampleSize, rootPath.Columns);
 
             return schema;
         }

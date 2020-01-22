@@ -140,36 +140,24 @@ namespace PluginCSV.API.CSV
 
                 // cmd.CommandText = $"DROP TABLE IF EXISTS [{SchemaName}].[{TableName}]";
                 // cmd.ExecuteNonQuery();
-
-                var dt = SQLDatabaseConnection.GetSchema("Columns", new string[]
+                
+                cmd.CommandText = $"CREATE TABLE IF NOT EXISTS [{SchemaName}].[{TableName}] (";
+                foreach (var columnName in headerColumns)
                 {
-                    $"[{SchemaName}].[{TableName}]"
-                });
-
-                if (dt.Rows.Count != 6) //Table does not exists other wise if 6 rows then table have definition
-                {
-                    cmd.CommandText = $"CREATE TABLE IF NOT EXISTS [{SchemaName}].[{TableName}] (";
-                    foreach (var columnName in headerColumns)
-                    {
-                        cmd.CommandText +=
-                            columnName +
-                            " None,"; //The DataType none is used since we do not know if all rows have same datatype                        
-                    }
-
-                    cmd.CommandText = cmd.CommandText.Substring(0, cmd.CommandText.Length - 1); //Remove the last comma
-                    cmd.CommandText += ");";
-                    cmd.ExecuteNonQuery(); // Create table
-
-                    dt = SQLDatabaseConnection.GetSchema("Columns", new string[] {$"[{SchemaName}].[{TableName}]"});
-                    // if (dt.Rows.Count != 6)
-                    //     throw new Exception("Unable to create or find table.");
+                    cmd.CommandText +=
+                        columnName +
+                        $" VARCHAR({int.MaxValue}),"; //The DataType none is used since we do not know if all rows have same datatype                        
                 }
 
+                cmd.CommandText = cmd.CommandText.Substring(0, cmd.CommandText.Length - 1); //Remove the last comma
+                cmd.CommandText += ");";
+                cmd.ExecuteNonQuery(); // Create table
 
+                var dt = SQLDatabaseConnection.GetSchema("Columns", new string[] {$"[{SchemaName}].[{TableName}]"});
+                
                 // Sanity check if number of columns in CSV and table are equal
                 if (dt.Rows.Count != headerColumns.Count)
                     throw new Exception("Number of columns in CSV should be same as number of columns in the table");
-
 
                 // Start of code block to generate INSERT statement.
                 cmd.CommandText = $"INSERT INTO {SchemaName}.[{TableName}] VALUES (";

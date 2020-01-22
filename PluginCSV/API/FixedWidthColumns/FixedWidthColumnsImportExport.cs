@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using PluginCSV.API.Factory;
@@ -31,13 +32,30 @@ namespace PluginCSV.API.FixedWidthColumns
         {
             // setup db table
             var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (");
+            var primaryKeySb = new StringBuilder("PRIMARY KEY (");
+            var hasPrimaryKey = false;
             foreach (var column in rootPath.Columns)
             {
-                querySb.Append($"{column.ColumnName} None{(column.IsKey ? " NOT NULL UNIQUE" : "")},");
+                querySb.Append($"{column.ColumnName} VARCHAR({int.MaxValue}){(column.IsKey ? " NOT NULL UNIQUE" : "")},");
+                if (column.IsKey)
+                {
+                    primaryKeySb.Append($"{column.ColumnName},");
+                    hasPrimaryKey = true;
+                }
             }
 
-            querySb.Length--;
-            querySb.Append(");");
+            if (hasPrimaryKey)
+            {
+                primaryKeySb.Length--;
+                primaryKeySb.Append(")");
+                querySb.Append($"{primaryKeySb});");
+            }
+            else
+            {
+                querySb.Length--;
+                querySb.Append(");");
+            }
+            
             var query = querySb.ToString();
             
             var cmd = new SqlDatabaseCommand

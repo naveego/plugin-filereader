@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using PluginCSV.API.Utility;
+using PluginCSV.Helper;
 using Pub;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -9,7 +11,7 @@ namespace PluginCSV.API.Discover
 {
     public static partial class Discover
     {
-        public static Schema GetSchemaForQuery(Schema schema, int sampleSize = 5)
+        public static Schema GetSchemaForQuery(Schema schema, int sampleSize = 5, List<Column> columns = null)
         {
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
@@ -21,6 +23,11 @@ namespace PluginCSV.API.Discover
 
             var reader = cmd.ExecuteReader();
             var schemaTable = reader.GetSchemaTable();
+            
+            // var schemaTable = conn.GetSchema("Columns", new string[]
+            // {
+            //     "[dbo].[ReadDirectory]"
+            // });
 
             if (schemaTable != null)
             {
@@ -38,20 +45,41 @@ namespace PluginCSV.API.Discover
                     }
 
                     // create property
-                    var property = new Property
+                    Property property;
+                    if (columns == null)
                     {
-                        Id = colName,
-                        Name = colName,
-                        Description = "",
-                        Type = GetPropertyType(row),
-                        TypeAtSource = row["DataType"].ToString(),
-                        IsKey = Boolean.Parse(row["IsKey"].ToString()),
-                        IsNullable = Boolean.Parse(row["AllowDBNull"].ToString()),
-                        IsCreateCounter = false,
-                        IsUpdateCounter = false,
-                        PublisherMetaJson = ""
-                    };
-
+                        property = new Property
+                        {
+                            Id = colName,
+                            Name = colName,
+                            Description = "",
+                            Type = GetPropertyType(row),
+                            TypeAtSource = row["DataType"].ToString(),
+                            IsKey = Boolean.Parse(row["IsKey"].ToString()),
+                            IsNullable = Boolean.Parse(row["AllowDBNull"].ToString()),
+                            IsCreateCounter = false,
+                            IsUpdateCounter = false,
+                            PublisherMetaJson = ""
+                        };
+                    }
+                    else
+                    {
+                        var column = columns.FirstOrDefault(c => c.ColumnName == colName);
+                        property = new Property
+                        {
+                            Id = colName,
+                            Name = colName,
+                            Description = "",
+                            Type = GetPropertyType(row),
+                            TypeAtSource = row["DataType"].ToString(),
+                            IsKey = column?.IsKey ?? Boolean.Parse(row["IsKey"].ToString()),
+                            IsNullable = !column?.IsKey ?? Boolean.Parse(row["AllowDBNull"].ToString()),
+                            IsCreateCounter = false,
+                            IsUpdateCounter = false,
+                            PublisherMetaJson = ""
+                        };
+                    }
+                    
                     // add property to schema
                     schema.Properties.Add(property);
                 }
