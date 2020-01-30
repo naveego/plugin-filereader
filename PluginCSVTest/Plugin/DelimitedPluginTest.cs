@@ -25,7 +25,7 @@ namespace PluginCSVTest.Plugin
         private const string DefaultFilter = "*.csv";
         private const string DelimitedMode = "Delimited";
 
-        private void PrepareTestEnvironment(bool configureInvalid)
+        private void PrepareTestEnvironment(bool configureInvalid = false, bool configureArchiveFull = false)
         {
             File.Delete(DatabasePath);
 
@@ -59,6 +59,13 @@ namespace PluginCSVTest.Plugin
                 }
 
                 File.Copy(filePath, targetPath, true);
+
+                if (configureArchiveFull)
+                {
+                    targetPath = $"{Path.Join(ArchivePath, Path.GetFileName(filePath))}";
+                    
+                    File.Copy(filePath, targetPath, true);
+                }
             }
         }
 
@@ -128,7 +135,7 @@ namespace PluginCSVTest.Plugin
         public async Task ConnectSessionTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -167,7 +174,7 @@ namespace PluginCSVTest.Plugin
         public async Task ConnectTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -198,7 +205,7 @@ namespace PluginCSVTest.Plugin
         public async Task DiscoverSchemasAllTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -253,7 +260,7 @@ namespace PluginCSVTest.Plugin
         public async Task DiscoverSchemasMultipleAllTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -326,7 +333,7 @@ namespace PluginCSVTest.Plugin
         public async Task DiscoverSchemasAllDelimiterTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -364,7 +371,7 @@ namespace PluginCSVTest.Plugin
         public async Task DiscoverSchemasRefreshTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -409,7 +416,7 @@ namespace PluginCSVTest.Plugin
         public async Task ReadStreamQueryBasedSchemaTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -461,7 +468,7 @@ on a.id = b.id")
         public async Task ReadStreamInvalidQueryBasedSchemaTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -509,7 +516,7 @@ on a.id = b.id")
         public async Task ReadStreamDirectoryBasedSchemaTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -563,7 +570,7 @@ on a.id = b.id")
         public async Task ReadStreamLimitTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -615,10 +622,77 @@ on a.id = b.id")
         }
 
         [Fact]
-        public async Task ReadStreamCleanUpArchiveTest()
+        public async Task ReadStreamCleanUpArchiveFullTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment(false, true);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings("Archive");
+
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                Directory = ReadPath
+            });
+
+            var request = new ReadRequest()
+            {
+                Schema = schema
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverAllRequest);
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            var readFiles = Directory.GetFiles(ReadPath, DefaultFilter);
+            var archiveFiles = Directory.GetFiles(ArchivePath, DefaultFilter);
+
+            var secondResponse = client.ReadStream(request);
+            var secondResponseStream = secondResponse.ResponseStream;
+            var secondRecords = new List<Record>();
+            while (await secondResponseStream.MoveNext())
+            {
+                secondRecords.Add(secondResponseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(2000, records.Count);
+            Assert.Empty(secondRecords);
+            Assert.Empty(readFiles);
+            Assert.Equal(5, archiveFiles.Length);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamCleanUpArchiveEmptyTest()
+        {
+            // setup
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
@@ -685,7 +759,7 @@ on a.id = b.id")
         public async Task ReadStreamCleanUpDeleteTest()
         {
             // setup
-            PrepareTestEnvironment(false);
+            PrepareTestEnvironment();
             Server server = new Server
             {
                 Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},

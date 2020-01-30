@@ -14,7 +14,7 @@ namespace PluginCSV.API.Utility
             }
             catch (Exception e)
             {
-                Logger.Error($"Unable to archive file {path}");
+                Logger.Error($"Unable to delete file {path}");
                 Logger.Error(e.Message);
             }
         }
