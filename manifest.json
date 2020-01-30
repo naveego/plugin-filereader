@@ -170,6 +170,12 @@
                               "description": "Is this column the key property?",
                               "default": false,
                               "type": "boolean"
+                            },
+                            "TrimWhitespace" : {
+                              "title": "Trim Whitespace",
+                              "description": "Trim all leading and trailing whitespace?",
+                              "default": false,
+                              "type": "boolean"
                             }
                           },
                           "required": ["ColumnName", "ColumnStart", "ColumnEnd"]
@@ -234,6 +240,12 @@
                             "IsKey": {
                               "title": "Is Key",
                               "description": "Is this column the key property?",
+                              "default": false,
+                              "type": "boolean"
+                            },
+                            "TrimWhitespace" : {
+                              "title": "Trim Whitespace",
+                              "description": "Trim all leading and trailing whitespace?",
                               "default": false,
                               "type": "boolean"
                             }

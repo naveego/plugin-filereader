@@ -36,7 +36,8 @@ namespace PluginCSV.API.FixedWidthColumns
             var hasPrimaryKey = false;
             foreach (var column in rootPath.Columns)
             {
-                querySb.Append($"{column.ColumnName} VARCHAR({int.MaxValue}){(column.IsKey ? " NOT NULL UNIQUE" : "")},");
+                querySb.Append(
+                    $"{column.ColumnName} VARCHAR({int.MaxValue}){(column.IsKey ? " NOT NULL UNIQUE" : "")},");
                 if (column.IsKey)
                 {
                     primaryKeySb.Append($"{column.ColumnName},");
@@ -55,9 +56,9 @@ namespace PluginCSV.API.FixedWidthColumns
                 querySb.Length--;
                 querySb.Append(");");
             }
-            
+
             var query = querySb.ToString();
-            
+
             var cmd = new SqlDatabaseCommand
             {
                 Connection = _conn,
@@ -70,7 +71,7 @@ namespace PluginCSV.API.FixedWidthColumns
             var file = new StreamReader(filePathAndName);
             string line;
             var rowsRead = 0;
-            
+
             // prepare insert cmd with parameters
             querySb = new StringBuilder($"INSERT INTO [{_schemaName}].[{_tableName}] (");
             foreach (var column in rootPath.Columns)
@@ -80,27 +81,28 @@ namespace PluginCSV.API.FixedWidthColumns
 
             querySb.Length--;
             querySb.Append(") VALUES (");
-                
+
             foreach (var column in rootPath.Columns)
             {
                 var paramName = $"@{column.ColumnName}";
                 querySb.Append($"{paramName},");
                 cmd.Parameters.Add(paramName);
             }
-                
+
             querySb.Length--;
             querySb.Append(");");
-                
+
             query = querySb.ToString();
 
             cmd.CommandText = query;
-            
+
+            // read all lines from file
             while ((line = file.ReadLine()) != null)
             {
                 foreach (var column in rootPath.Columns)
                 {
                     var rawValue = line.Substring(column.ColumnStart, column.ColumnEnd - column.ColumnStart + 1);
-                    cmd.Parameters[$"@{column.ColumnName}"].Value = rawValue;
+                    cmd.Parameters[$"@{column.ColumnName}"].Value = column.TrimWhitespace ? rawValue.Trim() : rawValue;
                 }
 
                 cmd.ExecuteNonQuery();

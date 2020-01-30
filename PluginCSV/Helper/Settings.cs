@@ -160,5 +160,6 @@ namespace PluginCSV.Helper
         public bool IsKey { get; set; }
         public int ColumnStart { get; set; }
         public int ColumnEnd { get; set; }
+        public bool TrimWhitespace { get; set; }
     }
 }
