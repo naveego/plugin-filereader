@@ -32,7 +32,31 @@
     "ui": {
       "ui:order": [
         "RootPaths"
-      ]
+      ],
+      "RootPaths" : {
+        "items": {
+          "ui:order": [
+            "RootPath",
+            "Filter",
+            "CleanupAction",
+            "ArchivePath",
+            "Mode",
+            "Delimiter",
+            "HasHeader",
+            "Columns"
+          ],
+          "Columns": {
+            "items": {
+              "ui:order":[
+                "ColumnName",
+                "IsKey",
+                "ColumnStart",
+                "ColumnEnd"
+              ]
+            }
+          }
+        }
+      }
     },
     "schema": {
       "type": "object",
@@ -78,74 +102,125 @@
                   "Delete",
                   "Archive"
                 ]
-              },
-              "ArchivePath": {
-                "type": "string",
-                "title": "Archive Folder",
-                "description": "The folder to move files to after processing, if cleanup action is \"archive\".",
-                "default": "",
-                "examples": [
-                  "string"
-                ]
-              },
-              "HasHeader": {
-                "type": "boolean",
-                "title": "Has Header ",
-                "description": "Does the file have a header row?",
-                "default": false,
-                "examples": [
-                  true
-                ]
-              },
-              "Delimiter": {
-                "type": "string",
-                "title": "Delimiter",
-                "description": "The delimiter for delimited files.",
-                "default": ",",
-                "examples": [
-                  ",",
-                  "|"
-                ],
-                "maxLength": 1,
-                "pattern": ""
-              },
-              "Columns": {
-                "type": "array",
-                "title": "Columns",
-                "description": "Columns for fixed column width files",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "ColumnName": {
-                      "title": "Column Name",
-                      "description": "The name of the column.",
-                      "type": "string"
-                    },
-                    "ColumnStart": {
-                      "title": "Column Start",
-                      "description": "The index of the first character of the column (0 is the first index).",
-                      "type": "number"
-                    },
-                    "ColumnEnd": {
-                      "title": "Column End",
-                      "description": "The index of the last character of the column.",
-                      "type": "number"
-                    },
-                    "IsKey": {
-                      "title": "Is Key",
-                      "description": "Is this column the key property?",
-                      "default": false,
-                      "type": "boolean"
-                    }
-                  },
-                  "required": ["ColumnName", "ColumnStart", "ColumnEnd"]
-                }
               }
             },
             "required": [
               "RootPath",
-              "Filter"
-            ]
+              "Filter",
+              "Mode"
+            ],
+            "dependencies": {
+              "Mode": {
+                "oneOf":[
+                  {
+                    "properties":{
+                      "Mode": {
+                        "enum":[
+                          "Delimited"
+                        ]
+                      },
+                      "HasHeader": {
+                        "type": "boolean",
+                        "title": "Has Header ",
+                        "description": "Does the file have a header row?",
+                        "default": false,
+                        "examples": [
+                          true
+                        ]
+                      },
+                      "Delimiter": {
+                        "type": "string",
+                        "title": "Delimiter",
+                        "description": "The delimiter for delimited files.",
+                        "default": ",",
+                        "examples": [
+                          ",",
+                          "|"
+                        ],
+                        "maxLength": 1,
+                        "pattern": ""
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "Mode": {
+                        "enum":[
+                          "Fixed Width Columns"
+                        ]
+                      },
+                      "Columns": {
+                        "type": "array",
+                        "minItems": 1,
+                        "title": "Columns",
+                        "description": "Columns for fixed column width files",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "ColumnName": {
+                              "title": "Column Name",
+                              "description": "The name of the column.",
+                              "type": "string"
+                            },
+                            "ColumnStart": {
+                              "title": "Column Start",
+                              "description": "The index of the first character of the column (0 is the first index).",
+                              "type": "number"
+                            },
+                            "ColumnEnd": {
+                              "title": "Column End",
+                              "description": "The index of the last character of the column.",
+                              "type": "number"
+                            },
+                            "IsKey": {
+                              "title": "Is Key",
+                              "description": "Is this column the key property?",
+                              "default": false,
+                              "type": "boolean"
+                            }
+                          },
+                          "required": ["ColumnName", "ColumnStart", "ColumnEnd"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "CleanupAction": {
+                "oneOf": [
+                  {
+                    "properties": {
+                      "CleanupAction": {
+                        "enum": [
+                          "Archive"
+                        ]
+                      },
+                      "ArchivePath": {
+                        "type": "string",
+                        "title": "Archive Folder",
+                        "description": "The folder to move files to after processing, if cleanup action is \"archive\".",
+                        "default": "",
+                        "examples": [
+                          "string"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "ArchivePath"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "CleanupAction": {
+                        "enum": [
+                          "Nothing","Delete"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
           }
         }
       },
