@@ -248,6 +248,7 @@ namespace PluginCSVTest.Plugin
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
             Assert.Equal(6, schema.Properties.Count);
+            Assert.True(schema.PublisherMetaJson != "");
 
             var property = schema.Properties[0];
             Assert.Equal("id", property.Id);
@@ -304,6 +305,7 @@ namespace PluginCSVTest.Plugin
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
             Assert.Equal(6, schema.Properties.Count);
+            Assert.True(schema.PublisherMetaJson != "");
 
             var property = schema.Properties[0];
             Assert.Equal("id", property.Id);
@@ -321,6 +323,7 @@ namespace PluginCSVTest.Plugin
             // Assert.Equal(1000, schema2.Count.Value);
             Assert.Equal(10, schema2.Sample.Count);
             Assert.Equal(4, schema2.Properties.Count);
+            Assert.True(schema.PublisherMetaJson != "");
 
             var property2 = schema2.Properties[0];
             Assert.Equal("id", property2.Id);

@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using PluginCSV.API.Factory;
 using PluginCSV.API.Utility;
+using PluginCSV.DataContracts;
 using PluginCSV.Helper;
 using Pub;
 
@@ -21,6 +23,10 @@ namespace PluginCSV.API.Discover
             var schemaName = Constants.SchemaName;
             var tableName = new DirectoryInfo(rootPath.RootPath).Name;
             var schemaId = $"[{schemaName}].[{tableName}]";
+            var publisherMetaJson = new SchemaPublisherMetaJson
+            {
+                RootPath = rootPath
+            };
             
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
             
@@ -37,6 +43,7 @@ namespace PluginCSV.API.Discover
             };
 
             schema = GetSchemaForQuery(schema, sampleSize, rootPath.Columns);
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(publisherMetaJson);
 
             return schema;
         }
