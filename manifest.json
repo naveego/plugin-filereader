@@ -1,5 +1,5 @@
 {
-  "id": "plugin-pub-csv",
+  "id": "plugin-filereader",
   "displayName": "File Reader",
   "description": "Publisher which extracts data from delimited and fixed width column flat files.",
   "apiVersion": "2",
@@ -10,6 +10,11 @@
   "kind": "publisher",
   "os": "$GOOS",
   "arch": "$GOARCH",
+  "accessGroups": [
+    "vandelay",
+    "nalww",
+    "prodsupport"
+  ],
   "canConfigureRealTime": true,
   "canProduceMultipleSchemas": true,
   "canAcceptQueryBasedSchemas": true,

@@ -37,7 +37,7 @@ namespace PluginCSV.API.FixedWidthColumns
             foreach (var column in rootPath.Columns)
             {
                 querySb.Append(
-                    $"{column.ColumnName} VARCHAR({int.MaxValue}){(column.IsKey ? " NOT NULL UNIQUE" : "")},");
+                    $"[{column.ColumnName}] VARCHAR({int.MaxValue}){(column.IsKey ? " NOT NULL UNIQUE" : "")},");
                 if (column.IsKey)
                 {
                     primaryKeySb.Append($"{column.ColumnName},");

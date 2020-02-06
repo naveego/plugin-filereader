@@ -12,8 +12,9 @@ namespace PluginCSV.API.Utility
             RootPathObject rootPath,
             string tableName, string schemaName, string path)
         {
-            Logger.Info($"Loading file: {path}");
+            Logger.Info($"Preparing to load file: {path}");
             var importExportFile = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName);
+            Logger.Info($"Begin loading file: {path}");
             var rowsWritten = importExportFile.ImportTable(path, rootPath);
             Logger.Info($"Loaded file {path} with {rowsWritten} rows");
 

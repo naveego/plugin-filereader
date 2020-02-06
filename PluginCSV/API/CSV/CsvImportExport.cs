@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using Newtonsoft.Json;
 using PluginCSV.API.Factory;
 using PluginCSV.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
@@ -129,6 +130,8 @@ namespace PluginCSV.API.CSV
 
             if (headerColumns.Count == 0)
                 throw new Exception("Columns are required, check the function parameters.");
+            
+            Logger.Debug($"Headers: {JsonConvert.SerializeObject(headerColumns, Formatting.Indented)}");
 
             if (SQLDatabaseConnection.State != ConnectionState.Open)
                 throw new Exception("A valid and open connection is required.");
@@ -145,12 +148,13 @@ namespace PluginCSV.API.CSV
                 foreach (var columnName in headerColumns)
                 {
                     cmd.CommandText +=
-                        columnName +
+                        $"[{columnName}]" +
                         $" VARCHAR({int.MaxValue}),"; //The DataType none is used since we do not know if all rows have same datatype                        
                 }
 
                 cmd.CommandText = cmd.CommandText.Substring(0, cmd.CommandText.Length - 1); //Remove the last comma
                 cmd.CommandText += ");";
+                Logger.Debug($"Create table SQL: {cmd.CommandText}");
                 cmd.ExecuteNonQuery(); // Create table
 
                 var dt = SQLDatabaseConnection.GetSchema("Columns", new string[] {$"[{SchemaName}].[{TableName}]"});
@@ -171,6 +175,8 @@ namespace PluginCSV.API.CSV
 
                 cmd.CommandText = cmd.CommandText.Substring(0, cmd.CommandText.Length - 1); //Remove the last comma
                 cmd.CommandText += ");";
+                
+                Logger.Debug($"Insert Row SQL: {cmd.CommandText}");
 
                 // Add parameters
                 paramCount = 0;
@@ -183,7 +189,8 @@ namespace PluginCSV.API.CSV
 
                 // End of code block to generate INSERT statement.
 
-
+                Logger.Debug($"Reading delimited file {filePathAndName}");
+                
                 //Read CSV once insert statement has been created.
                 using (CsvReader = new CsvFileReader(filePathAndName, Encoding.UTF8))
                 {
