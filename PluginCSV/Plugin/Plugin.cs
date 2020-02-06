@@ -22,6 +22,7 @@ namespace PluginCSV.Plugin
     public class Plugin : Publisher.PublisherBase
     {
         private readonly ServerStatus _server;
+
         private TaskCompletionSource<bool> _tcs;
         // private IImportExportFactory _importExportFactory;
 
@@ -65,11 +66,10 @@ namespace PluginCSV.Plugin
             _server.Connected = true;
 
             Logger.Info("Connected.");
-            
+
             // TODO: switch case for which factory to use
-            switch(settings)
+            switch (settings)
             {
-                
             }
             // _importExportFactory = new CsvImportExportFactory();
 
@@ -135,7 +135,8 @@ namespace PluginCSV.Plugin
                     Logger.Info($"Schemas attempted: {files.Count}");
 
                     var schemas = _server.Settings.RootPaths.Select(p =>
-                            Discover.GetSchemaForDirectory(Utility.GetImportExportFactory(p), p, files[p.RootPath], sampleSize))
+                            Discover.GetSchemaForDirectory(Utility.GetImportExportFactory(p), p, files[p.RootPath],
+                                sampleSize))
                         .ToArray();
 
                     discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
@@ -187,6 +188,7 @@ namespace PluginCSV.Plugin
             var limit = request.Limit;
             var limitFlag = request.Limit != 0;
             var jobId = request.JobId;
+            var recordsCount = 0;
 
             Logger.Info($"Publishing records for schema: {schema.Name}");
 
@@ -195,40 +197,79 @@ namespace PluginCSV.Plugin
                 var conn = Utility.GetSqlConnection(jobId);
                 var filesByDirectory = _server.Settings.GetAllFilesByDirectory();
 
-                foreach (var rootPath in _server.Settings.RootPaths)
+                if (schema.PublisherMetaJson != "")
                 {
-                    var files = filesByDirectory[rootPath.RootPath];
+                    // schema is not query based so we can stream each file as it is loaded
+                    var schemaMetaJson = JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
+                    var files = filesByDirectory[schemaMetaJson.RootPath.RootPath];
                     var schemaName = Constants.SchemaName;
-                    var tableName = new DirectoryInfo(rootPath.RootPath).Name;
+                    var tableName = new DirectoryInfo(schemaMetaJson.RootPath.RootPath).Name;
                     if (files.Count > 0)
                     {
-                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath), conn, rootPath, tableName, schemaName, files);
+                        // load file and then stream file one by one
+                        foreach (var file in files)
+                        {
+                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(schemaMetaJson.RootPath), conn, schemaMetaJson.RootPath,
+                                tableName, schemaName, new List<string>{file});
+                                
+                            var records = Read.ReadRecords(schema, jobId);
+
+                            foreach (var record in records)
+                            {
+                                // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
+                                if ((limitFlag && recordsCount == limit) || !_server.Connected)
+                                {
+                                    break;
+                                }
+
+                                // publish record
+                                await responseStream.WriteAsync(record);
+                                recordsCount++;
+                            }
+                        }
                     }
                     else
                     {
                         Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
                     }
                 }
-
-                var recordsCount = 0;
-
-                var records = Read.ReadRecords(schema, jobId);
-
-                foreach (var record in records)
+                else
                 {
-                    // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
-                    if ((limitFlag && recordsCount == limit) || !_server.Connected)
+                    // schema is query based so everything needs to be loaded first
+                    foreach (var rootPath in _server.Settings.RootPaths)
                     {
-                        break;
-                    }
+                        var files = filesByDirectory[rootPath.RootPath];
+                        var schemaName = Constants.SchemaName;
+                        var tableName = new DirectoryInfo(rootPath.RootPath).Name;
+                        if (files.Count > 0)
+                        {
+                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath), conn, rootPath,
+                                tableName, schemaName, files);
+                        }
+                        else
+                        {
+                            Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
+                        }
+                    } 
+                    
+                    var records = Read.ReadRecords(schema, jobId);
 
-                    // publish record
-                    await responseStream.WriteAsync(record);
-                    recordsCount++;
+                    foreach (var record in records)
+                    {
+                        // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
+                        if ((limitFlag && recordsCount == limit) || !_server.Connected)
+                        {
+                            break;
+                        }
+
+                        // publish record
+                        await responseStream.WriteAsync(record);
+                        recordsCount++;
+                    }
                 }
 
                 Logger.Info($"Published {recordsCount} records");
-                
+
                 foreach (var rootPath in _server.Settings.RootPaths)
                 {
                     var files = filesByDirectory[rootPath.RootPath];
@@ -238,8 +279,9 @@ namespace PluginCSV.Plugin
                             foreach (var file in files)
                             {
                                 Logger.Info($"Deleting file {file}");
-                                Utility.DeleteFileAtPath(file); 
+                                Utility.DeleteFileAtPath(file);
                             }
+
                             break;
                         case "Archive":
                             foreach (var file in files)
@@ -247,6 +289,7 @@ namespace PluginCSV.Plugin
                                 Logger.Info($"Archiving file {file} to {rootPath.ArchivePath}");
                                 Utility.ArchiveFileAtPath(file, rootPath.ArchivePath);
                             }
+
                             break;
                     }
                 }

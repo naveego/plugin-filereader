@@ -88,7 +88,7 @@ namespace PluginCSV.API.Discover
             var records = Read.Read.ReadRecords(schema, Constants.DiscoverDbPrefix).Take(sampleSize);
             schema.Sample.AddRange(records);
 
-            schema.Count = Read.Read.GetCountOfRecords(schema, Constants.DiscoverDbPrefix);
+            // schema.Count = Read.Read.GetCountOfRecords(schema, Constants.DiscoverDbPrefix);
 
             return schema;
         }

@@ -1,7 +1,9 @@
+using PluginCSV.Helper;
+
 namespace PluginCSV.DataContracts
 {
     public class SchemaPublisherMetaJson
     {
-        public string Directory { get; set; }
+        public RootPathObject RootPath { get; set; }
     }
 }
