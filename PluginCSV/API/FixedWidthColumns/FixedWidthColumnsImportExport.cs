@@ -76,7 +76,7 @@ namespace PluginCSV.API.FixedWidthColumns
             querySb = new StringBuilder($"INSERT INTO [{_schemaName}].[{_tableName}] (");
             foreach (var column in rootPath.Columns)
             {
-                querySb.Append($"{column.ColumnName},");
+                querySb.Append($"[{column.ColumnName}],");
             }
 
             querySb.Length--;
