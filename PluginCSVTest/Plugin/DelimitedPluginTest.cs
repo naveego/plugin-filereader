@@ -285,7 +285,7 @@ namespace PluginCSVTest.Plugin
             var request = new DiscoverSchemasRequest
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
-                SampleSize = 10
+                SampleSize = 0
             };
 
             // act
@@ -303,7 +303,7 @@ namespace PluginCSVTest.Plugin
             Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
-            Assert.Equal(10, schema.Sample.Count);
+            Assert.Equal(5, schema.Sample.Count);
             Assert.Equal(6, schema.Properties.Count);
             Assert.True(schema.PublisherMetaJson != "");
 
@@ -321,7 +321,7 @@ namespace PluginCSVTest.Plugin
             Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectoryDifferent]", schema2.Query);
             // Assert.Equal(Count.Types.Kind.Exact, schema2.Count.Kind);
             // Assert.Equal(1000, schema2.Count.Value);
-            Assert.Equal(10, schema2.Sample.Count);
+            Assert.Equal(5, schema2.Sample.Count);
             Assert.Equal(4, schema2.Properties.Count);
             Assert.True(schema.PublisherMetaJson != "");
 

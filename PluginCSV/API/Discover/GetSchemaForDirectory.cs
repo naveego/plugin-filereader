@@ -29,6 +29,11 @@ namespace PluginCSV.API.Discover
             };
             
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
+
+            if (sampleSize == 0)
+            {
+                sampleSize = 5;
+            }
             
             // Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths);
             Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths.Take(1).ToList(), sampleSize);
