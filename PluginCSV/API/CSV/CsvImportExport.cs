@@ -102,7 +102,7 @@ namespace PluginCSV.API.CSV
             return rowCount;
         }
 
-        public int ImportTable(string filePathAndName, RootPathObject rootPath)
+        public long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = long.MaxValue)
         {
             var rowCount = 0;
             List<string> headerColumns = new List<string>();
@@ -201,7 +201,7 @@ namespace PluginCSV.API.CSV
                     if (rootPath.HasHeader)
                         CsvReader.SkipLines = 1;
 
-                    while (CsvReader.ReadLine())
+                    while (CsvReader.ReadLine() && rowCount < limit)
                     {
                         int csvColumnCount = 0;
                         foreach (string fieldValue in CsvReader.Fields)

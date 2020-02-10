@@ -31,7 +31,7 @@ namespace PluginCSV.API.Discover
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
             
             // Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths);
-            Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths.Take(1).ToList());
+            Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths.Take(1).ToList(), sampleSize);
             
             var schema = new Schema
             {

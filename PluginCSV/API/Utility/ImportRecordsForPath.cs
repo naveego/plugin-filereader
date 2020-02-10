@@ -8,14 +8,14 @@ namespace PluginCSV.API.Utility
 {
     public static partial class Utility
     {
-        private static int ImportRecordsForPath(IImportExportFactory factory, SqlDatabaseConnection conn,
+        private static long ImportRecordsForPath(IImportExportFactory factory, SqlDatabaseConnection conn,
             RootPathObject rootPath,
-            string tableName, string schemaName, string path)
+            string tableName, string schemaName, string path, long limit = long.MaxValue)
         {
             Logger.Info($"Preparing to load file: {path}");
             var importExportFile = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName);
             Logger.Info($"Begin loading file: {path}");
-            var rowsWritten = importExportFile.ImportTable(path, rootPath);
+            var rowsWritten = importExportFile.ImportTable(path, rootPath, limit);
             Logger.Info($"Loaded file {path} with {rowsWritten} rows");
 
             return rowsWritten;

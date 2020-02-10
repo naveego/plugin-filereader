@@ -17,7 +17,8 @@ namespace PluginCSV.API.Factory
         /// </summary>
         /// <param name="filePathAndName"></param>
         /// <param name="rootPath"></param>
+        /// <param name="limit"></param>
         /// <returns>Number of rows written</returns>
-        int ImportTable(string filePathAndName, RootPathObject rootPath);
+        long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = -1);
     }
 }

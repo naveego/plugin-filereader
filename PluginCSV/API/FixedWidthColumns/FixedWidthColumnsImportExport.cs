@@ -28,7 +28,7 @@ namespace PluginCSV.API.FixedWidthColumns
             throw new System.NotImplementedException();
         }
 
-        public int ImportTable(string filePathAndName, RootPathObject rootPath)
+        public long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = long.MaxValue)
         {
             // setup db table
             var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (");
@@ -97,7 +97,7 @@ namespace PluginCSV.API.FixedWidthColumns
             cmd.CommandText = query;
 
             // read all lines from file
-            while ((line = file.ReadLine()) != null)
+            while ((line = file.ReadLine()) != null && rowsRead < limit)
             {
                 foreach (var column in rootPath.Columns)
                 {
