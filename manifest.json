@@ -13,7 +13,8 @@
   "accessGroups": [
     "vandelay",
     "nalww",
-    "prodsupport"
+    "prodsupport",
+    "populytics"
   ],
   "canConfigureRealTime": true,
   "canProduceMultipleSchemas": true,
