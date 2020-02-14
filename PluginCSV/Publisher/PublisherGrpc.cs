@@ -174,7 +174,6 @@ namespace Pub {
     }
 
     /// <summary>Base class for server-side implementations of Publisher</summary>
-    [grpc::BindServiceMethod(typeof(Publisher), "BindService")]
     public abstract partial class PublisherBase
     {
       /// <summary>
@@ -423,7 +422,7 @@ namespace Pub {
     {
       /// <summary>Creates a new client for Publisher</summary>
       /// <param name="channel">The channel to use to make remote calls.</param>
-      public PublisherClient(grpc::ChannelBase channel) : base(channel)
+      public PublisherClient(grpc::Channel channel) : base(channel)
       {
       }
       /// <summary>Creates a new client for Publisher that uses a custom <c>CallInvoker</c>.</summary>
@@ -1271,30 +1270,30 @@ namespace Pub {
           .AddMethod(__Method_WriteStream, serviceImpl.WriteStream).Build();
     }
 
-    /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the  service binding logic.
+    /// <summary>Register service method implementations with a service binder. Useful when customizing the service binding logic.
     /// Note: this method is part of an experimental API that can change or be removed without any prior notice.</summary>
     /// <param name="serviceBinder">Service methods will be bound by calling <c>AddMethod</c> on this object.</param>
     /// <param name="serviceImpl">An object implementing the server-side handling logic.</param>
     public static void BindService(grpc::ServiceBinderBase serviceBinder, PublisherBase serviceImpl)
     {
-      serviceBinder.AddMethod(__Method_Configure, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.ConfigureRequest, global::Pub.ConfigureResponse>(serviceImpl.Configure));
-      serviceBinder.AddMethod(__Method_Connect, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.ConnectRequest, global::Pub.ConnectResponse>(serviceImpl.Connect));
-      serviceBinder.AddMethod(__Method_ConnectSession, serviceImpl == null ? null : new grpc::ServerStreamingServerMethod<global::Pub.ConnectRequest, global::Pub.ConnectResponse>(serviceImpl.ConnectSession));
-      serviceBinder.AddMethod(__Method_DiscoverShapes, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.DiscoverSchemasRequest, global::Pub.DiscoverSchemasResponse>(serviceImpl.DiscoverShapes));
-      serviceBinder.AddMethod(__Method_DiscoverSchemas, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.DiscoverSchemasRequest, global::Pub.DiscoverSchemasResponse>(serviceImpl.DiscoverSchemas));
-      serviceBinder.AddMethod(__Method_DiscoverSchemasStream, serviceImpl == null ? null : new grpc::ServerStreamingServerMethod<global::Pub.DiscoverSchemasRequest, global::Pub.Schema>(serviceImpl.DiscoverSchemasStream));
-      serviceBinder.AddMethod(__Method_PublishStream, serviceImpl == null ? null : new grpc::ServerStreamingServerMethod<global::Pub.ReadRequest, global::Pub.Record>(serviceImpl.PublishStream));
-      serviceBinder.AddMethod(__Method_ReadStream, serviceImpl == null ? null : new grpc::ServerStreamingServerMethod<global::Pub.ReadRequest, global::Pub.Record>(serviceImpl.ReadStream));
-      serviceBinder.AddMethod(__Method_Disconnect, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.DisconnectRequest, global::Pub.DisconnectResponse>(serviceImpl.Disconnect));
-      serviceBinder.AddMethod(__Method_ConfigureConnection, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.ConfigureConnectionRequest, global::Pub.ConfigureConnectionResponse>(serviceImpl.ConfigureConnection));
-      serviceBinder.AddMethod(__Method_ConfigureQuery, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.ConfigureQueryRequest, global::Pub.ConfigureQueryResponse>(serviceImpl.ConfigureQuery));
-      serviceBinder.AddMethod(__Method_ConfigureRealTime, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.ConfigureRealTimeRequest, global::Pub.ConfigureRealTimeResponse>(serviceImpl.ConfigureRealTime));
-      serviceBinder.AddMethod(__Method_BeginOAuthFlow, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.BeginOAuthFlowRequest, global::Pub.BeginOAuthFlowResponse>(serviceImpl.BeginOAuthFlow));
-      serviceBinder.AddMethod(__Method_CompleteOAuthFlow, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.CompleteOAuthFlowRequest, global::Pub.CompleteOAuthFlowResponse>(serviceImpl.CompleteOAuthFlow));
-      serviceBinder.AddMethod(__Method_ConfigureWrite, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.ConfigureWriteRequest, global::Pub.ConfigureWriteResponse>(serviceImpl.ConfigureWrite));
-      serviceBinder.AddMethod(__Method_ConfigureReplication, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.ConfigureReplicationRequest, global::Pub.ConfigureReplicationResponse>(serviceImpl.ConfigureReplication));
-      serviceBinder.AddMethod(__Method_PrepareWrite, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::Pub.PrepareWriteRequest, global::Pub.PrepareWriteResponse>(serviceImpl.PrepareWrite));
-      serviceBinder.AddMethod(__Method_WriteStream, serviceImpl == null ? null : new grpc::DuplexStreamingServerMethod<global::Pub.Record, global::Pub.RecordAck>(serviceImpl.WriteStream));
+      serviceBinder.AddMethod(__Method_Configure, serviceImpl.Configure);
+      serviceBinder.AddMethod(__Method_Connect, serviceImpl.Connect);
+      serviceBinder.AddMethod(__Method_ConnectSession, serviceImpl.ConnectSession);
+      serviceBinder.AddMethod(__Method_DiscoverShapes, serviceImpl.DiscoverShapes);
+      serviceBinder.AddMethod(__Method_DiscoverSchemas, serviceImpl.DiscoverSchemas);
+      serviceBinder.AddMethod(__Method_DiscoverSchemasStream, serviceImpl.DiscoverSchemasStream);
+      serviceBinder.AddMethod(__Method_PublishStream, serviceImpl.PublishStream);
+      serviceBinder.AddMethod(__Method_ReadStream, serviceImpl.ReadStream);
+      serviceBinder.AddMethod(__Method_Disconnect, serviceImpl.Disconnect);
+      serviceBinder.AddMethod(__Method_ConfigureConnection, serviceImpl.ConfigureConnection);
+      serviceBinder.AddMethod(__Method_ConfigureQuery, serviceImpl.ConfigureQuery);
+      serviceBinder.AddMethod(__Method_ConfigureRealTime, serviceImpl.ConfigureRealTime);
+      serviceBinder.AddMethod(__Method_BeginOAuthFlow, serviceImpl.BeginOAuthFlow);
+      serviceBinder.AddMethod(__Method_CompleteOAuthFlow, serviceImpl.CompleteOAuthFlow);
+      serviceBinder.AddMethod(__Method_ConfigureWrite, serviceImpl.ConfigureWrite);
+      serviceBinder.AddMethod(__Method_ConfigureReplication, serviceImpl.ConfigureReplication);
+      serviceBinder.AddMethod(__Method_PrepareWrite, serviceImpl.PrepareWrite);
+      serviceBinder.AddMethod(__Method_WriteStream, serviceImpl.WriteStream);
     }
 
   }

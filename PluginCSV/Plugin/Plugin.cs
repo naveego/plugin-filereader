@@ -24,7 +24,6 @@ namespace PluginCSV.Plugin
         private readonly ServerStatus _server;
 
         private TaskCompletionSource<bool> _tcs;
-        // private IImportExportFactory _importExportFactory;
 
         public Plugin()
         {
@@ -66,12 +65,6 @@ namespace PluginCSV.Plugin
             _server.Connected = true;
 
             Logger.Info("Connected.");
-
-            // TODO: switch case for which factory to use
-            switch (settings)
-            {
-            }
-            // _importExportFactory = new CsvImportExportFactory();
 
             return Task.FromResult(new ConnectResponse
             {
@@ -119,6 +112,7 @@ namespace PluginCSV.Plugin
         public override Task<DiscoverSchemasResponse> DiscoverSchemas(DiscoverSchemasRequest request,
             ServerCallContext context)
         {
+            Logger.SetLogPrefix("discover");
             Logger.Info("Discovering Schemas...");
 
             var sampleSize = checked((int) request.SampleSize);
@@ -190,6 +184,7 @@ namespace PluginCSV.Plugin
             var jobId = request.JobId;
             var recordsCount = 0;
 
+            Logger.SetLogPrefix(request.DataVersions.JobId);
             Logger.Info($"Publishing records for schema: {schema.Name}");
 
             try

@@ -14,8 +14,9 @@ namespace PluginCSV.Helper
             Error,
             Off
         }
-        
-        private static string _path = @"plugin-csv-log.txt";
+
+        private static string _logPrefix = "";
+        private static string _path = @"plugin-filereader-log.txt";
         private static LogLevel _level = LogLevel.Info;
         private static ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
         
@@ -25,13 +26,16 @@ namespace PluginCSV.Helper
         /// <param name="message"></param>
         private static void Log(string message)
         {
-            while(_readWriteLock.IsWriteLockHeld){}
             // Set Status to Locked
             _readWriteLock.EnterWriteLock();
             try
             {
+                // ensure log directory exists
+                Directory.CreateDirectory("logs");
+                
                 // Append text to the file
-                using (StreamWriter sw = File.AppendText(_path))
+                var filePath = $"logs/{_logPrefix}_{_path}";
+                using (StreamWriter sw = File.AppendText(filePath))
                 {
                     sw.WriteLine($"{DateTime.Now} {message}");
                     sw.Close();
@@ -69,7 +73,7 @@ namespace PluginCSV.Helper
                 return;
             }
             
-            Log($"VERBOSE: {message}");
+            Log(message);
         }
         
         /// <summary>
@@ -83,7 +87,7 @@ namespace PluginCSV.Helper
                 return;
             }
             
-            Log($"DEBUG: {message}");
+            Log(message);
         }
         /// <summary>
         /// Logging method for Info messages
@@ -96,7 +100,7 @@ namespace PluginCSV.Helper
                 return;
             }
             
-            Log($"INFO: {message}");
+            Log(message);
         }
         
         /// <summary>
@@ -110,7 +114,7 @@ namespace PluginCSV.Helper
                 return;
             }
             
-            Log($"ERROR: {message}");
+            Log(message);
         }
 
         /// <summary>
@@ -120,6 +124,15 @@ namespace PluginCSV.Helper
         public static void SetLogLevel(LogLevel level)
         {
             _level = level;
+        }
+
+        /// <summary>
+        /// Sets a 
+        /// </summary>
+        /// <param name="logPrefix"></param>
+        public static void SetLogPrefix(string logPrefix)
+        {
+            _logPrefix = logPrefix;
         }
     }
 }

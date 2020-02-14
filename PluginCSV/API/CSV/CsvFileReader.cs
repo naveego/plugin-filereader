@@ -105,7 +105,8 @@ namespace PluginCSV.API.CSV
         public CsvFileReader(string path, Encoding encoding)
         {
             InitCsvReader();
-            _reader = new StreamReader(path, encoding);
+            // _reader = new StreamReader(path, encoding);
+            _reader = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
         }
 
         public void RestrictToColumns(params int[] columnIndexes)

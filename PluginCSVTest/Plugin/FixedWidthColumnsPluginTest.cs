@@ -519,7 +519,11 @@ namespace PluginCSVTest.Plugin
 
             var request = new ReadRequest()
             {
-                Schema = schema
+                Schema = schema,
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                }
             };
 
             // act
@@ -576,7 +580,11 @@ namespace PluginCSVTest.Plugin
             var request = new ReadRequest()
             {
                 Schema = schema,
-                Limit = 10
+                Limit = 10,
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                }
             };
 
             // act

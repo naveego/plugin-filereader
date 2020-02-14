@@ -24,146 +24,153 @@ namespace Pub {
     static PublisherReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cg9wdWJsaXNoZXIucHJvdG8SA3B1YiKFAQoQQ29uZmlndXJlUmVxdWVzdBIg",
-            "Cglsb2dfbGV2ZWwYASABKA4yDS5wdWIuTG9nTGV2ZWwSFQoNbG9nX2RpcmVj",
-            "dG9yeRgCIAEoCRIbChNwZXJtYW5lbnRfZGlyZWN0b3J5GAMgASgJEhsKE3Rl",
-            "bXBvcmFyeV9kaXJlY3RvcnkYBCABKAkiEwoRQ29uZmlndXJlUmVzcG9uc2Ui",
-            "dwoOQ29ubmVjdFJlcXVlc3QSFQoNc2V0dGluZ3NfanNvbhgCIAEoCRI0ChNv",
-            "YXV0aF9jb25maWd1cmF0aW9uGAMgASgLMhcucHViLk9BdXRoQ29uZmlndXJh",
-            "dGlvbhIYChBvYXV0aF9zdGF0ZV9qc29uGAQgASgJInIKD0Nvbm5lY3RSZXNw",
-            "b25zZRIWCg5zZXR0aW5nc19lcnJvchgBIAEoCRIYChBjb25uZWN0aW9uX2Vy",
-            "cm9yGAIgASgJEhMKC29hdXRoX2Vycm9yGAMgASgJEhgKEG9hdXRoX3N0YXRl",
-            "X2pzb24YBCABKAkiwwEKC1JlYWRSZXF1ZXN0EhsKBnNjaGVtYRgBIAEoCzIL",
-            "LnB1Yi5TY2hlbWESDQoFbGltaXQYAiABKA0SIwoHZmlsdGVycxgDIAMoCzIS",
-            "LnB1Yi5QdWJsaXNoRmlsdGVyEh8KF3JlYWxfdGltZV9zZXR0aW5nc19qc29u",
-            "GAYgASgJEhwKFHJlYWxfdGltZV9zdGF0ZV9qc29uGAcgASgJEg4KBmpvYl9p",
-            "ZBgIIAEoCRIUCgxkYXRhX3ZlcnNpb24YCSABKA0ijwEKDVB1Ymxpc2hGaWx0",
-            "ZXISJQoEa2luZBgBIAEoDjIXLnB1Yi5QdWJsaXNoRmlsdGVyLktpbmQSEwoL",
-            "cHJvcGVydHlfaWQYAiABKAkSDQoFdmFsdWUYAyABKAkiMwoES2luZBIKCgZF",
-            "UVVBTFMQABINCglMRVNTX1RIQU4QARIQCgxHUkVBVEVSX1RIQU4QAiKcAQoW",
-            "RGlzY292ZXJTY2hlbWFzUmVxdWVzdBIuCgRtb2RlGAEgASgOMiAucHViLkRp",
-            "c2NvdmVyU2NoZW1hc1JlcXVlc3QuTW9kZRIfCgp0b19yZWZyZXNoGAIgAygL",
-            "MgsucHViLlNjaGVtYRITCgtzYW1wbGVfc2l6ZRgEIAEoDSIcCgRNb2RlEgcK",
-            "A0FMTBAAEgsKB1JFRlJFU0gQASI3ChdEaXNjb3ZlclNjaGVtYXNSZXNwb25z",
-            "ZRIcCgdzY2hlbWFzGAEgAygLMgsucHViLlNjaGVtYSLEAgoGU2NoZW1hEgoK",
-            "AmlkGAEgASgJEgwKBG5hbWUYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkS",
-            "IQoKcHJvcGVydGllcxgEIAMoCzINLnB1Yi5Qcm9wZXJ0eRIZCgVjb3VudBgF",
-            "IAEoCzIKLnB1Yi5Db3VudBIbCgZzYW1wbGUYBiADKAsyCy5wdWIuUmVjb3Jk",
-            "Eg0KBXF1ZXJ5GAcgASgJEhsKE3B1Ymxpc2hlcl9tZXRhX2pzb24YCCABKAkS",
-            "DgoGZXJyb3JzGAkgAygJEjoKE2RhdGFfZmxvd19kaXJlY3Rpb24YCiABKA4y",
-            "HS5wdWIuU2NoZW1hLkRhdGFGbG93RGlyZWN0aW9uIjgKEURhdGFGbG93RGly",
-            "ZWN0aW9uEggKBFJFQUQQABIJCgVXUklURRABEg4KClJFQURfV1JJVEUQAiJn",
-            "CgVDb3VudBIdCgRraW5kGAEgASgOMg8ucHViLkNvdW50LktpbmQSDQoFdmFs",
-            "dWUYAiABKAUiMAoES2luZBIPCgtVTkFWQUlMQUJMRRAAEgwKCEVTVElNQVRF",
-            "EAESCQoFRVhBQ1QQAiLqAQoIUHJvcGVydHkSCgoCaWQYASABKAkSDAoEbmFt",
-            "ZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIfCgR0eXBlGAQgASgOMhEu",
-            "cHViLlByb3BlcnR5VHlwZRIOCgZpc19rZXkYBSABKAgSGQoRaXNfY3JlYXRl",
-            "X2NvdW50ZXIYBiABKAgSGQoRaXNfdXBkYXRlX2NvdW50ZXIYByABKAgSGwoT",
-            "cHVibGlzaGVyX21ldGFfanNvbhgIIAEoCRIWCg50eXBlX2F0X3NvdXJjZRgJ",
-            "IAEoCRITCgtpc19udWxsYWJsZRgKIAEoCCITChFEaXNjb25uZWN0UmVxdWVz",
-            "dCIUChJEaXNjb25uZWN0UmVzcG9uc2UikwIKBlJlY29yZBIiCgZhY3Rpb24Y",
-            "ASABKA4yEi5wdWIuUmVjb3JkLkFjdGlvbhIRCglkYXRhX2pzb24YAiABKAkS",
-            "HAoUcmVhbF90aW1lX3N0YXRlX2pzb24YAyABKAkSDQoFY2F1c2UYBCABKAkS",
-            "FgoOY29ycmVsYXRpb25faWQYBSABKAkSEQoJcmVjb3JkX2lkGAYgASgJEiQK",
-            "CHZlcnNpb25zGAcgAygLMhIucHViLlJlY29yZFZlcnNpb24iVAoGQWN0aW9u",
-            "EgoKBlVQU0VSVBAAEgoKBklOU0VSVBABEgoKBlVQREFURRACEgoKBkRFTEVU",
-            "RRADEhoKFlJFQUxfVElNRV9TVEFURV9DT01NSVQQBCKJAQoNUmVjb3JkVmVy",
-            "c2lvbhIVCg1jb25uZWN0aW9uX2lkGAEgASgJEg4KBmpvYl9pZBgCIAEoCRIR",
-            "CglzY2hlbWFfaWQYAyABKAkSEQoJcmVjb3JkX2lkGAQgASgJEhEKCWRhdGFf",
-            "anNvbhgFIAEoCRIYChBzY2hlbWFfZGF0YV9qc29uGAYgASgJIkQKFUNvbmZp",
-            "Z3VyZVF1ZXJ5UmVxdWVzdBIrCgRmb3JtGAEgASgLMh0ucHViLkNvbmZpZ3Vy",
-            "YXRpb25Gb3JtUmVxdWVzdCJjChZDb25maWd1cmVRdWVyeVJlc3BvbnNlEiwK",
-            "BGZvcm0YASABKAsyHi5wdWIuQ29uZmlndXJhdGlvbkZvcm1SZXNwb25zZRIb",
-            "CgZzY2hlbWEYAiABKAsyCy5wdWIuU2NoZW1hIncKGkNvbmZpZ3VyZUNvbm5l",
-            "Y3Rpb25SZXF1ZXN0EisKBGZvcm0YASABKAsyHS5wdWIuQ29uZmlndXJhdGlv",
-            "bkZvcm1SZXF1ZXN0EiwKD2Nvbm5lY3RfcmVxdWVzdBgCIAEoCzITLnB1Yi5D",
-            "b25uZWN0UmVxdWVzdCJ7ChtDb25maWd1cmVDb25uZWN0aW9uUmVzcG9uc2US",
-            "LAoEZm9ybRgBIAEoCzIeLnB1Yi5Db25maWd1cmF0aW9uRm9ybVJlc3BvbnNl",
-            "Ei4KEGNvbm5lY3RfcmVzcG9uc2UYAiABKAsyFC5wdWIuQ29ubmVjdFJlc3Bv",
-            "bnNlImQKGENvbmZpZ3VyZVJlYWxUaW1lUmVxdWVzdBIrCgRmb3JtGAEgASgL",
-            "Mh0ucHViLkNvbmZpZ3VyYXRpb25Gb3JtUmVxdWVzdBIbCgZzY2hlbWEYAiAB",
-            "KAsyCy5wdWIuU2NoZW1hIkkKGUNvbmZpZ3VyZVJlYWxUaW1lUmVzcG9uc2US",
-            "LAoEZm9ybRgBIAEoCzIeLnB1Yi5Db25maWd1cmF0aW9uRm9ybVJlc3BvbnNl",
-            "IlIKGENvbmZpZ3VyYXRpb25Gb3JtUmVxdWVzdBIRCglkYXRhX2pzb24YASAB",
-            "KAkSEgoKc3RhdGVfanNvbhgCIAEoCRIPCgdpc19zYXZlGAMgASgIIpIBChlD",
-            "b25maWd1cmF0aW9uRm9ybVJlc3BvbnNlEhMKC3NjaGVtYV9qc29uGAEgASgJ",
-            "Eg8KB3VpX2pzb24YAiABKAkSEgoKc3RhdGVfanNvbhgDIAEoCRIRCglkYXRh",
-            "X2pzb24YBCABKAkSGAoQZGF0YV9lcnJvcnNfanNvbhgFIAEoCRIOCgZlcnJv",
-            "cnMYBiADKAkiXQoVQmVnaW5PQXV0aEZsb3dSZXF1ZXN0Ei4KDWNvbmZpZ3Vy",
-            "YXRpb24YASABKAsyFy5wdWIuT0F1dGhDb25maWd1cmF0aW9uEhQKDHJlZGly",
-            "ZWN0X3VybBgCIAEoCSIzChZCZWdpbk9BdXRoRmxvd1Jlc3BvbnNlEhkKEWF1",
-            "dGhvcml6YXRpb25fdXJsGAEgASgJIncKGENvbXBsZXRlT0F1dGhGbG93UmVx",
-            "dWVzdBIuCg1jb25maWd1cmF0aW9uGAEgASgLMhcucHViLk9BdXRoQ29uZmln",
-            "dXJhdGlvbhIUCgxyZWRpcmVjdF91cmwYAiABKAkSFQoNcmVkaXJlY3RfYm9k",
-            "eRgDIAEoCSJaChJPQXV0aENvbmZpZ3VyYXRpb24SEQoJY2xpZW50X2lkGAEg",
-            "ASgJEhUKDWNsaWVudF9zZWNyZXQYAiABKAkSGgoSY29uZmlndXJhdGlvbl9q",
-            "c29uGAMgASgJIjUKGUNvbXBsZXRlT0F1dGhGbG93UmVzcG9uc2USGAoQb2F1",
-            "dGhfc3RhdGVfanNvbhgBIAEoCSJEChVDb25maWd1cmVXcml0ZVJlcXVlc3QS",
-            "KwoEZm9ybRgBIAEoCzIdLnB1Yi5Db25maWd1cmF0aW9uRm9ybVJlcXVlc3Qi",
-            "YwoWQ29uZmlndXJlV3JpdGVSZXNwb25zZRIsCgRmb3JtGAEgASgLMh4ucHVi",
-            "LkNvbmZpZ3VyYXRpb25Gb3JtUmVzcG9uc2USGwoGc2NoZW1hGAIgASgLMgsu",
-            "cHViLlNjaGVtYSKXAQobQ29uZmlndXJlUmVwbGljYXRpb25SZXF1ZXN0EisK",
-            "BGZvcm0YASABKAsyHS5wdWIuQ29uZmlndXJhdGlvbkZvcm1SZXF1ZXN0EhsK",
-            "BnNjaGVtYRgCIAEoCzILLnB1Yi5TY2hlbWESLgoIdmVyc2lvbnMYAyADKAsy",
-            "HC5wdWIuUmVwbGljYXRpb25Xcml0ZVZlcnNpb24iTAocQ29uZmlndXJlUmVw",
-            "bGljYXRpb25SZXNwb25zZRIsCgRmb3JtGAEgASgLMh4ucHViLkNvbmZpZ3Vy",
-            "YXRpb25Gb3JtUmVzcG9uc2UigQEKE1ByZXBhcmVXcml0ZVJlcXVlc3QSGgoS",
-            "Y29tbWl0X3NsYV9zZWNvbmRzGAEgASgFEhsKBnNjaGVtYRgCIAEoCzILLnB1",
-            "Yi5TY2hlbWESMQoLcmVwbGljYXRpb24YAyABKAsyHC5wdWIuUmVwbGljYXRp",
-            "b25Xcml0ZVJlcXVlc3QiYAoXUmVwbGljYXRpb25Xcml0ZVJlcXVlc3QSLgoI",
-            "dmVyc2lvbnMYASADKAsyHC5wdWIuUmVwbGljYXRpb25Xcml0ZVZlcnNpb24S",
-            "FQoNc2V0dGluZ3NfanNvbhgCIAEoCSLUAgoXUmVwbGljYXRpb25Xcml0ZVZl",
-            "cnNpb24SFQoNY29ubmVjdGlvbl9pZBgBIAEoCRIXCg9jb25uZWN0aW9uX25h",
-            "bWUYAiABKAkSDgoGam9iX2lkGAMgASgJEhAKCGpvYl9uYW1lGAQgASgJEhEK",
-            "CXNjaGVtYV9pZBgFIAEoCRITCgtzY2hlbWFfbmFtZRgGIAEoCRJnCh9jYXB0",
-            "dXJlZF9zY2hlbWFfZGF0YV9wcm9wZXJ0aWVzGAcgAygLMj4ucHViLlJlcGxp",
-            "Y2F0aW9uV3JpdGVWZXJzaW9uLkNhcHR1cmVkU2NoZW1hRGF0YVByb3BlcnRp",
-            "ZXNFbnRyeRpWCiFDYXB0dXJlZFNjaGVtYURhdGFQcm9wZXJ0aWVzRW50cnkS",
-            "CwoDa2V5GAEgASgJEiAKBXZhbHVlGAIgASgOMhEucHViLlByb3BlcnR5VHlw",
-            "ZToCOAEiFgoUUHJlcGFyZVdyaXRlUmVzcG9uc2UiMgoJUmVjb3JkQWNrEhYK",
-            "DmNvcnJlbGF0aW9uX2lkGAEgASgJEg0KBWVycm9yGAIgASgJKj8KCExvZ0xl",
-            "dmVsEgkKBUVycm9yEAASCAoEV2FybhABEggKBEluZm8QAhIJCgVEZWJ1ZxAD",
-            "EgkKBVRyYWNlEAQqkgEKDFByb3BlcnR5VHlwZRIKCgZTVFJJTkcQABIICgRC",
-            "T09MEAISCwoHSU5URUdFUhADEgkKBUZMT0FUEAQSCwoHREVDSU1BTBAFEggK",
-            "BERBVEUQBhIICgRUSU1FEAcSDAoIREFURVRJTUUQCBIICgRURVhUEAkSCAoE",
-            "QkxPQhAKEggKBEpTT04QCxIHCgNYTUwQDDKbCgoJUHVibGlzaGVyEjwKCUNv",
-            "bmZpZ3VyZRIVLnB1Yi5Db25maWd1cmVSZXF1ZXN0GhYucHViLkNvbmZpZ3Vy",
-            "ZVJlc3BvbnNlIgASNgoHQ29ubmVjdBITLnB1Yi5Db25uZWN0UmVxdWVzdBoU",
-            "LnB1Yi5Db25uZWN0UmVzcG9uc2UiABI/Cg5Db25uZWN0U2Vzc2lvbhITLnB1",
-            "Yi5Db25uZWN0UmVxdWVzdBoULnB1Yi5Db25uZWN0UmVzcG9uc2UiADABElAK",
-            "DkRpc2NvdmVyU2hhcGVzEhsucHViLkRpc2NvdmVyU2NoZW1hc1JlcXVlc3Qa",
-            "HC5wdWIuRGlzY292ZXJTY2hlbWFzUmVzcG9uc2UiA4gCARJOCg9EaXNjb3Zl",
-            "clNjaGVtYXMSGy5wdWIuRGlzY292ZXJTY2hlbWFzUmVxdWVzdBocLnB1Yi5E",
-            "aXNjb3ZlclNjaGVtYXNSZXNwb25zZSIAEkUKFURpc2NvdmVyU2NoZW1hc1N0",
-            "cmVhbRIbLnB1Yi5EaXNjb3ZlclNjaGVtYXNSZXF1ZXN0GgsucHViLlNjaGVt",
-            "YSIAMAESNQoNUHVibGlzaFN0cmVhbRIQLnB1Yi5SZWFkUmVxdWVzdBoLLnB1",
-            "Yi5SZWNvcmQiA4gCATABEi8KClJlYWRTdHJlYW0SEC5wdWIuUmVhZFJlcXVl",
-            "c3QaCy5wdWIuUmVjb3JkIgAwARI/CgpEaXNjb25uZWN0EhYucHViLkRpc2Nv",
-            "bm5lY3RSZXF1ZXN0GhcucHViLkRpc2Nvbm5lY3RSZXNwb25zZSIAEloKE0Nv",
-            "bmZpZ3VyZUNvbm5lY3Rpb24SHy5wdWIuQ29uZmlndXJlQ29ubmVjdGlvblJl",
-            "cXVlc3QaIC5wdWIuQ29uZmlndXJlQ29ubmVjdGlvblJlc3BvbnNlIgASSwoO",
-            "Q29uZmlndXJlUXVlcnkSGi5wdWIuQ29uZmlndXJlUXVlcnlSZXF1ZXN0Ghsu",
-            "cHViLkNvbmZpZ3VyZVF1ZXJ5UmVzcG9uc2UiABJUChFDb25maWd1cmVSZWFs",
-            "VGltZRIdLnB1Yi5Db25maWd1cmVSZWFsVGltZVJlcXVlc3QaHi5wdWIuQ29u",
-            "ZmlndXJlUmVhbFRpbWVSZXNwb25zZSIAEksKDkJlZ2luT0F1dGhGbG93Ehou",
-            "cHViLkJlZ2luT0F1dGhGbG93UmVxdWVzdBobLnB1Yi5CZWdpbk9BdXRoRmxv",
-            "d1Jlc3BvbnNlIgASVAoRQ29tcGxldGVPQXV0aEZsb3cSHS5wdWIuQ29tcGxl",
-            "dGVPQXV0aEZsb3dSZXF1ZXN0Gh4ucHViLkNvbXBsZXRlT0F1dGhGbG93UmVz",
-            "cG9uc2UiABJLCg5Db25maWd1cmVXcml0ZRIaLnB1Yi5Db25maWd1cmVXcml0",
-            "ZVJlcXVlc3QaGy5wdWIuQ29uZmlndXJlV3JpdGVSZXNwb25zZSIAEl0KFENv",
-            "bmZpZ3VyZVJlcGxpY2F0aW9uEiAucHViLkNvbmZpZ3VyZVJlcGxpY2F0aW9u",
-            "UmVxdWVzdBohLnB1Yi5Db25maWd1cmVSZXBsaWNhdGlvblJlc3BvbnNlIgAS",
-            "RQoMUHJlcGFyZVdyaXRlEhgucHViLlByZXBhcmVXcml0ZVJlcXVlc3QaGS5w",
-            "dWIuUHJlcGFyZVdyaXRlUmVzcG9uc2UiABIwCgtXcml0ZVN0cmVhbRILLnB1",
-            "Yi5SZWNvcmQaDi5wdWIuUmVjb3JkQWNrIgAoATABYgZwcm90bzM="));
+            "Cg9wdWJsaXNoZXIucHJvdG8SA3B1YiJmCgxEYXRhVmVyc2lvbnMSDgoGam9i",
+            "X2lkGAEgASgJEhgKEGpvYl9kYXRhX3ZlcnNpb24YAiABKA0SEAoIc2hhcGVf",
+            "aWQYAyABKAkSGgoSc2hhcGVfZGF0YV92ZXJzaW9uGAQgASgNIq8BChBDb25m",
+            "aWd1cmVSZXF1ZXN0EiAKCWxvZ19sZXZlbBgBIAEoDjINLnB1Yi5Mb2dMZXZl",
+            "bBIVCg1sb2dfZGlyZWN0b3J5GAIgASgJEhsKE3Blcm1hbmVudF9kaXJlY3Rv",
+            "cnkYAyABKAkSGwoTdGVtcG9yYXJ5X2RpcmVjdG9yeRgEIAEoCRIoCg1kYXRh",
+            "X3ZlcnNpb25zGAUgASgLMhEucHViLkRhdGFWZXJzaW9ucyITChFDb25maWd1",
+            "cmVSZXNwb25zZSKhAQoOQ29ubmVjdFJlcXVlc3QSFQoNc2V0dGluZ3NfanNv",
+            "bhgCIAEoCRI0ChNvYXV0aF9jb25maWd1cmF0aW9uGAMgASgLMhcucHViLk9B",
+            "dXRoQ29uZmlndXJhdGlvbhIYChBvYXV0aF9zdGF0ZV9qc29uGAQgASgJEigK",
+            "DWRhdGFfdmVyc2lvbnMYBSABKAsyES5wdWIuRGF0YVZlcnNpb25zInIKD0Nv",
+            "bm5lY3RSZXNwb25zZRIWCg5zZXR0aW5nc19lcnJvchgBIAEoCRIYChBjb25u",
+            "ZWN0aW9uX2Vycm9yGAIgASgJEhMKC29hdXRoX2Vycm9yGAMgASgJEhgKEG9h",
+            "dXRoX3N0YXRlX2pzb24YBCABKAki7QEKC1JlYWRSZXF1ZXN0EhsKBnNjaGVt",
+            "YRgBIAEoCzILLnB1Yi5TY2hlbWESDQoFbGltaXQYAiABKA0SIwoHZmlsdGVy",
+            "cxgDIAMoCzISLnB1Yi5QdWJsaXNoRmlsdGVyEh8KF3JlYWxfdGltZV9zZXR0",
+            "aW5nc19qc29uGAYgASgJEhwKFHJlYWxfdGltZV9zdGF0ZV9qc29uGAcgASgJ",
+            "Eg4KBmpvYl9pZBgIIAEoCRIUCgxkYXRhX3ZlcnNpb24YCSABKA0SKAoNZGF0",
+            "YV92ZXJzaW9ucxgKIAEoCzIRLnB1Yi5EYXRhVmVyc2lvbnMijwEKDVB1Ymxp",
+            "c2hGaWx0ZXISJQoEa2luZBgBIAEoDjIXLnB1Yi5QdWJsaXNoRmlsdGVyLktp",
+            "bmQSEwoLcHJvcGVydHlfaWQYAiABKAkSDQoFdmFsdWUYAyABKAkiMwoES2lu",
+            "ZBIKCgZFUVVBTFMQABINCglMRVNTX1RIQU4QARIQCgxHUkVBVEVSX1RIQU4Q",
+            "AiKcAQoWRGlzY292ZXJTY2hlbWFzUmVxdWVzdBIuCgRtb2RlGAEgASgOMiAu",
+            "cHViLkRpc2NvdmVyU2NoZW1hc1JlcXVlc3QuTW9kZRIfCgp0b19yZWZyZXNo",
+            "GAIgAygLMgsucHViLlNjaGVtYRITCgtzYW1wbGVfc2l6ZRgEIAEoDSIcCgRN",
+            "b2RlEgcKA0FMTBAAEgsKB1JFRlJFU0gQASI3ChdEaXNjb3ZlclNjaGVtYXNS",
+            "ZXNwb25zZRIcCgdzY2hlbWFzGAEgAygLMgsucHViLlNjaGVtYSLEAgoGU2No",
+            "ZW1hEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSEwoLZGVzY3JpcHRpb24Y",
+            "AyABKAkSIQoKcHJvcGVydGllcxgEIAMoCzINLnB1Yi5Qcm9wZXJ0eRIZCgVj",
+            "b3VudBgFIAEoCzIKLnB1Yi5Db3VudBIbCgZzYW1wbGUYBiADKAsyCy5wdWIu",
+            "UmVjb3JkEg0KBXF1ZXJ5GAcgASgJEhsKE3B1Ymxpc2hlcl9tZXRhX2pzb24Y",
+            "CCABKAkSDgoGZXJyb3JzGAkgAygJEjoKE2RhdGFfZmxvd19kaXJlY3Rpb24Y",
+            "CiABKA4yHS5wdWIuU2NoZW1hLkRhdGFGbG93RGlyZWN0aW9uIjgKEURhdGFG",
+            "bG93RGlyZWN0aW9uEggKBFJFQUQQABIJCgVXUklURRABEg4KClJFQURfV1JJ",
+            "VEUQAiJnCgVDb3VudBIdCgRraW5kGAEgASgOMg8ucHViLkNvdW50LktpbmQS",
+            "DQoFdmFsdWUYAiABKAUiMAoES2luZBIPCgtVTkFWQUlMQUJMRRAAEgwKCEVT",
+            "VElNQVRFEAESCQoFRVhBQ1QQAiLqAQoIUHJvcGVydHkSCgoCaWQYASABKAkS",
+            "DAoEbmFtZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIfCgR0eXBlGAQg",
+            "ASgOMhEucHViLlByb3BlcnR5VHlwZRIOCgZpc19rZXkYBSABKAgSGQoRaXNf",
+            "Y3JlYXRlX2NvdW50ZXIYBiABKAgSGQoRaXNfdXBkYXRlX2NvdW50ZXIYByAB",
+            "KAgSGwoTcHVibGlzaGVyX21ldGFfanNvbhgIIAEoCRIWCg50eXBlX2F0X3Nv",
+            "dXJjZRgJIAEoCRITCgtpc19udWxsYWJsZRgKIAEoCCITChFEaXNjb25uZWN0",
+            "UmVxdWVzdCIUChJEaXNjb25uZWN0UmVzcG9uc2UikwIKBlJlY29yZBIiCgZh",
+            "Y3Rpb24YASABKA4yEi5wdWIuUmVjb3JkLkFjdGlvbhIRCglkYXRhX2pzb24Y",
+            "AiABKAkSHAoUcmVhbF90aW1lX3N0YXRlX2pzb24YAyABKAkSDQoFY2F1c2UY",
+            "BCABKAkSFgoOY29ycmVsYXRpb25faWQYBSABKAkSEQoJcmVjb3JkX2lkGAYg",
+            "ASgJEiQKCHZlcnNpb25zGAcgAygLMhIucHViLlJlY29yZFZlcnNpb24iVAoG",
+            "QWN0aW9uEgoKBlVQU0VSVBAAEgoKBklOU0VSVBABEgoKBlVQREFURRACEgoK",
+            "BkRFTEVURRADEhoKFlJFQUxfVElNRV9TVEFURV9DT01NSVQQBCKJAQoNUmVj",
+            "b3JkVmVyc2lvbhIVCg1jb25uZWN0aW9uX2lkGAEgASgJEg4KBmpvYl9pZBgC",
+            "IAEoCRIRCglzY2hlbWFfaWQYAyABKAkSEQoJcmVjb3JkX2lkGAQgASgJEhEK",
+            "CWRhdGFfanNvbhgFIAEoCRIYChBzY2hlbWFfZGF0YV9qc29uGAYgASgJIkQK",
+            "FUNvbmZpZ3VyZVF1ZXJ5UmVxdWVzdBIrCgRmb3JtGAEgASgLMh0ucHViLkNv",
+            "bmZpZ3VyYXRpb25Gb3JtUmVxdWVzdCJjChZDb25maWd1cmVRdWVyeVJlc3Bv",
+            "bnNlEiwKBGZvcm0YASABKAsyHi5wdWIuQ29uZmlndXJhdGlvbkZvcm1SZXNw",
+            "b25zZRIbCgZzY2hlbWEYAiABKAsyCy5wdWIuU2NoZW1hIncKGkNvbmZpZ3Vy",
+            "ZUNvbm5lY3Rpb25SZXF1ZXN0EisKBGZvcm0YASABKAsyHS5wdWIuQ29uZmln",
+            "dXJhdGlvbkZvcm1SZXF1ZXN0EiwKD2Nvbm5lY3RfcmVxdWVzdBgCIAEoCzIT",
+            "LnB1Yi5Db25uZWN0UmVxdWVzdCJ7ChtDb25maWd1cmVDb25uZWN0aW9uUmVz",
+            "cG9uc2USLAoEZm9ybRgBIAEoCzIeLnB1Yi5Db25maWd1cmF0aW9uRm9ybVJl",
+            "c3BvbnNlEi4KEGNvbm5lY3RfcmVzcG9uc2UYAiABKAsyFC5wdWIuQ29ubmVj",
+            "dFJlc3BvbnNlImQKGENvbmZpZ3VyZVJlYWxUaW1lUmVxdWVzdBIrCgRmb3Jt",
+            "GAEgASgLMh0ucHViLkNvbmZpZ3VyYXRpb25Gb3JtUmVxdWVzdBIbCgZzY2hl",
+            "bWEYAiABKAsyCy5wdWIuU2NoZW1hIkkKGUNvbmZpZ3VyZVJlYWxUaW1lUmVz",
+            "cG9uc2USLAoEZm9ybRgBIAEoCzIeLnB1Yi5Db25maWd1cmF0aW9uRm9ybVJl",
+            "c3BvbnNlIlIKGENvbmZpZ3VyYXRpb25Gb3JtUmVxdWVzdBIRCglkYXRhX2pz",
+            "b24YASABKAkSEgoKc3RhdGVfanNvbhgCIAEoCRIPCgdpc19zYXZlGAMgASgI",
+            "IpIBChlDb25maWd1cmF0aW9uRm9ybVJlc3BvbnNlEhMKC3NjaGVtYV9qc29u",
+            "GAEgASgJEg8KB3VpX2pzb24YAiABKAkSEgoKc3RhdGVfanNvbhgDIAEoCRIR",
+            "CglkYXRhX2pzb24YBCABKAkSGAoQZGF0YV9lcnJvcnNfanNvbhgFIAEoCRIO",
+            "CgZlcnJvcnMYBiADKAkiXQoVQmVnaW5PQXV0aEZsb3dSZXF1ZXN0Ei4KDWNv",
+            "bmZpZ3VyYXRpb24YASABKAsyFy5wdWIuT0F1dGhDb25maWd1cmF0aW9uEhQK",
+            "DHJlZGlyZWN0X3VybBgCIAEoCSIzChZCZWdpbk9BdXRoRmxvd1Jlc3BvbnNl",
+            "EhkKEWF1dGhvcml6YXRpb25fdXJsGAEgASgJIncKGENvbXBsZXRlT0F1dGhG",
+            "bG93UmVxdWVzdBIuCg1jb25maWd1cmF0aW9uGAEgASgLMhcucHViLk9BdXRo",
+            "Q29uZmlndXJhdGlvbhIUCgxyZWRpcmVjdF91cmwYAiABKAkSFQoNcmVkaXJl",
+            "Y3RfYm9keRgDIAEoCSJaChJPQXV0aENvbmZpZ3VyYXRpb24SEQoJY2xpZW50",
+            "X2lkGAEgASgJEhUKDWNsaWVudF9zZWNyZXQYAiABKAkSGgoSY29uZmlndXJh",
+            "dGlvbl9qc29uGAMgASgJIjUKGUNvbXBsZXRlT0F1dGhGbG93UmVzcG9uc2US",
+            "GAoQb2F1dGhfc3RhdGVfanNvbhgBIAEoCSJEChVDb25maWd1cmVXcml0ZVJl",
+            "cXVlc3QSKwoEZm9ybRgBIAEoCzIdLnB1Yi5Db25maWd1cmF0aW9uRm9ybVJl",
+            "cXVlc3QiYwoWQ29uZmlndXJlV3JpdGVSZXNwb25zZRIsCgRmb3JtGAEgASgL",
+            "Mh4ucHViLkNvbmZpZ3VyYXRpb25Gb3JtUmVzcG9uc2USGwoGc2NoZW1hGAIg",
+            "ASgLMgsucHViLlNjaGVtYSKXAQobQ29uZmlndXJlUmVwbGljYXRpb25SZXF1",
+            "ZXN0EisKBGZvcm0YASABKAsyHS5wdWIuQ29uZmlndXJhdGlvbkZvcm1SZXF1",
+            "ZXN0EhsKBnNjaGVtYRgCIAEoCzILLnB1Yi5TY2hlbWESLgoIdmVyc2lvbnMY",
+            "AyADKAsyHC5wdWIuUmVwbGljYXRpb25Xcml0ZVZlcnNpb24iTAocQ29uZmln",
+            "dXJlUmVwbGljYXRpb25SZXNwb25zZRIsCgRmb3JtGAEgASgLMh4ucHViLkNv",
+            "bmZpZ3VyYXRpb25Gb3JtUmVzcG9uc2UiqwEKE1ByZXBhcmVXcml0ZVJlcXVl",
+            "c3QSGgoSY29tbWl0X3NsYV9zZWNvbmRzGAEgASgFEhsKBnNjaGVtYRgCIAEo",
+            "CzILLnB1Yi5TY2hlbWESMQoLcmVwbGljYXRpb24YAyABKAsyHC5wdWIuUmVw",
+            "bGljYXRpb25Xcml0ZVJlcXVlc3QSKAoNZGF0YV92ZXJzaW9ucxgEIAEoCzIR",
+            "LnB1Yi5EYXRhVmVyc2lvbnMiYAoXUmVwbGljYXRpb25Xcml0ZVJlcXVlc3QS",
+            "LgoIdmVyc2lvbnMYASADKAsyHC5wdWIuUmVwbGljYXRpb25Xcml0ZVZlcnNp",
+            "b24SFQoNc2V0dGluZ3NfanNvbhgCIAEoCSLUAgoXUmVwbGljYXRpb25Xcml0",
+            "ZVZlcnNpb24SFQoNY29ubmVjdGlvbl9pZBgBIAEoCRIXCg9jb25uZWN0aW9u",
+            "X25hbWUYAiABKAkSDgoGam9iX2lkGAMgASgJEhAKCGpvYl9uYW1lGAQgASgJ",
+            "EhEKCXNjaGVtYV9pZBgFIAEoCRITCgtzY2hlbWFfbmFtZRgGIAEoCRJnCh9j",
+            "YXB0dXJlZF9zY2hlbWFfZGF0YV9wcm9wZXJ0aWVzGAcgAygLMj4ucHViLlJl",
+            "cGxpY2F0aW9uV3JpdGVWZXJzaW9uLkNhcHR1cmVkU2NoZW1hRGF0YVByb3Bl",
+            "cnRpZXNFbnRyeRpWCiFDYXB0dXJlZFNjaGVtYURhdGFQcm9wZXJ0aWVzRW50",
+            "cnkSCwoDa2V5GAEgASgJEiAKBXZhbHVlGAIgASgOMhEucHViLlByb3BlcnR5",
+            "VHlwZToCOAEiFgoUUHJlcGFyZVdyaXRlUmVzcG9uc2UiMgoJUmVjb3JkQWNr",
+            "EhYKDmNvcnJlbGF0aW9uX2lkGAEgASgJEg0KBWVycm9yGAIgASgJKj8KCExv",
+            "Z0xldmVsEgkKBUVycm9yEAASCAoEV2FybhABEggKBEluZm8QAhIJCgVEZWJ1",
+            "ZxADEgkKBVRyYWNlEAQqkgEKDFByb3BlcnR5VHlwZRIKCgZTVFJJTkcQABII",
+            "CgRCT09MEAISCwoHSU5URUdFUhADEgkKBUZMT0FUEAQSCwoHREVDSU1BTBAF",
+            "EggKBERBVEUQBhIICgRUSU1FEAcSDAoIREFURVRJTUUQCBIICgRURVhUEAkS",
+            "CAoEQkxPQhAKEggKBEpTT04QCxIHCgNYTUwQDDKbCgoJUHVibGlzaGVyEjwK",
+            "CUNvbmZpZ3VyZRIVLnB1Yi5Db25maWd1cmVSZXF1ZXN0GhYucHViLkNvbmZp",
+            "Z3VyZVJlc3BvbnNlIgASNgoHQ29ubmVjdBITLnB1Yi5Db25uZWN0UmVxdWVz",
+            "dBoULnB1Yi5Db25uZWN0UmVzcG9uc2UiABI/Cg5Db25uZWN0U2Vzc2lvbhIT",
+            "LnB1Yi5Db25uZWN0UmVxdWVzdBoULnB1Yi5Db25uZWN0UmVzcG9uc2UiADAB",
+            "ElAKDkRpc2NvdmVyU2hhcGVzEhsucHViLkRpc2NvdmVyU2NoZW1hc1JlcXVl",
+            "c3QaHC5wdWIuRGlzY292ZXJTY2hlbWFzUmVzcG9uc2UiA4gCARJOCg9EaXNj",
+            "b3ZlclNjaGVtYXMSGy5wdWIuRGlzY292ZXJTY2hlbWFzUmVxdWVzdBocLnB1",
+            "Yi5EaXNjb3ZlclNjaGVtYXNSZXNwb25zZSIAEkUKFURpc2NvdmVyU2NoZW1h",
+            "c1N0cmVhbRIbLnB1Yi5EaXNjb3ZlclNjaGVtYXNSZXF1ZXN0GgsucHViLlNj",
+            "aGVtYSIAMAESNQoNUHVibGlzaFN0cmVhbRIQLnB1Yi5SZWFkUmVxdWVzdBoL",
+            "LnB1Yi5SZWNvcmQiA4gCATABEi8KClJlYWRTdHJlYW0SEC5wdWIuUmVhZFJl",
+            "cXVlc3QaCy5wdWIuUmVjb3JkIgAwARI/CgpEaXNjb25uZWN0EhYucHViLkRp",
+            "c2Nvbm5lY3RSZXF1ZXN0GhcucHViLkRpc2Nvbm5lY3RSZXNwb25zZSIAEloK",
+            "E0NvbmZpZ3VyZUNvbm5lY3Rpb24SHy5wdWIuQ29uZmlndXJlQ29ubmVjdGlv",
+            "blJlcXVlc3QaIC5wdWIuQ29uZmlndXJlQ29ubmVjdGlvblJlc3BvbnNlIgAS",
+            "SwoOQ29uZmlndXJlUXVlcnkSGi5wdWIuQ29uZmlndXJlUXVlcnlSZXF1ZXN0",
+            "GhsucHViLkNvbmZpZ3VyZVF1ZXJ5UmVzcG9uc2UiABJUChFDb25maWd1cmVS",
+            "ZWFsVGltZRIdLnB1Yi5Db25maWd1cmVSZWFsVGltZVJlcXVlc3QaHi5wdWIu",
+            "Q29uZmlndXJlUmVhbFRpbWVSZXNwb25zZSIAEksKDkJlZ2luT0F1dGhGbG93",
+            "EhoucHViLkJlZ2luT0F1dGhGbG93UmVxdWVzdBobLnB1Yi5CZWdpbk9BdXRo",
+            "Rmxvd1Jlc3BvbnNlIgASVAoRQ29tcGxldGVPQXV0aEZsb3cSHS5wdWIuQ29t",
+            "cGxldGVPQXV0aEZsb3dSZXF1ZXN0Gh4ucHViLkNvbXBsZXRlT0F1dGhGbG93",
+            "UmVzcG9uc2UiABJLCg5Db25maWd1cmVXcml0ZRIaLnB1Yi5Db25maWd1cmVX",
+            "cml0ZVJlcXVlc3QaGy5wdWIuQ29uZmlndXJlV3JpdGVSZXNwb25zZSIAEl0K",
+            "FENvbmZpZ3VyZVJlcGxpY2F0aW9uEiAucHViLkNvbmZpZ3VyZVJlcGxpY2F0",
+            "aW9uUmVxdWVzdBohLnB1Yi5Db25maWd1cmVSZXBsaWNhdGlvblJlc3BvbnNl",
+            "IgASRQoMUHJlcGFyZVdyaXRlEhgucHViLlByZXBhcmVXcml0ZVJlcXVlc3Qa",
+            "GS5wdWIuUHJlcGFyZVdyaXRlUmVzcG9uc2UiABIwCgtXcml0ZVN0cmVhbRIL",
+            "LnB1Yi5SZWNvcmQaDi5wdWIuUmVjb3JkQWNrIgAoATABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Pub.LogLevel), typeof(global::Pub.PropertyType), }, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ConfigureRequest), global::Pub.ConfigureRequest.Parser, new[]{ "LogLevel", "LogDirectory", "PermanentDirectory", "TemporaryDirectory" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Pub.DataVersions), global::Pub.DataVersions.Parser, new[]{ "JobId", "JobDataVersion", "ShapeId", "ShapeDataVersion" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ConfigureRequest), global::Pub.ConfigureRequest.Parser, new[]{ "LogLevel", "LogDirectory", "PermanentDirectory", "TemporaryDirectory", "DataVersions" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ConfigureResponse), global::Pub.ConfigureResponse.Parser, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ConnectRequest), global::Pub.ConnectRequest.Parser, new[]{ "SettingsJson", "OauthConfiguration", "OauthStateJson" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ConnectRequest), global::Pub.ConnectRequest.Parser, new[]{ "SettingsJson", "OauthConfiguration", "OauthStateJson", "DataVersions" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ConnectResponse), global::Pub.ConnectResponse.Parser, new[]{ "SettingsError", "ConnectionError", "OauthError", "OauthStateJson" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ReadRequest), global::Pub.ReadRequest.Parser, new[]{ "Schema", "Limit", "Filters", "RealTimeSettingsJson", "RealTimeStateJson", "JobId", "DataVersion" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ReadRequest), global::Pub.ReadRequest.Parser, new[]{ "Schema", "Limit", "Filters", "RealTimeSettingsJson", "RealTimeStateJson", "JobId", "DataVersion", "DataVersions" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.PublishFilter), global::Pub.PublishFilter.Parser, new[]{ "Kind", "PropertyId", "Value" }, null, new[]{ typeof(global::Pub.PublishFilter.Types.Kind) }, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.DiscoverSchemasRequest), global::Pub.DiscoverSchemasRequest.Parser, new[]{ "Mode", "ToRefresh", "SampleSize" }, null, new[]{ typeof(global::Pub.DiscoverSchemasRequest.Types.Mode) }, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.DiscoverSchemasResponse), global::Pub.DiscoverSchemasResponse.Parser, new[]{ "Schemas" }, null, null, null),
@@ -191,7 +198,7 @@ namespace Pub {
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ConfigureWriteResponse), global::Pub.ConfigureWriteResponse.Parser, new[]{ "Form", "Schema" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ConfigureReplicationRequest), global::Pub.ConfigureReplicationRequest.Parser, new[]{ "Form", "Schema", "Versions" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ConfigureReplicationResponse), global::Pub.ConfigureReplicationResponse.Parser, new[]{ "Form" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Pub.PrepareWriteRequest), global::Pub.PrepareWriteRequest.Parser, new[]{ "CommitSlaSeconds", "Schema", "Replication" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Pub.PrepareWriteRequest), global::Pub.PrepareWriteRequest.Parser, new[]{ "CommitSlaSeconds", "Schema", "Replication", "DataVersions" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ReplicationWriteRequest), global::Pub.ReplicationWriteRequest.Parser, new[]{ "Versions", "SettingsJson" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.ReplicationWriteVersion), global::Pub.ReplicationWriteVersion.Parser, new[]{ "ConnectionId", "ConnectionName", "JobId", "JobName", "SchemaId", "SchemaName", "CapturedSchemaDataProperties" }, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
             new pbr::GeneratedClrTypeInfo(typeof(global::Pub.PrepareWriteResponse), global::Pub.PrepareWriteResponse.Parser, null, null, null, null),
@@ -264,6 +271,235 @@ namespace Pub {
   #endregion
 
   #region Messages
+  public sealed partial class DataVersions : pb::IMessage<DataVersions> {
+    private static readonly pb::MessageParser<DataVersions> _parser = new pb::MessageParser<DataVersions>(() => new DataVersions());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<DataVersions> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[0]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DataVersions() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DataVersions(DataVersions other) : this() {
+      jobId_ = other.jobId_;
+      jobDataVersion_ = other.jobDataVersion_;
+      shapeId_ = other.shapeId_;
+      shapeDataVersion_ = other.shapeDataVersion_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DataVersions Clone() {
+      return new DataVersions(this);
+    }
+
+    /// <summary>Field number for the "job_id" field.</summary>
+    public const int JobIdFieldNumber = 1;
+    private string jobId_ = "";
+    /// <summary>
+    /// The ID of the job related to this request, if any. Can be used to
+    /// name caches related to a specific job.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string JobId {
+      get { return jobId_; }
+      set {
+        jobId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "job_data_version" field.</summary>
+    public const int JobDataVersionFieldNumber = 2;
+    private uint jobDataVersion_;
+    /// <summary>
+    /// The data version of the job related to this request. When this increments,
+    /// any cached data associated with the job should be discarded.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint JobDataVersion {
+      get { return jobDataVersion_; }
+      set {
+        jobDataVersion_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "shape_id" field.</summary>
+    public const int ShapeIdFieldNumber = 3;
+    private string shapeId_ = "";
+    /// <summary>
+    /// The ID of the shape related to this request, if any. Can be used to
+    /// name caches related to a specific shape.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string ShapeId {
+      get { return shapeId_; }
+      set {
+        shapeId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "shape_data_version" field.</summary>
+    public const int ShapeDataVersionFieldNumber = 4;
+    private uint shapeDataVersion_;
+    /// <summary>
+    /// The data version of the shape related to this request. When this
+    /// increments, any cached data associated with the shape should be discarded.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint ShapeDataVersion {
+      get { return shapeDataVersion_; }
+      set {
+        shapeDataVersion_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as DataVersions);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(DataVersions other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (JobId != other.JobId) return false;
+      if (JobDataVersion != other.JobDataVersion) return false;
+      if (ShapeId != other.ShapeId) return false;
+      if (ShapeDataVersion != other.ShapeDataVersion) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (JobId.Length != 0) hash ^= JobId.GetHashCode();
+      if (JobDataVersion != 0) hash ^= JobDataVersion.GetHashCode();
+      if (ShapeId.Length != 0) hash ^= ShapeId.GetHashCode();
+      if (ShapeDataVersion != 0) hash ^= ShapeDataVersion.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (JobId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(JobId);
+      }
+      if (JobDataVersion != 0) {
+        output.WriteRawTag(16);
+        output.WriteUInt32(JobDataVersion);
+      }
+      if (ShapeId.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(ShapeId);
+      }
+      if (ShapeDataVersion != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(ShapeDataVersion);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (JobId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(JobId);
+      }
+      if (JobDataVersion != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(JobDataVersion);
+      }
+      if (ShapeId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(ShapeId);
+      }
+      if (ShapeDataVersion != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(ShapeDataVersion);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(DataVersions other) {
+      if (other == null) {
+        return;
+      }
+      if (other.JobId.Length != 0) {
+        JobId = other.JobId;
+      }
+      if (other.JobDataVersion != 0) {
+        JobDataVersion = other.JobDataVersion;
+      }
+      if (other.ShapeId.Length != 0) {
+        ShapeId = other.ShapeId;
+      }
+      if (other.ShapeDataVersion != 0) {
+        ShapeDataVersion = other.ShapeDataVersion;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            JobId = input.ReadString();
+            break;
+          }
+          case 16: {
+            JobDataVersion = input.ReadUInt32();
+            break;
+          }
+          case 26: {
+            ShapeId = input.ReadString();
+            break;
+          }
+          case 32: {
+            ShapeDataVersion = input.ReadUInt32();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
   public sealed partial class ConfigureRequest : pb::IMessage<ConfigureRequest> {
     private static readonly pb::MessageParser<ConfigureRequest> _parser = new pb::MessageParser<ConfigureRequest>(() => new ConfigureRequest());
     private pb::UnknownFieldSet _unknownFields;
@@ -272,7 +508,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -293,6 +529,7 @@ namespace Pub {
       logDirectory_ = other.logDirectory_;
       permanentDirectory_ = other.permanentDirectory_;
       temporaryDirectory_ = other.temporaryDirectory_;
+      dataVersions_ = other.dataVersions_ != null ? other.dataVersions_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -358,6 +595,21 @@ namespace Pub {
       }
     }
 
+    /// <summary>Field number for the "data_versions" field.</summary>
+    public const int DataVersionsFieldNumber = 5;
+    private global::Pub.DataVersions dataVersions_;
+    /// <summary>
+    /// Data versions which will be in effect until the next configure request.
+    /// This can be used to name log files or caches.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Pub.DataVersions DataVersions {
+      get { return dataVersions_; }
+      set {
+        dataVersions_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as ConfigureRequest);
@@ -375,6 +627,7 @@ namespace Pub {
       if (LogDirectory != other.LogDirectory) return false;
       if (PermanentDirectory != other.PermanentDirectory) return false;
       if (TemporaryDirectory != other.TemporaryDirectory) return false;
+      if (!object.Equals(DataVersions, other.DataVersions)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -385,6 +638,7 @@ namespace Pub {
       if (LogDirectory.Length != 0) hash ^= LogDirectory.GetHashCode();
       if (PermanentDirectory.Length != 0) hash ^= PermanentDirectory.GetHashCode();
       if (TemporaryDirectory.Length != 0) hash ^= TemporaryDirectory.GetHashCode();
+      if (dataVersions_ != null) hash ^= DataVersions.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -414,6 +668,10 @@ namespace Pub {
         output.WriteRawTag(34);
         output.WriteString(TemporaryDirectory);
       }
+      if (dataVersions_ != null) {
+        output.WriteRawTag(42);
+        output.WriteMessage(DataVersions);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -433,6 +691,9 @@ namespace Pub {
       }
       if (TemporaryDirectory.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(TemporaryDirectory);
+      }
+      if (dataVersions_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(DataVersions);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -457,6 +718,12 @@ namespace Pub {
       if (other.TemporaryDirectory.Length != 0) {
         TemporaryDirectory = other.TemporaryDirectory;
       }
+      if (other.dataVersions_ != null) {
+        if (dataVersions_ == null) {
+          dataVersions_ = new global::Pub.DataVersions();
+        }
+        DataVersions.MergeFrom(other.DataVersions);
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -469,7 +736,7 @@ namespace Pub {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            LogLevel = (global::Pub.LogLevel) input.ReadEnum();
+            logLevel_ = (global::Pub.LogLevel) input.ReadEnum();
             break;
           }
           case 18: {
@@ -482,6 +749,13 @@ namespace Pub {
           }
           case 34: {
             TemporaryDirectory = input.ReadString();
+            break;
+          }
+          case 42: {
+            if (dataVersions_ == null) {
+              dataVersions_ = new global::Pub.DataVersions();
+            }
+            input.ReadMessage(dataVersions_);
             break;
           }
         }
@@ -498,7 +772,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -599,7 +873,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -619,6 +893,7 @@ namespace Pub {
       settingsJson_ = other.settingsJson_;
       oauthConfiguration_ = other.oauthConfiguration_ != null ? other.oauthConfiguration_.Clone() : null;
       oauthStateJson_ = other.oauthStateJson_;
+      dataVersions_ = other.dataVersions_ != null ? other.dataVersions_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -673,6 +948,21 @@ namespace Pub {
       }
     }
 
+    /// <summary>Field number for the "data_versions" field.</summary>
+    public const int DataVersionsFieldNumber = 5;
+    private global::Pub.DataVersions dataVersions_;
+    /// <summary>
+    /// Data versions which will be in effect until the next configure request.
+    /// This can be used to name log files or caches.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Pub.DataVersions DataVersions {
+      get { return dataVersions_; }
+      set {
+        dataVersions_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as ConnectRequest);
@@ -689,6 +979,7 @@ namespace Pub {
       if (SettingsJson != other.SettingsJson) return false;
       if (!object.Equals(OauthConfiguration, other.OauthConfiguration)) return false;
       if (OauthStateJson != other.OauthStateJson) return false;
+      if (!object.Equals(DataVersions, other.DataVersions)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -698,6 +989,7 @@ namespace Pub {
       if (SettingsJson.Length != 0) hash ^= SettingsJson.GetHashCode();
       if (oauthConfiguration_ != null) hash ^= OauthConfiguration.GetHashCode();
       if (OauthStateJson.Length != 0) hash ^= OauthStateJson.GetHashCode();
+      if (dataVersions_ != null) hash ^= DataVersions.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -723,6 +1015,10 @@ namespace Pub {
         output.WriteRawTag(34);
         output.WriteString(OauthStateJson);
       }
+      if (dataVersions_ != null) {
+        output.WriteRawTag(42);
+        output.WriteMessage(DataVersions);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -740,6 +1036,9 @@ namespace Pub {
       if (OauthStateJson.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(OauthStateJson);
       }
+      if (dataVersions_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(DataVersions);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -756,12 +1055,18 @@ namespace Pub {
       }
       if (other.oauthConfiguration_ != null) {
         if (oauthConfiguration_ == null) {
-          OauthConfiguration = new global::Pub.OAuthConfiguration();
+          oauthConfiguration_ = new global::Pub.OAuthConfiguration();
         }
         OauthConfiguration.MergeFrom(other.OauthConfiguration);
       }
       if (other.OauthStateJson.Length != 0) {
         OauthStateJson = other.OauthStateJson;
+      }
+      if (other.dataVersions_ != null) {
+        if (dataVersions_ == null) {
+          dataVersions_ = new global::Pub.DataVersions();
+        }
+        DataVersions.MergeFrom(other.DataVersions);
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -780,13 +1085,20 @@ namespace Pub {
           }
           case 26: {
             if (oauthConfiguration_ == null) {
-              OauthConfiguration = new global::Pub.OAuthConfiguration();
+              oauthConfiguration_ = new global::Pub.OAuthConfiguration();
             }
-            input.ReadMessage(OauthConfiguration);
+            input.ReadMessage(oauthConfiguration_);
             break;
           }
           case 34: {
             OauthStateJson = input.ReadString();
+            break;
+          }
+          case 42: {
+            if (dataVersions_ == null) {
+              dataVersions_ = new global::Pub.DataVersions();
+            }
+            input.ReadMessage(dataVersions_);
             break;
           }
         }
@@ -806,7 +1118,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1036,7 +1348,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1060,6 +1372,7 @@ namespace Pub {
       realTimeStateJson_ = other.realTimeStateJson_;
       jobId_ = other.jobId_;
       dataVersion_ = other.dataVersion_;
+      dataVersions_ = other.dataVersions_ != null ? other.dataVersions_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1160,12 +1473,25 @@ namespace Pub {
     /// <summary>
     /// The data_version is a counter that will be incremented whenever
     /// all data produced for a particular job_id should be discarded.
+    ///
+    /// Deprecated: Use the data_versions property instead.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public uint DataVersion {
       get { return dataVersion_; }
       set {
         dataVersion_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "data_versions" field.</summary>
+    public const int DataVersionsFieldNumber = 10;
+    private global::Pub.DataVersions dataVersions_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Pub.DataVersions DataVersions {
+      get { return dataVersions_; }
+      set {
+        dataVersions_ = value;
       }
     }
 
@@ -1189,6 +1515,7 @@ namespace Pub {
       if (RealTimeStateJson != other.RealTimeStateJson) return false;
       if (JobId != other.JobId) return false;
       if (DataVersion != other.DataVersion) return false;
+      if (!object.Equals(DataVersions, other.DataVersions)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1202,6 +1529,7 @@ namespace Pub {
       if (RealTimeStateJson.Length != 0) hash ^= RealTimeStateJson.GetHashCode();
       if (JobId.Length != 0) hash ^= JobId.GetHashCode();
       if (DataVersion != 0) hash ^= DataVersion.GetHashCode();
+      if (dataVersions_ != null) hash ^= DataVersions.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1240,6 +1568,10 @@ namespace Pub {
         output.WriteRawTag(72);
         output.WriteUInt32(DataVersion);
       }
+      if (dataVersions_ != null) {
+        output.WriteRawTag(82);
+        output.WriteMessage(DataVersions);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1267,6 +1599,9 @@ namespace Pub {
       if (DataVersion != 0) {
         size += 1 + pb::CodedOutputStream.ComputeUInt32Size(DataVersion);
       }
+      if (dataVersions_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(DataVersions);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1280,7 +1615,7 @@ namespace Pub {
       }
       if (other.schema_ != null) {
         if (schema_ == null) {
-          Schema = new global::Pub.Schema();
+          schema_ = new global::Pub.Schema();
         }
         Schema.MergeFrom(other.Schema);
       }
@@ -1300,6 +1635,12 @@ namespace Pub {
       if (other.DataVersion != 0) {
         DataVersion = other.DataVersion;
       }
+      if (other.dataVersions_ != null) {
+        if (dataVersions_ == null) {
+          dataVersions_ = new global::Pub.DataVersions();
+        }
+        DataVersions.MergeFrom(other.DataVersions);
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -1313,9 +1654,9 @@ namespace Pub {
             break;
           case 10: {
             if (schema_ == null) {
-              Schema = new global::Pub.Schema();
+              schema_ = new global::Pub.Schema();
             }
-            input.ReadMessage(Schema);
+            input.ReadMessage(schema_);
             break;
           }
           case 16: {
@@ -1342,6 +1683,13 @@ namespace Pub {
             DataVersion = input.ReadUInt32();
             break;
           }
+          case 82: {
+            if (dataVersions_ == null) {
+              dataVersions_ = new global::Pub.DataVersions();
+            }
+            input.ReadMessage(dataVersions_);
+            break;
+          }
         }
       }
     }
@@ -1356,7 +1704,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1528,7 +1876,7 @@ namespace Pub {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Kind = (global::Pub.PublishFilter.Types.Kind) input.ReadEnum();
+            kind_ = (global::Pub.PublishFilter.Types.Kind) input.ReadEnum();
             break;
           }
           case 18: {
@@ -1575,7 +1923,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1736,7 +2084,7 @@ namespace Pub {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Mode = (global::Pub.DiscoverSchemasRequest.Types.Mode) input.ReadEnum();
+            mode_ = (global::Pub.DiscoverSchemasRequest.Types.Mode) input.ReadEnum();
             break;
           }
           case 18: {
@@ -1780,7 +2128,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1904,7 +2252,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[8]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2217,7 +2565,7 @@ namespace Pub {
       properties_.Add(other.properties_);
       if (other.count_ != null) {
         if (count_ == null) {
-          Count = new global::Pub.Count();
+          count_ = new global::Pub.Count();
         }
         Count.MergeFrom(other.Count);
       }
@@ -2261,9 +2609,9 @@ namespace Pub {
           }
           case 42: {
             if (count_ == null) {
-              Count = new global::Pub.Count();
+              count_ = new global::Pub.Count();
             }
-            input.ReadMessage(Count);
+            input.ReadMessage(count_);
             break;
           }
           case 50: {
@@ -2283,7 +2631,7 @@ namespace Pub {
             break;
           }
           case 80: {
-            DataFlowDirection = (global::Pub.Schema.Types.DataFlowDirection) input.ReadEnum();
+            dataFlowDirection_ = (global::Pub.Schema.Types.DataFlowDirection) input.ReadEnum();
             break;
           }
         }
@@ -2313,7 +2661,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[9]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2449,7 +2797,7 @@ namespace Pub {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Kind = (global::Pub.Count.Types.Kind) input.ReadEnum();
+            kind_ = (global::Pub.Count.Types.Kind) input.ReadEnum();
             break;
           }
           case 16: {
@@ -2483,7 +2831,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[10]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[11]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2860,7 +3208,7 @@ namespace Pub {
             break;
           }
           case 32: {
-            Type = (global::Pub.PropertyType) input.ReadEnum();
+            type_ = (global::Pub.PropertyType) input.ReadEnum();
             break;
           }
           case 40: {
@@ -2901,7 +3249,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[11]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[12]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3002,7 +3350,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[12]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[13]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3103,7 +3451,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[13]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[14]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3217,7 +3565,7 @@ namespace Pub {
     public const int RecordIdFieldNumber = 6;
     private string recordId_ = "";
     /// <summary>
-    /// RecordID for the source record. 
+    /// RecordID for the source record.
     /// Only set on a replication writeback.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3234,7 +3582,7 @@ namespace Pub {
         = pb::FieldCodec.ForMessage(58, global::Pub.RecordVersion.Parser);
     private readonly pbc::RepeatedField<global::Pub.RecordVersion> versions_ = new pbc::RepeatedField<global::Pub.RecordVersion>();
     /// <summary>
-    /// Versions of the record from other sources. 
+    /// Versions of the record from other sources.
     /// Only set on a replication writeback.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3382,7 +3730,7 @@ namespace Pub {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Action = (global::Pub.Record.Types.Action) input.ReadEnum();
+            action_ = (global::Pub.Record.Types.Action) input.ReadEnum();
             break;
           }
           case 18: {
@@ -3447,7 +3795,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[14]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[15]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3734,7 +4082,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[15]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[16]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3836,7 +4184,7 @@ namespace Pub {
       }
       if (other.form_ != null) {
         if (form_ == null) {
-          Form = new global::Pub.ConfigurationFormRequest();
+          form_ = new global::Pub.ConfigurationFormRequest();
         }
         Form.MergeFrom(other.Form);
       }
@@ -3853,9 +4201,9 @@ namespace Pub {
             break;
           case 10: {
             if (form_ == null) {
-              Form = new global::Pub.ConfigurationFormRequest();
+              form_ = new global::Pub.ConfigurationFormRequest();
             }
-            input.ReadMessage(Form);
+            input.ReadMessage(form_);
             break;
           }
         }
@@ -3872,7 +4220,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[16]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[17]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3995,13 +4343,13 @@ namespace Pub {
       }
       if (other.form_ != null) {
         if (form_ == null) {
-          Form = new global::Pub.ConfigurationFormResponse();
+          form_ = new global::Pub.ConfigurationFormResponse();
         }
         Form.MergeFrom(other.Form);
       }
       if (other.schema_ != null) {
         if (schema_ == null) {
-          Schema = new global::Pub.Schema();
+          schema_ = new global::Pub.Schema();
         }
         Schema.MergeFrom(other.Schema);
       }
@@ -4018,16 +4366,16 @@ namespace Pub {
             break;
           case 10: {
             if (form_ == null) {
-              Form = new global::Pub.ConfigurationFormResponse();
+              form_ = new global::Pub.ConfigurationFormResponse();
             }
-            input.ReadMessage(Form);
+            input.ReadMessage(form_);
             break;
           }
           case 18: {
             if (schema_ == null) {
-              Schema = new global::Pub.Schema();
+              schema_ = new global::Pub.Schema();
             }
-            input.ReadMessage(Schema);
+            input.ReadMessage(schema_);
             break;
           }
         }
@@ -4044,7 +4392,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[17]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[18]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4171,13 +4519,13 @@ namespace Pub {
       }
       if (other.form_ != null) {
         if (form_ == null) {
-          Form = new global::Pub.ConfigurationFormRequest();
+          form_ = new global::Pub.ConfigurationFormRequest();
         }
         Form.MergeFrom(other.Form);
       }
       if (other.connectRequest_ != null) {
         if (connectRequest_ == null) {
-          ConnectRequest = new global::Pub.ConnectRequest();
+          connectRequest_ = new global::Pub.ConnectRequest();
         }
         ConnectRequest.MergeFrom(other.ConnectRequest);
       }
@@ -4194,16 +4542,16 @@ namespace Pub {
             break;
           case 10: {
             if (form_ == null) {
-              Form = new global::Pub.ConfigurationFormRequest();
+              form_ = new global::Pub.ConfigurationFormRequest();
             }
-            input.ReadMessage(Form);
+            input.ReadMessage(form_);
             break;
           }
           case 18: {
             if (connectRequest_ == null) {
-              ConnectRequest = new global::Pub.ConnectRequest();
+              connectRequest_ = new global::Pub.ConnectRequest();
             }
-            input.ReadMessage(ConnectRequest);
+            input.ReadMessage(connectRequest_);
             break;
           }
         }
@@ -4220,7 +4568,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[18]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[19]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4345,13 +4693,13 @@ namespace Pub {
       }
       if (other.form_ != null) {
         if (form_ == null) {
-          Form = new global::Pub.ConfigurationFormResponse();
+          form_ = new global::Pub.ConfigurationFormResponse();
         }
         Form.MergeFrom(other.Form);
       }
       if (other.connectResponse_ != null) {
         if (connectResponse_ == null) {
-          ConnectResponse = new global::Pub.ConnectResponse();
+          connectResponse_ = new global::Pub.ConnectResponse();
         }
         ConnectResponse.MergeFrom(other.ConnectResponse);
       }
@@ -4368,16 +4716,16 @@ namespace Pub {
             break;
           case 10: {
             if (form_ == null) {
-              Form = new global::Pub.ConfigurationFormResponse();
+              form_ = new global::Pub.ConfigurationFormResponse();
             }
-            input.ReadMessage(Form);
+            input.ReadMessage(form_);
             break;
           }
           case 18: {
             if (connectResponse_ == null) {
-              ConnectResponse = new global::Pub.ConnectResponse();
+              connectResponse_ = new global::Pub.ConnectResponse();
             }
-            input.ReadMessage(ConnectResponse);
+            input.ReadMessage(connectResponse_);
             break;
           }
         }
@@ -4394,7 +4742,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[19]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[20]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4520,13 +4868,13 @@ namespace Pub {
       }
       if (other.form_ != null) {
         if (form_ == null) {
-          Form = new global::Pub.ConfigurationFormRequest();
+          form_ = new global::Pub.ConfigurationFormRequest();
         }
         Form.MergeFrom(other.Form);
       }
       if (other.schema_ != null) {
         if (schema_ == null) {
-          Schema = new global::Pub.Schema();
+          schema_ = new global::Pub.Schema();
         }
         Schema.MergeFrom(other.Schema);
       }
@@ -4543,16 +4891,16 @@ namespace Pub {
             break;
           case 10: {
             if (form_ == null) {
-              Form = new global::Pub.ConfigurationFormRequest();
+              form_ = new global::Pub.ConfigurationFormRequest();
             }
-            input.ReadMessage(Form);
+            input.ReadMessage(form_);
             break;
           }
           case 18: {
             if (schema_ == null) {
-              Schema = new global::Pub.Schema();
+              schema_ = new global::Pub.Schema();
             }
-            input.ReadMessage(Schema);
+            input.ReadMessage(schema_);
             break;
           }
         }
@@ -4569,7 +4917,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[20]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[21]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4668,7 +5016,7 @@ namespace Pub {
       }
       if (other.form_ != null) {
         if (form_ == null) {
-          Form = new global::Pub.ConfigurationFormResponse();
+          form_ = new global::Pub.ConfigurationFormResponse();
         }
         Form.MergeFrom(other.Form);
       }
@@ -4685,9 +5033,9 @@ namespace Pub {
             break;
           case 10: {
             if (form_ == null) {
-              Form = new global::Pub.ConfigurationFormResponse();
+              form_ = new global::Pub.ConfigurationFormResponse();
             }
-            input.ReadMessage(Form);
+            input.ReadMessage(form_);
             break;
           }
         }
@@ -4704,7 +5052,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[21]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[22]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4902,7 +5250,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[22]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[23]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5185,7 +5533,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[23]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[24]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5308,7 +5656,7 @@ namespace Pub {
       }
       if (other.configuration_ != null) {
         if (configuration_ == null) {
-          Configuration = new global::Pub.OAuthConfiguration();
+          configuration_ = new global::Pub.OAuthConfiguration();
         }
         Configuration.MergeFrom(other.Configuration);
       }
@@ -5328,9 +5676,9 @@ namespace Pub {
             break;
           case 10: {
             if (configuration_ == null) {
-              Configuration = new global::Pub.OAuthConfiguration();
+              configuration_ = new global::Pub.OAuthConfiguration();
             }
-            input.ReadMessage(Configuration);
+            input.ReadMessage(configuration_);
             break;
           }
           case 18: {
@@ -5351,7 +5699,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[24]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[25]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5483,7 +5831,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[25]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[26]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5632,7 +5980,7 @@ namespace Pub {
       }
       if (other.configuration_ != null) {
         if (configuration_ == null) {
-          Configuration = new global::Pub.OAuthConfiguration();
+          configuration_ = new global::Pub.OAuthConfiguration();
         }
         Configuration.MergeFrom(other.Configuration);
       }
@@ -5655,9 +6003,9 @@ namespace Pub {
             break;
           case 10: {
             if (configuration_ == null) {
-              Configuration = new global::Pub.OAuthConfiguration();
+              configuration_ = new global::Pub.OAuthConfiguration();
             }
-            input.ReadMessage(Configuration);
+            input.ReadMessage(configuration_);
             break;
           }
           case 18: {
@@ -5682,7 +6030,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[26]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[27]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5877,7 +6225,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[27]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[28]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6010,7 +6358,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[28]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[29]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6112,7 +6460,7 @@ namespace Pub {
       }
       if (other.form_ != null) {
         if (form_ == null) {
-          Form = new global::Pub.ConfigurationFormRequest();
+          form_ = new global::Pub.ConfigurationFormRequest();
         }
         Form.MergeFrom(other.Form);
       }
@@ -6129,9 +6477,9 @@ namespace Pub {
             break;
           case 10: {
             if (form_ == null) {
-              Form = new global::Pub.ConfigurationFormRequest();
+              form_ = new global::Pub.ConfigurationFormRequest();
             }
-            input.ReadMessage(Form);
+            input.ReadMessage(form_);
             break;
           }
         }
@@ -6148,7 +6496,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[29]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[30]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6274,13 +6622,13 @@ namespace Pub {
       }
       if (other.form_ != null) {
         if (form_ == null) {
-          Form = new global::Pub.ConfigurationFormResponse();
+          form_ = new global::Pub.ConfigurationFormResponse();
         }
         Form.MergeFrom(other.Form);
       }
       if (other.schema_ != null) {
         if (schema_ == null) {
-          Schema = new global::Pub.Schema();
+          schema_ = new global::Pub.Schema();
         }
         Schema.MergeFrom(other.Schema);
       }
@@ -6297,16 +6645,16 @@ namespace Pub {
             break;
           case 10: {
             if (form_ == null) {
-              Form = new global::Pub.ConfigurationFormResponse();
+              form_ = new global::Pub.ConfigurationFormResponse();
             }
-            input.ReadMessage(Form);
+            input.ReadMessage(form_);
             break;
           }
           case 18: {
             if (schema_ == null) {
-              Schema = new global::Pub.Schema();
+              schema_ = new global::Pub.Schema();
             }
-            input.ReadMessage(Schema);
+            input.ReadMessage(schema_);
             break;
           }
         }
@@ -6323,7 +6671,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[30]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[31]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6467,13 +6815,13 @@ namespace Pub {
       }
       if (other.form_ != null) {
         if (form_ == null) {
-          Form = new global::Pub.ConfigurationFormRequest();
+          form_ = new global::Pub.ConfigurationFormRequest();
         }
         Form.MergeFrom(other.Form);
       }
       if (other.schema_ != null) {
         if (schema_ == null) {
-          Schema = new global::Pub.Schema();
+          schema_ = new global::Pub.Schema();
         }
         Schema.MergeFrom(other.Schema);
       }
@@ -6491,16 +6839,16 @@ namespace Pub {
             break;
           case 10: {
             if (form_ == null) {
-              Form = new global::Pub.ConfigurationFormRequest();
+              form_ = new global::Pub.ConfigurationFormRequest();
             }
-            input.ReadMessage(Form);
+            input.ReadMessage(form_);
             break;
           }
           case 18: {
             if (schema_ == null) {
-              Schema = new global::Pub.Schema();
+              schema_ = new global::Pub.Schema();
             }
-            input.ReadMessage(Schema);
+            input.ReadMessage(schema_);
             break;
           }
           case 26: {
@@ -6521,7 +6869,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[31]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[32]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6623,7 +6971,7 @@ namespace Pub {
       }
       if (other.form_ != null) {
         if (form_ == null) {
-          Form = new global::Pub.ConfigurationFormResponse();
+          form_ = new global::Pub.ConfigurationFormResponse();
         }
         Form.MergeFrom(other.Form);
       }
@@ -6640,9 +6988,9 @@ namespace Pub {
             break;
           case 10: {
             if (form_ == null) {
-              Form = new global::Pub.ConfigurationFormResponse();
+              form_ = new global::Pub.ConfigurationFormResponse();
             }
-            input.ReadMessage(Form);
+            input.ReadMessage(form_);
             break;
           }
         }
@@ -6659,7 +7007,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[32]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[33]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6679,6 +7027,7 @@ namespace Pub {
       commitSlaSeconds_ = other.commitSlaSeconds_;
       schema_ = other.schema_ != null ? other.schema_.Clone() : null;
       replication_ = other.replication_ != null ? other.replication_.Clone() : null;
+      dataVersions_ = other.dataVersions_ != null ? other.dataVersions_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -6731,6 +7080,17 @@ namespace Pub {
       }
     }
 
+    /// <summary>Field number for the "data_versions" field.</summary>
+    public const int DataVersionsFieldNumber = 4;
+    private global::Pub.DataVersions dataVersions_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Pub.DataVersions DataVersions {
+      get { return dataVersions_; }
+      set {
+        dataVersions_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as PrepareWriteRequest);
@@ -6747,6 +7107,7 @@ namespace Pub {
       if (CommitSlaSeconds != other.CommitSlaSeconds) return false;
       if (!object.Equals(Schema, other.Schema)) return false;
       if (!object.Equals(Replication, other.Replication)) return false;
+      if (!object.Equals(DataVersions, other.DataVersions)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -6756,6 +7117,7 @@ namespace Pub {
       if (CommitSlaSeconds != 0) hash ^= CommitSlaSeconds.GetHashCode();
       if (schema_ != null) hash ^= Schema.GetHashCode();
       if (replication_ != null) hash ^= Replication.GetHashCode();
+      if (dataVersions_ != null) hash ^= DataVersions.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -6781,6 +7143,10 @@ namespace Pub {
         output.WriteRawTag(26);
         output.WriteMessage(Replication);
       }
+      if (dataVersions_ != null) {
+        output.WriteRawTag(34);
+        output.WriteMessage(DataVersions);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -6798,6 +7164,9 @@ namespace Pub {
       if (replication_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Replication);
       }
+      if (dataVersions_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(DataVersions);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -6814,15 +7183,21 @@ namespace Pub {
       }
       if (other.schema_ != null) {
         if (schema_ == null) {
-          Schema = new global::Pub.Schema();
+          schema_ = new global::Pub.Schema();
         }
         Schema.MergeFrom(other.Schema);
       }
       if (other.replication_ != null) {
         if (replication_ == null) {
-          Replication = new global::Pub.ReplicationWriteRequest();
+          replication_ = new global::Pub.ReplicationWriteRequest();
         }
         Replication.MergeFrom(other.Replication);
+      }
+      if (other.dataVersions_ != null) {
+        if (dataVersions_ == null) {
+          dataVersions_ = new global::Pub.DataVersions();
+        }
+        DataVersions.MergeFrom(other.DataVersions);
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -6841,16 +7216,23 @@ namespace Pub {
           }
           case 18: {
             if (schema_ == null) {
-              Schema = new global::Pub.Schema();
+              schema_ = new global::Pub.Schema();
             }
-            input.ReadMessage(Schema);
+            input.ReadMessage(schema_);
             break;
           }
           case 26: {
             if (replication_ == null) {
-              Replication = new global::Pub.ReplicationWriteRequest();
+              replication_ = new global::Pub.ReplicationWriteRequest();
             }
-            input.ReadMessage(Replication);
+            input.ReadMessage(replication_);
+            break;
+          }
+          case 34: {
+            if (dataVersions_ == null) {
+              dataVersions_ = new global::Pub.DataVersions();
+            }
+            input.ReadMessage(dataVersions_);
             break;
           }
         }
@@ -6867,7 +7249,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[33]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[34]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7027,7 +7409,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[34]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[35]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7321,7 +7703,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[35]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[36]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7422,7 +7804,7 @@ namespace Pub {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[36]; }
+      get { return global::Pub.PublisherReflection.Descriptor.MessageTypes[37]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

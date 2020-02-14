@@ -450,7 +450,11 @@ namespace PluginCSVTest.Plugin
                 Schema = GetTestSchema($@"select a.id, a.first_name, a.last_name, b.car_make
 from ReadDirectory as a
 inner join ReadDirectoryDifferent as b
-on a.id = b.id")
+on a.id = b.id"),
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                }
             };
 
             // act
@@ -499,7 +503,11 @@ on a.id = b.id")
 
             var request = new ReadRequest()
             {
-                Schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[NOPE]")
+                Schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[NOPE]"),
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                }
             };
 
             // act
@@ -554,7 +562,11 @@ on a.id = b.id")
 
             var request = new ReadRequest()
             {
-                Schema = schema
+                Schema = schema,
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                }
             };
 
             // act
@@ -611,7 +623,11 @@ on a.id = b.id")
             var request = new ReadRequest()
             {
                 Schema = schema,
-                Limit = 10
+                Limit = 10,
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                }
             };
 
             // act
@@ -667,7 +683,11 @@ on a.id = b.id")
 
             var request = new ReadRequest()
             {
-                Schema = schema
+                Schema = schema,
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                }
             };
 
             // act
@@ -736,7 +756,11 @@ on a.id = b.id")
 
             var request = new ReadRequest()
             {
-                Schema = schema
+                Schema = schema,
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                }
             };
 
             // act
@@ -805,7 +829,11 @@ on a.id = b.id")
 
             var request = new ReadRequest()
             {
-                Schema = schema
+                Schema = schema,
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                }
             };
 
             // act
