@@ -1,4 +1,4 @@
-namespace PluginCSV.Helper
+namespace PluginFileReader.Helper
 {
     public class ServerStatus
     {

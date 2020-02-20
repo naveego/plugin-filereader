@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Naveego.Sdk.Plugins;
-using PluginCSV.API.Utility;
-using PluginCSV.Helper;
-
+using PluginFileReader.API.Utility;
+using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
-namespace PluginCSV.API.Discover
+namespace PluginFileReader.API.Discover
 {
     public static partial class Discover
     {

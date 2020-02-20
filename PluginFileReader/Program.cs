@@ -2,10 +2,9 @@
 using System.Linq;
 using Grpc.Core;
 using Naveego.Sdk.Plugins;
-using PluginCSV.Helper;
+using PluginFileReader.Helper;
 
-
-namespace PluginCSV
+namespace PluginFileReader
 {
     class Program
     {

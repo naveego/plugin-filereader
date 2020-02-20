@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
-namespace PluginCSV.Helper
+namespace PluginFileReader.Helper
 {
     public class Settings
     {

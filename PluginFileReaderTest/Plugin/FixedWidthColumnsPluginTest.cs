@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
-using PluginCSV.API.Utility;
-using PluginCSV.DataContracts;
-using PluginCSV.Helper;
-
+using PluginFileReader.API.Utility;
+using PluginFileReader.DataContracts;
+using PluginFileReader.Helper;
 using Xunit;
 using Record = Naveego.Sdk.Plugins.Record;
 
-namespace PluginCSVTest.Plugin
+namespace PluginFileReaderTest.Plugin
 {
     public class FixedWidthColumnsPluginTest
     {
@@ -27,7 +26,15 @@ namespace PluginCSVTest.Plugin
 
         private void PrepareTestEnvironment(bool configureInvalid)
         {
-            File.Delete(DatabasePath);
+            try
+            {
+                File.Delete(DatabasePath);
+            }
+            catch
+            {
+                
+            }
+            
 
             foreach (var filePath in Directory.GetFiles(ArchivePath))
             {
@@ -251,7 +258,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment(false);
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -290,7 +297,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment(false);
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -321,7 +328,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment(false);
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -376,7 +383,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment(false);
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -449,7 +456,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment(false);
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -494,7 +501,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment(false);
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -506,9 +513,10 @@ namespace PluginCSVTest.Plugin
 
             var connectRequest = GetConnectSettings();
 
-            var discoverAllRequest = new DiscoverSchemasRequest
+            var refreshSchemaRequest = new DiscoverSchemasRequest
             {
-                Mode = DiscoverSchemasRequest.Types.Mode.All,
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                ToRefresh = {GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]")},
             };
 
             var settings = GetSettings();
@@ -520,7 +528,6 @@ namespace PluginCSVTest.Plugin
 
             var request = new ReadRequest()
             {
-                Schema = schema,
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
@@ -529,7 +536,9 @@ namespace PluginCSVTest.Plugin
 
             // act
             client.Connect(connectRequest);
-            client.DiscoverSchemas(discoverAllRequest);
+            var refreshResponse = client.DiscoverSchemas(refreshSchemaRequest);
+            request.Schema = refreshResponse.Schemas[0];
+            
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
             var records = new List<Record>();
@@ -541,6 +550,14 @@ namespace PluginCSVTest.Plugin
 
             // assert
             Assert.Equal(1000, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal("46904477493454029959SPNUZMVK63614033839X", record["id"]);
+            Assert.Equal("40", record["data1"]);
+            Assert.Equal("2019-09-04", record["date1"]);
+            Assert.Equal("2019-09-04", record["date2"]);
+            Assert.Equal("1827C30681", record["data2"]);
+            Assert.Equal("000000000000000293.44", record["data3"]);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -554,7 +571,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment(false);
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();

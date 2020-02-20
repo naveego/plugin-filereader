@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,14 +5,13 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
-using PluginCSV.API.Utility;
-using PluginCSV.DataContracts;
-using PluginCSV.Helper;
-
+using PluginFileReader.API.Utility;
+using PluginFileReader.DataContracts;
+using PluginFileReader.Helper;
 using Xunit;
 using Record = Naveego.Sdk.Plugins.Record;
 
-namespace PluginCSVTest.Plugin
+namespace PluginFileReaderTest.Plugin
 {
     public class DelimitiedPluginTest
     {
@@ -28,7 +26,14 @@ namespace PluginCSVTest.Plugin
 
         private void PrepareTestEnvironment(bool configureInvalid = false, bool configureArchiveFull = false)
         {
-            File.Delete(DatabasePath);
+            try
+            {
+                File.Delete(DatabasePath);
+            }
+            catch
+            {
+                
+            }
 
             foreach (var filePath in Directory.GetFiles(ArchivePath))
             {
@@ -145,7 +150,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -184,7 +189,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -215,7 +220,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -271,7 +276,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -346,7 +351,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -384,7 +389,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -429,7 +434,7 @@ namespace PluginCSVTest.Plugin
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -485,7 +490,7 @@ on a.id = b.id"),
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -537,7 +542,7 @@ on a.id = b.id"),
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -597,7 +602,7 @@ on a.id = b.id"),
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -658,7 +663,7 @@ on a.id = b.id"),
             PrepareTestEnvironment(false, true);
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -731,7 +736,7 @@ on a.id = b.id"),
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();
@@ -804,7 +809,7 @@ on a.id = b.id"),
             PrepareTestEnvironment();
             Server server = new Server
             {
-                Services = {Publisher.BindService(new PluginCSV.Plugin.Plugin())},
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
                 Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
             };
             server.Start();

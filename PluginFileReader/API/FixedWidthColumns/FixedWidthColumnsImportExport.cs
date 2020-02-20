@@ -1,11 +1,10 @@
-using System;
 using System.IO;
 using System.Text;
-using PluginCSV.API.Factory;
-using PluginCSV.Helper;
+using PluginFileReader.API.Factory;
+using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
-namespace PluginCSV.API.FixedWidthColumns
+namespace PluginFileReader.API.FixedWidthColumns
 {
     public class FixedWidthColumnsImportExport : IImportExportFile
     {

@@ -1,12 +1,12 @@
 using System.IO;
-using PluginCSV.Helper;
+using PluginFileReader.Helper;
 using Xunit;
 
-namespace PluginCSVTest.Helper
+namespace PluginFileReaderTest.Helper
 {
     public class LoggerTest
     {
-        private static string _path = @"plugin-csv-log.txt";
+        private static string _path = @"logs/plugin-filereader-log.txt";
         
         [Fact]
         public void VerboseTest()

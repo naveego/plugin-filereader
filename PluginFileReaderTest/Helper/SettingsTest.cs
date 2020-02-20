@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using PluginCSV.Helper;
+using PluginFileReader.Helper;
 using Xunit;
 
-namespace PluginCSVTest.Helper
+namespace PluginFileReaderTest.Helper
 {
     public class SettingsTest
     {
@@ -88,33 +88,33 @@ namespace PluginCSVTest.Helper
             Assert.Contains("NotADir is not a directory", e.Message);
         }
 
-        [Fact]
-        public void ValidateBadFiltersTest()
-        {
-            // setup
-            var settings = new Settings
-            {
-                RootPaths = new List<RootPathObject>
-                {
-                    new RootPathObject
-                    {
-                        RootPath = "../../../MockData/DelimitedData",
-                        Mode = "Delimited",
-                        Filter = "invalid",
-                        Delimiter = ',',
-                        HasHeader = true,
-                        CleanupAction = "none",
-                        ArchivePath = ""
-                    }
-                }
-            };
-
-            // act
-            Exception e = Assert.Throws<Exception>(() => settings.Validate());
-
-            // assert
-            Assert.Contains("No files in given RootPaths with given Filters", e.Message);
-        }
+        // [Fact]
+        // public void ValidateBadFiltersTest()
+        // {
+        //     // setup
+        //     var settings = new Settings
+        //     {
+        //         RootPaths = new List<RootPathObject>
+        //         {
+        //             new RootPathObject
+        //             {
+        //                 RootPath = "../../../MockData/DelimitedData",
+        //                 Mode = "Delimited",
+        //                 Filter = "invalid",
+        //                 Delimiter = ',',
+        //                 HasHeader = true,
+        //                 CleanupAction = "none",
+        //                 ArchivePath = ""
+        //             }
+        //         }
+        //     };
+        //
+        //     // act
+        //     Exception e = Assert.Throws<Exception>(() => settings.Validate());
+        //
+        //     // assert
+        //     Assert.Contains("No files in given RootPaths with given Filters", e.Message);
+        // }
         
         [Fact]
         public void ValidateNoModeTest()

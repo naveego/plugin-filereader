@@ -2,7 +2,7 @@ using System;
 using System.Data;
 using Naveego.Sdk.Plugins;
 
-namespace PluginCSV.API.Discover
+namespace PluginFileReader.API.Discover
 {
     public static partial class Discover
     {

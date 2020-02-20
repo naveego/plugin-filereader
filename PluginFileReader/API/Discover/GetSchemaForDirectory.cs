@@ -3,13 +3,12 @@ using System.IO;
 using System.Linq;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
-using PluginCSV.API.Factory;
-using PluginCSV.API.Utility;
-using PluginCSV.DataContracts;
-using PluginCSV.Helper;
+using PluginFileReader.API.Factory;
+using PluginFileReader.API.Utility;
+using PluginFileReader.DataContracts;
+using PluginFileReader.Helper;
 
-
-namespace PluginCSV.API.Discover
+namespace PluginFileReader.API.Discover
 {
     public static partial class Discover
     {

@@ -1,4 +1,4 @@
-namespace PluginCSV.API.Utility
+namespace PluginFileReader.API.Utility
 {
     public static class Constants
     {

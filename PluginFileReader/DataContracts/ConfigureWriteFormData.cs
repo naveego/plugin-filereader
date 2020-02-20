@@ -1,4 +1,4 @@
-namespace PluginCSV.DataContracts
+namespace PluginFileReader.DataContracts
 {
     public class ConfigureWriteFormData
     {

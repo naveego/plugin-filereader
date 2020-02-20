@@ -1,10 +1,10 @@
 using System;
 using System.IO;
-using PluginCSV.API.Factory;
-using PluginCSV.Helper;
+using PluginFileReader.API.Factory;
+using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
-namespace PluginCSV.API.Utility
+namespace PluginFileReader.API.Utility
 {
     public static partial class Utility
     {

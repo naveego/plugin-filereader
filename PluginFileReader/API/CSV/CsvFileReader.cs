@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace PluginCSV.API.CSV
+namespace PluginFileReader.API.CSV
 {
     /// <summary>
     /// Class for reading from comma separated values (CSV) file

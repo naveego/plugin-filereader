@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using Newtonsoft.Json;
-using PluginCSV.API.Factory;
-using PluginCSV.Helper;
+using PluginFileReader.API.Factory;
+using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
-namespace PluginCSV.API.CSV
+namespace PluginFileReader.API.CSV
 {
     public class CsvImportExport : IImportExportFile
     {

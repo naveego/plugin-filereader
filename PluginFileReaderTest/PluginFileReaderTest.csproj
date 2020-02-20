@@ -5,7 +5,7 @@
 
         <IsPackable>false</IsPackable>
 
-        <RootNamespace>PluginCSVTest</RootNamespace>
+        <RootNamespace>PluginFileReaderTest</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

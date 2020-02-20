@@ -1,4 +1,4 @@
-namespace PluginCSV.API.CSV
+namespace PluginFileReader.API.CSV
 {
     /// <summary>
     /// Determines how an entire blank or empty line should be handled.

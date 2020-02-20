@@ -1,7 +1,7 @@
-using PluginCSV.Helper;
+using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
-namespace PluginCSV.API.Factory
+namespace PluginFileReader.API.Factory
 {
     public interface IImportExportFactory
     {

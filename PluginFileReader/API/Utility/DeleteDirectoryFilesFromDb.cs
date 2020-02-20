@@ -1,8 +1,8 @@
 using System;
-using PluginCSV.Helper;
+using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
-namespace PluginCSV.API.Utility
+namespace PluginFileReader.API.Utility
 {
     public static partial class Utility
     {

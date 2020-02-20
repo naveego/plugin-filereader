@@ -1,23 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
-using PluginCSV.API.CSV;
-using PluginCSV.API.Discover;
-using PluginCSV.API.Factory;
-using PluginCSV.API.Read;
-using PluginCSV.API.Utility;
-using PluginCSV.API.Write;
-using PluginCSV.DataContracts;
-using PluginCSV.Helper;
-using SQLDatabase.Net.SQLDatabaseClient;
+using PluginFileReader.API.Discover;
+using PluginFileReader.API.Read;
+using PluginFileReader.API.Utility;
+using PluginFileReader.API.Write;
+using PluginFileReader.DataContracts;
+using PluginFileReader.Helper;
 
-namespace PluginCSV.Plugin
+namespace PluginFileReader.Plugin
 {
     public class Plugin : Publisher.PublisherBase
     {
@@ -184,7 +180,7 @@ namespace PluginCSV.Plugin
             var jobId = request.JobId;
             var recordsCount = 0;
 
-            Logger.SetLogPrefix(request.DataVersions.JobId);
+            Logger.SetLogPrefix(request.JobId);
             Logger.Info($"Publishing records for schema: {schema.Name}");
 
             try

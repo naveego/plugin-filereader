@@ -1,9 +1,9 @@
-using PluginCSV.API.CSV;
-using PluginCSV.API.Factory;
-using PluginCSV.API.FixedWidthColumns;
-using PluginCSV.Helper;
+using PluginFileReader.API.CSV;
+using PluginFileReader.API.Factory;
+using PluginFileReader.API.FixedWidthColumns;
+using PluginFileReader.Helper;
 
-namespace PluginCSV.API.Utility
+namespace PluginFileReader.API.Utility
 {
     public static partial class Utility
     {

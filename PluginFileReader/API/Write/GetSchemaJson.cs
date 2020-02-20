@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace PluginCSV.API.Write
+namespace PluginFileReader.API.Write
 {
     public static partial class Write
     {

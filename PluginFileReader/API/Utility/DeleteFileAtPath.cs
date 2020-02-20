@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using PluginCSV.Helper;
+using PluginFileReader.Helper;
 
-namespace PluginCSV.API.Utility
+namespace PluginFileReader.API.Utility
 {
     public static partial class Utility 
     {

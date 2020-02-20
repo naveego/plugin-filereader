@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
 using Naveego.Sdk.Plugins;
-using Newtonsoft.Json;
-using PluginCSV.Helper;
-
 using SQLDatabase.Net.SQLDatabaseClient;
 
-namespace PluginCSV.API.Read
+namespace PluginFileReader.API.Read
 {
     public static partial class Read
     {

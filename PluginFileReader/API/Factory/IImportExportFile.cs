@@ -1,6 +1,6 @@
-using PluginCSV.Helper;
+using PluginFileReader.Helper;
 
-namespace PluginCSV.API.Factory
+namespace PluginFileReader.API.Factory
 {
     public interface IImportExportFile
     {

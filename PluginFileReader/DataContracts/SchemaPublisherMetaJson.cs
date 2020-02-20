@@ -1,6 +1,6 @@
-using PluginCSV.Helper;
+using PluginFileReader.Helper;
 
-namespace PluginCSV.DataContracts
+namespace PluginFileReader.DataContracts
 {
     public class SchemaPublisherMetaJson
     {

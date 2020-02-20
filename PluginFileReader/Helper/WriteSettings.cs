@@ -2,7 +2,7 @@
 
 using Naveego.Sdk.Plugins;
 
-namespace PluginCSV.Helper
+namespace PluginFileReader.Helper
 {
     public class WriteSettings
     {

@@ -1,7 +1,7 @@
 using System.IO;
 using SQLDatabase.Net.SQLDatabaseClient;
 
-namespace PluginCSV.API.Utility
+namespace PluginFileReader.API.Utility
 {
     public static partial class Utility
     {

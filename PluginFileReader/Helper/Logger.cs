@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 
-namespace PluginCSV.Helper
+namespace PluginFileReader.Helper
 {
     public static class Logger
     {
@@ -34,7 +34,7 @@ namespace PluginCSV.Helper
                 Directory.CreateDirectory("logs");
                 
                 // Append text to the file
-                var filePath = $"logs/{_logPrefix}_{_path}";
+                var filePath = $"logs/{_logPrefix}{_path}";
                 using (StreamWriter sw = File.AppendText(filePath))
                 {
                     sw.WriteLine($"{DateTime.Now} {message}");
