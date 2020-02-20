@@ -6,7 +6,7 @@
   "versionDescription": "Version 4",
   "version": "4.0.0",
   "iconFile": "icon.png",
-  "executable": "PluginCSV",
+  "executable": "PluginFileReader",
   "kind": "publisher",
   "os": "$GOOS",
   "arch": "$GOARCH",
