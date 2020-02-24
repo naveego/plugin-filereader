@@ -15,7 +15,8 @@ namespace PluginFileReaderTest.Plugin
 {
     public class DelimitiedPluginTest
     {
-        private readonly string DatabasePath = $"{Path.Join(Constants.DbFolder, Constants.DbFile)}";
+        private readonly string DiscoverDatabasePath = $"{Path.Join(Constants.DbFolder, $"{Constants.DiscoverDbPrefix}_{Constants.DbFile}")}";
+        private readonly string ReadDatabasePath = $"{Path.Join(Constants.DbFolder, $"test_{Constants.DbFile}")}";
         private const string BasePath = "../../../MockData/DelimitedData";
         private const string ReadPath = "../../../MockData/ReadDirectory";
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
@@ -24,15 +25,23 @@ namespace PluginFileReaderTest.Plugin
         private const string DefaultFilter = "*.csv";
         private const string DelimitedMode = "Delimited";
 
-        private void PrepareTestEnvironment(bool configureInvalid = false, bool configureArchiveFull = false)
+        private void PrepareTestEnvironment(bool configureInvalid = false, bool configureArchiveFull = false,
+            bool configureEmpty = false)
         {
             try
             {
-                File.Delete(DatabasePath);
+                File.Delete(DiscoverDatabasePath);
             }
             catch
             {
-                
+            }
+            
+            try
+            {
+                File.Delete(ReadDatabasePath);
+            }
+            catch
+            {
             }
 
             foreach (var filePath in Directory.GetFiles(ArchivePath))
@@ -50,27 +59,30 @@ namespace PluginFileReaderTest.Plugin
                 File.Delete(filePath);
             }
 
-            foreach (var filePath in Directory.GetFiles(BasePath))
+            if (!configureEmpty)
             {
-                var targetPath = "";
-                if (configureInvalid)
+                foreach (var filePath in Directory.GetFiles(BasePath))
                 {
-                    targetPath = $"{Path.Join(ReadPath, Path.GetFileName(filePath))}";
-                }
-                else
-                {
-                    targetPath = filePath.Contains("DIFFERENT")
-                        ? $"{Path.Join(ReadDifferentPath, Path.GetFileName(filePath))}"
-                        : $"{Path.Join(ReadPath, Path.GetFileName(filePath))}";
-                }
+                    var targetPath = "";
+                    if (configureInvalid)
+                    {
+                        targetPath = $"{Path.Join(ReadPath, Path.GetFileName(filePath))}";
+                    }
+                    else
+                    {
+                        targetPath = filePath.Contains("DIFFERENT")
+                            ? $"{Path.Join(ReadDifferentPath, Path.GetFileName(filePath))}"
+                            : $"{Path.Join(ReadPath, Path.GetFileName(filePath))}";
+                    }
 
-                File.Copy(filePath, targetPath, true);
-
-                if (configureArchiveFull)
-                {
-                    targetPath = $"{Path.Join(ArchivePath, Path.GetFileName(filePath))}";
-                    
                     File.Copy(filePath, targetPath, true);
+
+                    if (configureArchiveFull)
+                    {
+                        targetPath = $"{Path.Join(ArchivePath, Path.GetFileName(filePath))}";
+
+                        File.Copy(filePath, targetPath, true);
+                    }
                 }
             }
         }
@@ -460,7 +472,8 @@ on a.id = b.id"),
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
-                }
+                },
+                JobId = "test",
             };
 
             // act
@@ -513,7 +526,8 @@ on a.id = b.id"),
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
-                }
+                },
+                JobId = "test",
             };
 
             // act
@@ -558,7 +572,7 @@ on a.id = b.id"),
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
-            
+
             var settings = GetSettings();
             var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
             schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
@@ -572,7 +586,8 @@ on a.id = b.id"),
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
-                }
+                },
+                JobId = "test",
             };
 
             // act
@@ -594,7 +609,73 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
+        [Fact]
+        public async Task ReadStreamEmptyDirectoryBasedSchemaTest()
+        {
+            // setup
+            PrepareTestEnvironment(false, false, true);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var settings = GetSettings();
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                RootPath = settings.RootPaths.First()
+            });
+            schema.Properties.Add(new Property
+            {
+                Id = "testProp"
+            });
+
+            var connectRequest = GetConnectSettings();
+
+            var discoverRefreshRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                ToRefresh = {schema}
+            };
+
+            var request = new ReadRequest()
+            {
+                Schema = schema,
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverRefreshRequest);
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Empty(records);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
         [Fact]
         public async Task ReadStreamLimitTest()
         {
@@ -618,7 +699,7 @@ on a.id = b.id"),
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
-            
+
             var settings = GetSettings();
             var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
             schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
@@ -633,7 +714,8 @@ on a.id = b.id"),
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
-                }
+                },
+                JobId = "test",
             };
 
             // act
@@ -679,7 +761,7 @@ on a.id = b.id"),
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
-            
+
             var settings = GetSettings("Archive");
             var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
             schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
@@ -693,7 +775,8 @@ on a.id = b.id"),
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
-                }
+                },
+                JobId = "test",
             };
 
             // act
@@ -728,7 +811,7 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamCleanUpArchiveEmptyTest()
         {
@@ -752,7 +835,7 @@ on a.id = b.id"),
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
-            
+
             var settings = GetSettings("Archive");
             var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
             schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
@@ -766,7 +849,8 @@ on a.id = b.id"),
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
-                }
+                },
+                JobId = "test",
             };
 
             // act
@@ -825,7 +909,7 @@ on a.id = b.id"),
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
-            
+
             var settings = GetSettings("Delete");
             var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
             schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
@@ -839,7 +923,8 @@ on a.id = b.id"),
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
-                }
+                },
+                JobId = "test",
             };
 
             // act

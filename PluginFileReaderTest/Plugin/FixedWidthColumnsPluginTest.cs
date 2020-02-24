@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,7 +16,8 @@ namespace PluginFileReaderTest.Plugin
 {
     public class FixedWidthColumnsPluginTest
     {
-        private readonly string DatabasePath = $"{Path.Join(Constants.DbFolder, Constants.DbFile)}";
+        private readonly string DiscoverDatabasePath = $"{Path.Join(Constants.DbFolder, $"{Constants.DiscoverDbPrefix}_{Constants.DbFile}")}";
+        private readonly string ReadDatabasePath = $"{Path.Join(Constants.DbFolder, $"test_{Constants.DbFile}")}";
         private const string BasePath = "../../../MockData/FixedWidthColumnsData";
         private const string ReadPath = "../../../MockData/ReadDirectory";
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
@@ -28,11 +30,18 @@ namespace PluginFileReaderTest.Plugin
         {
             try
             {
-                File.Delete(DatabasePath);
+                File.Delete(DiscoverDatabasePath);
             }
             catch
             {
-                
+            }
+
+            try
+            {
+                File.Delete(ReadDatabasePath);
+            }
+            catch 
+            {
             }
             
 
@@ -184,8 +193,9 @@ namespace PluginFileReaderTest.Plugin
                                 {
                                     ColumnName = "id",
                                     ColumnStart = 0,
-                                    ColumnEnd = 39,
-                                    IsKey = true
+                                    ColumnEnd = 43,
+                                    IsKey = true,
+                                    TrimWhitespace = true
                                 },
                                 new Column()
                                 {
@@ -212,15 +222,17 @@ namespace PluginFileReaderTest.Plugin
                                 {
                                     ColumnName = "data2",
                                     ColumnStart = 66,
-                                    ColumnEnd = 75,
-                                    IsKey = false
+                                    ColumnEnd = 79,
+                                    IsKey = false,
+                                    TrimWhitespace = true
                                 },
                                 new Column()
                                 {
                                     ColumnName = "data3",
-                                    ColumnStart = 297,
+                                    ColumnStart = 293,
                                     ColumnEnd = 317,
-                                    IsKey = false
+                                    IsKey = false,
+                                    TrimWhitespace = false
                                 }
                             }
                         }
@@ -513,10 +525,9 @@ namespace PluginFileReaderTest.Plugin
 
             var connectRequest = GetConnectSettings();
 
-            var refreshSchemaRequest = new DiscoverSchemasRequest
+            var schemaRequest = new DiscoverSchemasRequest
             {
-                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
-                ToRefresh = {GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]")},
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
 
             var settings = GetSettings();
@@ -531,13 +542,14 @@ namespace PluginFileReaderTest.Plugin
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
-                }
+                },
+                JobId = "test",
             };
 
             // act
             client.Connect(connectRequest);
-            var refreshResponse = client.DiscoverSchemas(refreshSchemaRequest);
-            request.Schema = refreshResponse.Schemas[0];
+            var schemasResponse = client.DiscoverSchemas(schemaRequest);
+            request.Schema = schemasResponse.Schemas[0];
             
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -557,7 +569,7 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal("2019-09-04", record["date1"]);
             Assert.Equal("2019-09-04", record["date2"]);
             Assert.Equal("1827C30681", record["data2"]);
-            Assert.Equal("000000000000000293.44", record["data3"]);
+            Assert.Equal("    000000000000000293.44", record["data3"]);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -602,7 +614,8 @@ namespace PluginFileReaderTest.Plugin
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
-                }
+                },
+                JobId = "test",
             };
 
             // act

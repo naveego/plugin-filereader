@@ -13,84 +13,103 @@ namespace PluginFileReader.API.Discover
     {
         public static Schema GetSchemaForQuery(Schema schema, int sampleSize = 5, List<Column> columns = null)
         {
-            var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
-
-            var cmd = new SqlDatabaseCommand
+            try
             {
-                Connection = conn,
-                CommandText = schema.Query
-            };
+                var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
-            var reader = cmd.ExecuteReader();
-            var schemaTable = reader.GetSchemaTable();
-            
-            // var schemaTable = conn.GetSchema("Columns", new string[]
-            // {
-            //     "[dbo].[ReadDirectory]"
-            // });
-
-            if (schemaTable != null)
-            {
-                var unnamedColIndex = 0;
-
-                // get each column and create a property for the column
-                foreach (DataRow row in schemaTable.Rows)
+                var cmd = new SqlDatabaseCommand
                 {
-                    // get the column name
-                    var colName = row["ColumnName"].ToString();
-                    if (string.IsNullOrWhiteSpace(colName))
-                    {
-                        colName = $"UNKNOWN_{unnamedColIndex}";
-                        unnamedColIndex++;
-                    }
+                    Connection = conn,
+                    CommandText = schema.Query
+                };
 
-                    // create property
-                    Property property;
-                    if (columns == null)
+                var reader = cmd.ExecuteReader();
+                var schemaTable = reader.GetSchemaTable();
+
+                // var schemaTable = conn.GetSchema("Columns", new string[]
+                // {
+                //     "[dbo].[ReadDirectory]"
+                // });
+
+                var properties = new List<Property>();
+                if (schemaTable != null)
+                {
+                    var unnamedColIndex = 0;
+
+                    // get each column and create a property for the column
+                    foreach (DataRow row in schemaTable.Rows)
                     {
-                        property = new Property
+                        // get the column name
+                        var colName = row["ColumnName"].ToString();
+                        if (string.IsNullOrWhiteSpace(colName))
                         {
-                            Id = colName,
-                            Name = colName,
-                            Description = "",
-                            Type = GetPropertyType(row),
-                            TypeAtSource = row["DataType"].ToString(),
-                            IsKey = Boolean.Parse(row["IsKey"].ToString()),
-                            IsNullable = Boolean.Parse(row["AllowDBNull"].ToString()),
-                            IsCreateCounter = false,
-                            IsUpdateCounter = false,
-                            PublisherMetaJson = ""
-                        };
-                    }
-                    else
-                    {
-                        var column = columns.FirstOrDefault(c => c.ColumnName == colName);
-                        property = new Property
+                            colName = $"UNKNOWN_{unnamedColIndex}";
+                            unnamedColIndex++;
+                        }
+
+                        // create property
+                        Property property;
+                        if (columns == null)
                         {
-                            Id = colName,
-                            Name = colName,
-                            Description = "",
-                            Type = GetPropertyType(row),
-                            TypeAtSource = row["DataType"].ToString(),
-                            IsKey = column?.IsKey ?? Boolean.Parse(row["IsKey"].ToString()),
-                            IsNullable = !column?.IsKey ?? Boolean.Parse(row["AllowDBNull"].ToString()),
-                            IsCreateCounter = false,
-                            IsUpdateCounter = false,
-                            PublisherMetaJson = ""
-                        };
+                            property = new Property
+                            {
+                                Id = colName,
+                                Name = colName,
+                                Description = "",
+                                Type = GetPropertyType(row),
+                                TypeAtSource = row["DataType"].ToString(),
+                                IsKey = Boolean.Parse(row["IsKey"].ToString()),
+                                IsNullable = Boolean.Parse(row["AllowDBNull"].ToString()),
+                                IsCreateCounter = false,
+                                IsUpdateCounter = false,
+                                PublisherMetaJson = ""
+                            };
+                        }
+                        else
+                        {
+                            var column = columns.FirstOrDefault(c => c.ColumnName == colName);
+                            property = new Property
+                            {
+                                Id = colName,
+                                Name = colName,
+                                Description = "",
+                                Type = GetPropertyType(row),
+                                TypeAtSource = row["DataType"].ToString(),
+                                IsKey = column?.IsKey ?? Boolean.Parse(row["IsKey"].ToString()),
+                                IsNullable = !column?.IsKey ?? Boolean.Parse(row["AllowDBNull"].ToString()),
+                                IsCreateCounter = false,
+                                IsUpdateCounter = false,
+                                PublisherMetaJson = ""
+                            };
+                        }
+
+                        // add property to properties
+                        properties.Add(property);
                     }
-                    
-                    // add property to schema
-                    schema.Properties.Add(property);
                 }
+                
+                // add only discovered properties to schema
+                schema.Properties.Clear();
+                schema.Properties.AddRange(properties);
+
+                var records = Read.Read.ReadRecords(schema, Constants.DiscoverDbPrefix).Take(sampleSize);
+                schema.Sample.AddRange(records);
+
+                // schema.Count = Read.Read.GetCountOfRecords(schema, Constants.DiscoverDbPrefix);
+
+                return schema;
             }
+            catch (Exception e)
+            {
+                // return schema that existed before but files may not currently exist
+                if (schema.Properties.Count > 0)
+                {
+                    return schema;
+                }
 
-            var records = Read.Read.ReadRecords(schema, Constants.DiscoverDbPrefix).Take(sampleSize);
-            schema.Sample.AddRange(records);
-
-            // schema.Count = Read.Read.GetCountOfRecords(schema, Constants.DiscoverDbPrefix);
-
-            return schema;
+                Logger.Error(e.Message);
+                throw;
+            }
         }
     }
 }
