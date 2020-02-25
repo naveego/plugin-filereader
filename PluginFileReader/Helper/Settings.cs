@@ -24,11 +24,6 @@ namespace PluginFileReader.Helper
                 throw new Exception("A RootPath is not a directory");
             }
 
-            // if (!FilesExistAtRootPathsAndFilters())
-            // {
-            //     throw new Exception("No files in given RootPaths with given Filters");
-            // }
-
             if (!ModeIsSetOnAllRootPaths())
             {
                 throw new Exception("A RootPath does not have a Mode set");

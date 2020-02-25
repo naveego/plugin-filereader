@@ -26,11 +26,6 @@ namespace PluginFileReader.API.Discover
                 var reader = cmd.ExecuteReader();
                 var schemaTable = reader.GetSchemaTable();
 
-                // var schemaTable = conn.GetSchema("Columns", new string[]
-                // {
-                //     "[dbo].[ReadDirectory]"
-                // });
-
                 var properties = new List<Property>();
                 if (schemaTable != null)
                 {
@@ -94,8 +89,6 @@ namespace PluginFileReader.API.Discover
 
                 var records = Read.Read.ReadRecords(schema, Constants.DiscoverDbPrefix).Take(sampleSize);
                 schema.Sample.AddRange(records);
-
-                // schema.Count = Read.Read.GetCountOfRecords(schema, Constants.DiscoverDbPrefix);
 
                 return schema;
             }

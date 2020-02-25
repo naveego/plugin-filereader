@@ -35,7 +35,6 @@ namespace PluginFileReader.API.Discover
                 sampleSize = 5;
             }
             
-            // Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths);
             Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths.Take(1).ToList(), sampleSize);
             
             var schema = new Schema

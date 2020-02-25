@@ -192,15 +192,16 @@ namespace PluginFileReader.Plugin
                 {
                     // schema is not query based so we can stream each file as it is loaded
                     var schemaMetaJson = JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
-                    var files = filesByDirectory[schemaMetaJson.RootPath.RootPath];
+                    var rootPath = _server.Settings.RootPaths.Find(r => r.RootPath == schemaMetaJson.RootPath.RootPath);
+                    var files = filesByDirectory[rootPath.RootPath];
                     var schemaName = Constants.SchemaName;
-                    var tableName = new DirectoryInfo(schemaMetaJson.RootPath.RootPath).Name;
+                    var tableName = new DirectoryInfo(rootPath.RootPath).Name;
                     if (files.Count > 0)
                     {
                         // load file and then stream file one by one
                         foreach (var file in files)
                         {
-                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(schemaMetaJson.RootPath), conn, schemaMetaJson.RootPath,
+                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath), conn, rootPath,
                                 tableName, schemaName, new List<string>{file});
                                 
                             var records = Read.ReadRecords(schema, jobId);
