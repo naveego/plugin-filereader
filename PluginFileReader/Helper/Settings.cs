@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace PluginFileReader.Helper
 {
@@ -72,6 +73,33 @@ namespace PluginFileReader.Helper
             }
 
             return filesByDirectory;
+        }
+
+        /// <summary>
+        /// Gets all root paths present in a query string
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public List<RootPathObject> GetRootPathsFromQuery(string query)
+        {
+            var fromSplits = query.ToLower().Split("from");
+            var joinSplits = query.ToLower().Split("join");
+
+            var rootPaths = (from selectSplit in fromSplits.Skip(1)
+                select selectSplit.Split(' ').Skip(1).First()
+                into selectTableSplit
+                select selectTableSplit.TrimStart('[').TrimEnd(']')
+                into tableName
+                select RootPaths.Find(r => new DirectoryInfo(r.RootPath).Name.ToLower() == tableName)).ToList();
+
+            rootPaths.AddRange(from joinSplit in joinSplits.Skip(1)
+                select joinSplit.Split(' ').Skip(1).First()
+                into joinTableSplit
+                select joinTableSplit.TrimStart('[').TrimEnd(']')
+                into tableName
+                select RootPaths.Find(r => new DirectoryInfo(r.RootPath).Name.ToLower() == tableName));
+
+            return rootPaths.Where(r => r != null).ToList();
         }
 
         /// <summary>

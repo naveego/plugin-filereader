@@ -227,8 +227,11 @@ namespace PluginFileReader.Plugin
                 }
                 else
                 {
-                    // schema is query based so everything needs to be loaded first
-                    foreach (var rootPath in _server.Settings.RootPaths)
+                    // schema is query based
+                    var rootPaths = _server.Settings.GetRootPathsFromQuery(schema.Query);
+                    
+                    // schema is query based so everything in query needs to be loaded first
+                    foreach (var rootPath in rootPaths)
                     {
                         var files = filesByDirectory[rootPath.RootPath];
                         var schemaName = Constants.SchemaName;
