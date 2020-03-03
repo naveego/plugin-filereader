@@ -57,6 +57,8 @@ namespace PluginFileReader.API.FixedWidthColumns
             }
 
             var query = querySb.ToString();
+            
+            Logger.Debug($"Create table query: {query}");
 
             var cmd = new SqlDatabaseCommand
             {
@@ -92,6 +94,8 @@ namespace PluginFileReader.API.FixedWidthColumns
             querySb.Append(");");
 
             query = querySb.ToString();
+            
+            Logger.Debug($"Insert record query: {query}");
 
             cmd.CommandText = query;
 

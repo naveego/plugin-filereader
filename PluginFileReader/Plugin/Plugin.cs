@@ -36,6 +36,7 @@ namespace PluginFileReader.Plugin
         {
             _server.Connected = false;
 
+            // Logger.SetLogLevel(Logger.LogLevel.Debug);
             Logger.Info("Connecting...");
 
             var settings = JsonConvert.DeserializeObject<Settings>(request.SettingsJson);
@@ -229,6 +230,8 @@ namespace PluginFileReader.Plugin
                 {
                     // schema is query based
                     var rootPaths = _server.Settings.GetRootPathsFromQuery(schema.Query);
+                    
+                    Logger.Info($"Query root paths {JsonConvert.SerializeObject(rootPaths.Select(r => r.RootPath).ToList(), Formatting.Indented)}");
                     
                     // schema is query based so everything in query needs to be loaded first
                     foreach (var rootPath in rootPaths)

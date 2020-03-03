@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace PluginFileReader.Helper
 {
@@ -84,22 +85,38 @@ namespace PluginFileReader.Helper
         {
             var fromSplits = query.ToLower().Split("from");
             var joinSplits = query.ToLower().Split("join");
+            
+            Logger.Debug($"From splits {JsonConvert.SerializeObject(fromSplits, Formatting.Indented)}");
+            Logger.Debug($"Join splits {JsonConvert.SerializeObject(joinSplits, Formatting.Indented)}");
 
-            var rootPaths = (from selectSplit in fromSplits.Skip(1)
-                select selectSplit.Split(' ').Skip(1).First()
-                into selectTableSplit
-                select selectTableSplit.TrimStart('[').TrimEnd(']')
-                into tableName
-                select RootPaths.Find(r => new DirectoryInfo(r.RootPath).Name.ToLower() == tableName)).ToList();
+            var rootPaths = new List<RootPathObject>();
+            foreach (var selectSplit in fromSplits.Skip(1))
+            {
+                var selectTableSplit = selectSplit.Split(' ').Skip(1).First();
 
-            rootPaths.AddRange(from joinSplit in joinSplits.Skip(1)
-                select joinSplit.Split(' ').Skip(1).First()
-                into joinTableSplit
-                select joinTableSplit.TrimStart('[').TrimEnd(']')
-                into tableName
-                select RootPaths.Find(r => new DirectoryInfo(r.RootPath).Name.ToLower() == tableName));
+                if (selectTableSplit.Contains('\n'))
+                {
+                    selectTableSplit = selectTableSplit.Split('\n').First();
+                }
+                
+                var tableName = selectTableSplit.TrimStart('[').TrimEnd(']');
+                rootPaths.Add(RootPaths.Find(r => new DirectoryInfo(r.RootPath).Name.ToLower() == tableName));
+            }
 
-            return rootPaths.Where(r => r != null).ToList();
+            foreach (var joinSplit in joinSplits.Skip(1))
+            {
+                var joinTableSplit = joinSplit.Split(' ').Skip(1).First();
+                
+                if (joinTableSplit.Contains('\n'))
+                {
+                    joinTableSplit = joinTableSplit.Split('\n').First();
+                }
+                
+                var tableName = joinTableSplit.TrimStart('[').TrimEnd(']');
+                rootPaths.Add(RootPaths.Find(r => new DirectoryInfo(r.RootPath).Name.ToLower() == tableName));
+            }
+
+            return rootPaths.Where(r => r != null).GroupBy(r => r.RootPath).Select(g => g.First()).ToList();
         }
 
         /// <summary>
