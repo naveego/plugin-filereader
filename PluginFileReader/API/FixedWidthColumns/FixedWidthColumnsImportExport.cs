@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using PluginFileReader.API.Factory;
@@ -99,18 +100,40 @@ namespace PluginFileReader.API.FixedWidthColumns
 
             cmd.CommandText = query;
 
-            // read all lines from file
-            while ((line = file.ReadLine()) != null && rowsRead < limit)
+            var trans = _conn.BeginTransaction();
+            
+            try
             {
-                foreach (var column in rootPath.Columns)
+                // read all lines from file
+                while ((line = file.ReadLine()) != null && rowsRead < limit)
                 {
-                    var rawValue = line.Substring(column.ColumnStart, column.ColumnEnd - column.ColumnStart + 1);
-                    cmd.Parameters[$"@{column.ColumnName}"].Value = column.TrimWhitespace ? rawValue.Trim() : rawValue;
+                    foreach (var column in rootPath.Columns)
+                    {
+                        var rawValue = line.Substring(column.ColumnStart, column.ColumnEnd - column.ColumnStart + 1);
+                        cmd.Parameters[$"@{column.ColumnName}"].Value = column.TrimWhitespace ? rawValue.Trim() : rawValue;
+                    }
+
+                    cmd.ExecuteNonQuery();
+
+                    rowsRead++;
+
+                    // commit every 1000 rows
+                    if (rowsRead % 1000 == 0)
+                    {
+                        trans.Commit();
+                        trans = _conn.BeginTransaction();
+                    }
                 }
-
-                cmd.ExecuteNonQuery();
-
-                rowsRead++;
+            
+                // commit any pending inserts
+                trans.Commit();
+            }
+            catch (Exception e)
+            {
+                // rollback on error
+                trans.Rollback();
+                Logger.Error(e.Message);
+                throw;
             }
 
             return rowsRead;

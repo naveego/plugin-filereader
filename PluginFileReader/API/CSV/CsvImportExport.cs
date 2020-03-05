@@ -37,25 +37,6 @@ namespace PluginFileReader.API.CSV
             Delimiter = delimiter;
         }
 
-        public CsvImportExport(string databaseFile, string tableName, string schemaName, char delimiter)
-        {
-            if (string.IsNullOrWhiteSpace(tableName))
-                throw new Exception("TableName parameter is required.");
-
-            if (string.IsNullOrWhiteSpace(schemaName))
-                throw new Exception("SchemaName parameter is required.");
-
-            string constr = $"SchemaName={schemaName};uri=file://{databaseFile}";
-            SQLDatabaseConnection = new SqlDatabaseConnection(constr)
-            {
-                DatabaseFileMode = DatabaseFileMode.OpenIfExists
-            };
-
-            TableName = tableName;
-            SchemaName = schemaName;
-            Delimiter = delimiter;
-        }
-
         public int ExportTable(string filePathAndName, bool appendToFile = false)
         {
             int rowCount = 0;
@@ -201,18 +182,39 @@ namespace PluginFileReader.API.CSV
                     if (rootPath.HasHeader)
                         CsvReader.SkipLines = 1;
 
-                    while (CsvReader.ReadLine() && rowCount < limit)
+                    var trans = SQLDatabaseConnection.BeginTransaction();
+                    
+                    try
                     {
-                        int csvColumnCount = 0;
-                        foreach (string fieldValue in CsvReader.Fields)
+                        while (CsvReader.ReadLine() && rowCount < limit)
                         {
-                            csvColumnCount++;
-                            cmd.Parameters["@param" + csvColumnCount].Value =
-                                fieldValue; //Assign File Column to parameter
-                        }
+                            int csvColumnCount = 0;
+                            foreach (string fieldValue in CsvReader.Fields)
+                            {
+                                csvColumnCount++;
+                                cmd.Parameters["@param" + csvColumnCount].Value =
+                                    fieldValue; //Assign File Column to parameter
+                            }
 
-                        cmd.ExecuteNonQuery();
-                        rowCount++; // Count inserted rows.
+                            cmd.ExecuteNonQuery();
+                            rowCount++; // Count inserted rows.
+                            
+                            // commit every 1000 rows
+                            if (rowCount % 1000 == 0)
+                            {
+                                trans.Commit();
+                                trans = SQLDatabaseConnection.BeginTransaction();
+                            }
+                        }
+                        
+                        // commit any pending inserts
+                        trans.Commit();
+                    }
+                    catch (Exception e)
+                    {
+                        trans.Rollback();
+                        Logger.Error(e.Message);
+                        throw;
                     }
                 }
             }
