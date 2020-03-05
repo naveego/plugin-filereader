@@ -1,3 +1,4 @@
+using System.Data;
 using System.IO;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -5,6 +6,8 @@ namespace PluginFileReader.API.Utility
 {
     public static partial class Utility
     {
+        private static SqlDatabaseConnection _connection;
+        
         /// <summary>
         /// Creates a new sql connection
         /// </summary>
@@ -12,6 +15,14 @@ namespace PluginFileReader.API.Utility
         /// <returns>An open sql connection</returns>
         public static SqlDatabaseConnection GetSqlConnection(string dbFilePrefix)
         {
+            if (_connection != null)
+            {
+                if ((_connection.State & ConnectionState.Open) != 0)
+                {
+                    return _connection;
+                }
+            }
+            
             Directory.CreateDirectory(Constants.DbFolder);
             
             var connBuilder = new SqlDatabaseConnectionStringBuilder
@@ -19,12 +30,13 @@ namespace PluginFileReader.API.Utility
                 DatabaseFileMode = DatabaseFileMode.OpenOrCreate,
                 DatabaseMode = DatabaseMode.ReadWrite,
                 SchemaName = Constants.SchemaName,
-                Uri = $"file://{Path.Join(Constants.DbFolder, $"{dbFilePrefix}_{Constants.DbFile}")}"
+                // Uri = $"file://{Path.Join(Constants.DbFolder, $"{dbFilePrefix}_{Constants.DbFile}")}"
+                Uri = "file://@memory"
             };
-            var conn = new SqlDatabaseConnection(connBuilder.ConnectionString);
-            conn.Open();
+            _connection = new SqlDatabaseConnection(connBuilder.ConnectionString);
+            _connection.Open();
 
-            return conn;
+            return _connection;
         }
     }
 }
