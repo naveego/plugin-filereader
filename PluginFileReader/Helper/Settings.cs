@@ -120,6 +120,22 @@ namespace PluginFileReader.Helper
         }
 
         /// <summary>
+        /// Reads the columns configuration files if defined on each RootPath and populates the columns property
+        /// </summary>
+        public void ReconcileColumnsConfigurationFiles()
+        {
+            var serializer = new JsonSerializer();
+            foreach (var rootPath in RootPaths)
+            {
+                if (!string.IsNullOrWhiteSpace(rootPath.ColumnsConfigurationFile))
+                {
+                    using var file = File.OpenText(rootPath.ColumnsConfigurationFile);
+                    rootPath.Columns = (List<Column>)serializer.Deserialize(file, typeof(List<Column>));
+                }
+            }
+        }
+
+        /// <summary>
         /// Checks if RootPaths are directories
         /// </summary>
         /// <returns></returns>
@@ -190,6 +206,7 @@ namespace PluginFileReader.Helper
         public char Delimiter { get; set; }
 
         // FIXED COLUMN WIDTH MODE SETTINGS
+        public string ColumnsConfigurationFile { get; set; }
         public List<Column> Columns { get; set; }
     }
 

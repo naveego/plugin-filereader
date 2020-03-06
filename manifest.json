@@ -34,7 +34,7 @@
       "ui:order": ["RootPaths"],
       "RootPaths": {
         "items": {
-          "ui:order": ["RootPath", "Filter", "CleanupAction", "ArchivePath", "Mode", "Delimiter", "HasHeader", "Columns"],
+          "ui:order": ["RootPath", "Filter", "CleanupAction", "ArchivePath", "Mode", "Delimiter", "HasHeader", "ColumnsConfigurationFile", "Columns"],
           "Columns": {
             "items": {
               "ui:order": ["ColumnName", "IsKey", "TrimWhitespace", "ColumnStart", "ColumnEnd"]
@@ -98,10 +98,15 @@
               },
               "HasHeader": {
                 "type": "boolean",
-                "title": "Has Header ",
+                "title": "Has Header",
                 "description": "Does the file have a header row?",
                 "default": false,
                 "examples": [true]
+              },
+              "ColumnsConfigurationFile": {
+                "type": "string",
+                "title": "Columns Configuration File",
+                "description": "Path to the columns configuration file for fixed width files (optional)"
               },
               "Columns": {
                 "readOnly": true,

@@ -39,12 +39,11 @@ namespace PluginFileReader.Plugin
             // Logger.SetLogLevel(Logger.LogLevel.Debug);
             Logger.Info("Connecting...");
 
-            var settings = JsonConvert.DeserializeObject<Settings>(request.SettingsJson);
-
             // validate settings passed in
             try
             {
-                _server.Settings = settings;
+                _server.Settings = JsonConvert.DeserializeObject<Settings>(request.SettingsJson);
+                _server.Settings.ReconcileColumnsConfigurationFiles();
                 _server.Settings.Validate();
             }
             catch (Exception e)
@@ -52,7 +51,7 @@ namespace PluginFileReader.Plugin
                 Logger.Error(e.Message);
                 return Task.FromResult(new ConnectResponse
                 {
-                    OauthStateJson = request.OauthStateJson,
+                    OauthStateJson = "",
                     ConnectionError = "",
                     OauthError = "",
                     SettingsError = e.Message
