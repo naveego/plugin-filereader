@@ -31,7 +31,7 @@
   },
   "configSchema": {
     "ui": {
-      "ui:order": ["RootPaths"],
+      "ui:order": ["GlobalColumnsConfigurationFile","RootPaths"],
       "RootPaths": {
         "items": {
           "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "Delimiter", "HasHeader", "ColumnsConfigurationFile", "Columns"],
