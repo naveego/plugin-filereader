@@ -8,6 +8,7 @@ namespace PluginFileReader.Helper
 {
     public class Settings
     {
+        public string GlobalColumnsConfigurationFile { get; set; }
         public List<RootPathObject> RootPaths { get; set; }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace PluginFileReader.Helper
         {
             var fromSplits = query.ToLower().Split("from");
             var joinSplits = query.ToLower().Split("join");
-            
+
             Logger.Debug($"From splits {JsonConvert.SerializeObject(fromSplits, Formatting.Indented)}");
             Logger.Debug($"Join splits {JsonConvert.SerializeObject(joinSplits, Formatting.Indented)}");
 
@@ -98,7 +99,7 @@ namespace PluginFileReader.Helper
                 {
                     selectTableSplit = selectTableSplit.Split('\n').First();
                 }
-                
+
                 var tableName = selectTableSplit.TrimStart('[').TrimEnd(']');
                 rootPaths.Add(RootPaths.Find(r => new DirectoryInfo(r.RootPath).Name.ToLower() == tableName));
             }
@@ -106,12 +107,12 @@ namespace PluginFileReader.Helper
             foreach (var joinSplit in joinSplits.Skip(1))
             {
                 var joinTableSplit = joinSplit.Split(' ').Skip(1).First();
-                
+
                 if (joinTableSplit.Contains('\n'))
                 {
                     joinTableSplit = joinTableSplit.Split('\n').First();
                 }
-                
+
                 var tableName = joinTableSplit.TrimStart('[').TrimEnd(']');
                 rootPaths.Add(RootPaths.Find(r => new DirectoryInfo(r.RootPath).Name.ToLower() == tableName));
             }
@@ -124,13 +125,35 @@ namespace PluginFileReader.Helper
         /// </summary>
         public void ReconcileColumnsConfigurationFiles()
         {
+            var globalConfigurationColumns = new Dictionary<string, List<Column>>();
             var serializer = new JsonSerializer();
+
+            // load global config file if defined
+            if (!string.IsNullOrWhiteSpace(GlobalColumnsConfigurationFile))
+            {
+                using var file = File.OpenText(GlobalColumnsConfigurationFile);
+                globalConfigurationColumns =
+                    (Dictionary<string, List<Column>>) serializer.Deserialize(file,
+                        typeof(Dictionary<string, List<Column>>));
+            }
+
+            // apply config files
             foreach (var rootPath in RootPaths)
             {
+                // apply global config file
+                var indexName = string.IsNullOrWhiteSpace(rootPath.Name)
+                    ? new DirectoryInfo(rootPath.RootPath).Name
+                    : rootPath.Name;
+                if (globalConfigurationColumns.ContainsKey(indexName))
+                {
+                    rootPath.Columns = globalConfigurationColumns[indexName];
+                }
+
+                // apply local config file
                 if (!string.IsNullOrWhiteSpace(rootPath.ColumnsConfigurationFile))
                 {
                     using var file = File.OpenText(rootPath.ColumnsConfigurationFile);
-                    rootPath.Columns = (List<Column>)serializer.Deserialize(file, typeof(List<Column>));
+                    rootPath.Columns = (List<Column>) serializer.Deserialize(file, typeof(List<Column>));
                 }
             }
         }
@@ -196,7 +219,7 @@ namespace PluginFileReader.Helper
     {
         public string RootPath { get; set; }
         public string Filter { get; set; }
-
+        public string Name { get; set; }
         public string Mode { get; set; }
         public string CleanupAction { get; set; }
         public string ArchivePath { get; set; }

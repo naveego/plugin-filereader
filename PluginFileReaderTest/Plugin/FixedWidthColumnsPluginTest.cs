@@ -23,6 +23,8 @@ namespace PluginFileReaderTest.Plugin
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
         private const string ArchivePath = "../../../MockData/ArchiveDirectory";
         private const string ColumnsConfigFilePath = "../../../MockData/Configuration/ReadDirectoryConfig.json";
+        private const string GlobalColumnsConfigFilePath = "../../../MockData/Configuration/GlobalConfig.json";
+        private const string TestTableName = "PrimaryDirectory";
         private const string DefaultCleanupAction = "none";
         private const string DefaultFilter = "*.txt";
         private const string FixedWidthColumnsMode = "Fixed Width Columns";
@@ -242,9 +244,24 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, char delimiter = ',',
-            string filter = null, bool multiRoot = false, bool fromConfigFile = false)
+            string filter = null, bool multiRoot = false, bool fromConfigFile = false, bool fromGlobalConfigFile = false, bool withName = false)
         {
             var settings = GetSettings(cleanupAction, delimiter, filter, multiRoot);
+
+            if (withName)
+            {
+                foreach (var rootPath in settings.RootPaths)
+                {
+                    rootPath.Name = TestTableName;
+                    rootPath.Columns = null;
+                    rootPath.ColumnsConfigurationFile = ColumnsConfigFilePath;
+                }
+            }
+
+            if (fromGlobalConfigFile)
+            {
+                settings.GlobalColumnsConfigurationFile = GlobalColumnsConfigFilePath;
+            }
 
             if (fromConfigFile)
             {
@@ -361,6 +378,99 @@ namespace PluginFileReaderTest.Plugin
             var client = new Publisher.PublisherClient(channel);
 
             var request = GetConnectSettings(null, ',', null, false, true);
+
+            // act
+            var response = client.Connect(request);
+
+            // assert
+            Assert.IsType<ConnectResponse>(response);
+            Assert.Equal("", response.SettingsError);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ConnectGlobalConfigurationFileTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var request = GetConnectSettings(null, ',', null, false, false, true);
+
+            // act
+            var response = client.Connect(request);
+
+            // assert
+            Assert.IsType<ConnectResponse>(response);
+            Assert.Equal("", response.SettingsError);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ConnectGlobalConfigurationFileWithNameTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var request = GetConnectSettings(null, ',', null, false, false, true, true);
+
+            // act
+            var response = client.Connect(request);
+
+            // assert
+            Assert.IsType<ConnectResponse>(response);
+            Assert.Equal("", response.SettingsError);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ConnectGlobalAndLocalConfigurationFileTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var request = GetConnectSettings(null, ',', null, false, true, true);
 
             // act
             var response = client.Connect(request);

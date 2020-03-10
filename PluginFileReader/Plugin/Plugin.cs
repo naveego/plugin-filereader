@@ -195,7 +195,9 @@ namespace PluginFileReader.Plugin
                     var rootPath = _server.Settings.RootPaths.Find(r => r.RootPath == schemaMetaJson.RootPath.RootPath);
                     var files = filesByDirectory[rootPath.RootPath];
                     var schemaName = Constants.SchemaName;
-                    var tableName = new DirectoryInfo(rootPath.RootPath).Name;
+                    var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                        ? new DirectoryInfo(rootPath.RootPath).Name
+                        : rootPath.Name;
                     if (files.Count > 0)
                     {
                         // load file and then stream file one by one
@@ -237,7 +239,9 @@ namespace PluginFileReader.Plugin
                     {
                         var files = filesByDirectory[rootPath.RootPath];
                         var schemaName = Constants.SchemaName;
-                        var tableName = new DirectoryInfo(rootPath.RootPath).Name;
+                        var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                            ? new DirectoryInfo(rootPath.RootPath).Name
+                            : rootPath.Name;
                         if (files.Count > 0)
                         {
                             Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath), conn, rootPath,

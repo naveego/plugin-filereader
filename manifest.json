@@ -10,7 +10,7 @@
   "kind": "publisher",
   "os": "$GOOS",
   "arch": "$GOARCH",
-  "accessGroups": ["vandelay", "nalww", "prodsupport", "populytics", "wyatt", "casey", "katie", "waynedemo"],
+  "accessGroups": ["vandelay", "nalww", "prodsupport", "populytics", "wyatt", "casey", "katie", "waynedemo", "aon"],
   "canConfigureRealTime": false,
   "canProduceMultipleSchemas": true,
   "canAcceptQueryBasedSchemas": true,
@@ -34,7 +34,7 @@
       "ui:order": ["RootPaths"],
       "RootPaths": {
         "items": {
-          "ui:order": ["RootPath", "Filter", "CleanupAction", "ArchivePath", "Mode", "Delimiter", "HasHeader", "ColumnsConfigurationFile", "Columns"],
+          "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "Delimiter", "HasHeader", "ColumnsConfigurationFile", "Columns"],
           "Columns": {
             "items": {
               "ui:order": ["ColumnName", "IsKey", "TrimWhitespace", "ColumnStart", "ColumnEnd"]
@@ -46,6 +46,12 @@
     "schema": {
       "type": "object",
       "properties": {
+        "GlobalColumnsConfigurationFile": {
+          "type": "string",
+          "title": "Global Columns Configuration File",
+          "description": "Global configuration file for columns in fixed width root paths. Overridden by specific columns configuration files.",
+          "default": ""
+        },
         "RootPaths": {
           "title": "Root Paths",
           "description": "The folder(s) containing the files.",
@@ -63,6 +69,11 @@
                 "type": "string",
                 "description": "Filters used to select files beneath the root path. Each filter should be a regular expression.",
                 "default": "*.csv"
+              },
+              "Name": {
+                "type": "string",
+                "description": "Name for the schema and table. If one is not provided the folder name will be used.",
+                "default": ""
               },
               "CleanupAction": {
                 "type": "string",

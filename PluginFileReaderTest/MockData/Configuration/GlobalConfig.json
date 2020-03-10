@@ -1,0 +1,84 @@
+{
+  "ReadDirectory": [
+    {
+      "ColumnName": "id",
+      "ColumnStart": 0,
+      "ColumnEnd": 43,
+      "IsKey": true,
+      "TrimWhitespace": true
+    },
+    {
+      "ColumnName": "data1",
+      "ColumnStart": 44,
+      "ColumnEnd": 45,
+      "IsKey": false
+    },
+    {
+      "ColumnName": "date1",
+      "ColumnStart": 46,
+      "ColumnEnd": 55,
+      "IsKey": false
+    },
+    {
+      "ColumnName": "date2",
+      "ColumnStart": 56,
+      "ColumnEnd": 65,
+      "IsKey": false
+    },
+    {
+      "ColumnName": "data2",
+      "ColumnStart": 66,
+      "ColumnEnd": 79,
+      "IsKey": false,
+      "TrimWhitespace": true
+    },
+    {
+      "ColumnName": "data3",
+      "ColumnStart": 293,
+      "ColumnEnd": 317,
+      "IsKey": false,
+      "TrimWhitespace": true
+    }
+  ],
+  "PrimaryDirectory": [
+    {
+      "ColumnName": "id",
+      "ColumnStart": 0,
+      "ColumnEnd": 43,
+      "IsKey": true,
+      "TrimWhitespace": true
+    },
+    {
+      "ColumnName": "data1",
+      "ColumnStart": 44,
+      "ColumnEnd": 45,
+      "IsKey": false
+    },
+    {
+      "ColumnName": "date1",
+      "ColumnStart": 46,
+      "ColumnEnd": 55,
+      "IsKey": false
+    },
+    {
+      "ColumnName": "date2",
+      "ColumnStart": 56,
+      "ColumnEnd": 65,
+      "IsKey": false
+    },
+    {
+      "ColumnName": "data2",
+      "ColumnStart": 66,
+      "ColumnEnd": 79,
+      "IsKey": false,
+      "TrimWhitespace": true
+    },
+    {
+      "ColumnName": "data3",
+      "ColumnStart": 293,
+      "ColumnEnd": 317,
+      "IsKey": false,
+      "TrimWhitespace": true
+    }
+  ]
+}

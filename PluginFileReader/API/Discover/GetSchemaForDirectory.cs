@@ -21,7 +21,9 @@ namespace PluginFileReader.API.Discover
             }
             
             var schemaName = Constants.SchemaName;
-            var tableName = new DirectoryInfo(rootPath.RootPath).Name;
+            var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                ? new DirectoryInfo(rootPath.RootPath).Name
+                : rootPath.Name;
             var schemaId = $"[{schemaName}].[{tableName}]";
             var publisherMetaJson = new SchemaPublisherMetaJson
             {
