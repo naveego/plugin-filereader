@@ -10,7 +10,7 @@
   "kind": "publisher",
   "os": "$GOOS",
   "arch": "$GOARCH",
-  "accessGroups": ["vandelay", "nalww", "prodsupport", "populytics", "wyatt", "casey", "katie", "waynedemo", "aon", "apollo"],
+  "accessGroups": ["vandelay", "nalww", "prodsupport", "populytics", "wyatt", "casey", "katie", "waynedemo", "apollo"],
   "canConfigureRealTime": false,
   "canProduceMultipleSchemas": true,
   "canAcceptQueryBasedSchemas": true,

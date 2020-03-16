@@ -40,7 +40,7 @@ namespace PluginFileReader.API.FixedWidthColumns
                     $"[{column.ColumnName}] VARCHAR({int.MaxValue}){(column.IsKey ? " NOT NULL UNIQUE" : "")},");
                 if (column.IsKey)
                 {
-                    primaryKeySb.Append($"{column.ColumnName},");
+                    primaryKeySb.Append($"[{column.ColumnName}],");
                     hasPrimaryKey = true;
                 }
             }
