@@ -213,6 +213,59 @@ namespace PluginFileReader.Helper
 
             return true;
         }
+        
+        private bool FormatsValidOnAS400Paths()
+        {
+            foreach (var rootPath in RootPaths)
+            {
+                if (rootPath.Mode == "AS400")
+                {
+                    if (rootPath.Formats.Count == 0)
+                    {
+                        throw new Exception(
+                            $"{rootPath.RootPath} is set to AS400 and has no Formats defined");
+                    }
+                    
+                    foreach (var format in rootPath.Formats)
+                    {
+                        if (format.Columns.Count == 0)
+                        {
+                            throw new Exception(
+                                $"{rootPath.RootPath} is set to AS400 and Format has no Columns defined");
+                        }
+
+                        if (string.IsNullOrWhiteSpace(format.KeyValue.Value))
+                        {
+                            throw new Exception(
+                                $"{rootPath.RootPath} is set to AS400 and Format has no Key Value defined");
+                        }
+                    }
+                    
+                }
+            }
+
+            return true;
+        }
+        
+        private bool ColumnsValidOnAS400Paths()
+        {
+            foreach (var rootPath in RootPaths)
+            {
+                if (rootPath.Mode == "AS400")
+                {
+                    foreach (var format in rootPath.Formats)
+                    {
+                        if (format.Columns.Count == 0)
+                        {
+                            throw new Exception(
+                                $"{rootPath.RootPath} is set to AS400 and Format has no Columns defined");
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
     }
 
     public class RootPathObject
@@ -231,6 +284,9 @@ namespace PluginFileReader.Helper
         // FIXED COLUMN WIDTH MODE SETTINGS
         public string ColumnsConfigurationFile { get; set; }
         public List<Column> Columns { get; set; }
+        
+        // AS400 MODE SETTINGS
+        public List<Format> Formats { get; set; }
     }
 
     public class Column
@@ -240,5 +296,18 @@ namespace PluginFileReader.Helper
         public int ColumnStart { get; set; }
         public int ColumnEnd { get; set; }
         public bool TrimWhitespace { get; set; }
+    }
+
+    public class Format
+    {
+        public AS400KeyValue KeyValue { get; set; }
+        public List<Column> Columns { get; set; }
+    }
+
+    public class AS400KeyValue
+    {
+        public int ColumnStart { get; set; }
+        public int ColumnEnd { get; set; }
+        public string Value { get; set; }
     }
 }

@@ -3,17 +3,15 @@ using System.IO;
 using System.Linq;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
-using PluginFileReader.API.Factory;
 using PluginFileReader.API.Utility;
 using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
 
-namespace PluginFileReader.API.Discover
+namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
 {
-    public static partial class Discover
+    public class FixedWidthColumnsDiscoverer : IDiscoverer
     {
-        public static Schema GetSchemaForDirectory(IImportExportFactory factory, RootPathObject rootPath, List<string> paths,
-            int sampleSize = 5)
+        public IEnumerable<Schema> DiscoverSchemas(IImportExportFactory factory, RootPathObject rootPath, List<string> paths, int sampleSize = 5)
         {
             if (paths.Count == 0)
             {
@@ -48,10 +46,13 @@ namespace PluginFileReader.API.Discover
                 Properties = {},
             };
 
-            schema = GetSchemaForQuery(schema, sampleSize, rootPath.Columns);
+            schema = Discover.Discover.GetSchemaForQuery(schema, sampleSize, rootPath.Columns);
             schema.PublisherMetaJson = JsonConvert.SerializeObject(publisherMetaJson);
 
-            return schema;
+            return new List<Schema>
+            {
+                schema
+            };
         }
     }
 }

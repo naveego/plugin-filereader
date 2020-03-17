@@ -1,4 +1,3 @@
-using PluginFileReader.API.Factory;
 using PluginFileReader.API.Factory.Implementations.AS400;
 using PluginFileReader.API.Factory.Implementations.CSV;
 using PluginFileReader.API.Factory.Implementations.FixedWidthColumns;
@@ -13,18 +12,18 @@ namespace PluginFileReader.API.Utility
         /// </summary>
         /// <param name="rootPath"></param>
         /// <returns></returns>
-        public static IImportExportFactory GetImportExportFactory(RootPathObject rootPath)
+        public static bool GetIsMultipleSchemasForDirectory(RootPathObject rootPath)
         {
             switch (rootPath.Mode)
             {
                 case "Delimited":
-                    return new CsvImportExportFactory();
+                    return false;
                 case "Fixed Width Columns":
-                    return new FixedWidthColumnsFactory();
+                    return false;
                 case "AS400":
-                    return new AS400Factory();
+                    return true;
                 default:
-                    return null;
+                    return false;
             }
         }
     }

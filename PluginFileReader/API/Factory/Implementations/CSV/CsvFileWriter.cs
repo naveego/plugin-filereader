@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace PluginFileReader.API.CSV
+namespace PluginFileReader.API.Factory.Implementations.CSV
 {
     /// <summary>
     /// Class for writing CSV file

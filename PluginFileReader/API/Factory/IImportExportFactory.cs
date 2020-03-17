@@ -7,5 +7,6 @@ namespace PluginFileReader.API.Factory
     {
         IImportExportFile MakeImportExportFile(SqlDatabaseConnection sqlDatabaseConnection, RootPathObject rootPath, string tableName,
             string schemaName);
+        IDiscoverer MakeDiscoverer();
     }
 }

@@ -1,16 +1,14 @@
 using System;
 using System.IO;
 using System.Text;
-using PluginFileReader.API.Factory;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
-namespace PluginFileReader.API.FixedWidthColumns
+namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
 {
     public class FixedWidthColumnsImportExport : IImportExportFile
     {
         private readonly SqlDatabaseConnection _conn;
-        private readonly RootPathObject _rootPath;
         private readonly string _tableName;
         private readonly string _schemaName;
 
@@ -18,7 +16,6 @@ namespace PluginFileReader.API.FixedWidthColumns
             string tableName, string schemaName)
         {
             _conn = sqlDatabaseConnection;
-            _rootPath = rootPath;
             _tableName = tableName;
             _schemaName = schemaName;
         }

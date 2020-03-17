@@ -125,11 +125,11 @@ namespace PluginFileReader.Plugin
                     Logger.Info($"Schemas attempted: {files.Count}");
 
                     var schemas = _server.Settings.RootPaths.Select(p =>
-                            Discover.GetSchemaForDirectory(Utility.GetImportExportFactory(p), p, files[p.RootPath],
+                            Discover.GetSchemasForDirectory(Utility.GetImportExportFactory(p), p, files[p.RootPath],
                                 sampleSize))
-                        .ToArray();
+                        .ToList();
 
-                    discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
+                    discoverSchemasResponse.Schemas.AddRange(schemas.SelectMany(s => s));
 
                     Logger.Info($"Schemas returned: {discoverSchemasResponse.Schemas.Count}");
 
