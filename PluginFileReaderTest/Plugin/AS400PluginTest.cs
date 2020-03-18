@@ -259,7 +259,7 @@ namespace PluginFileReaderTest.Plugin
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
-            Assert.Equal(31, schema.Properties.Count);
+            Assert.Equal(138, schema.Properties.Count);
 
             var property = schema.Properties[0];
             Assert.Equal("VEH.NUM", property.Id);

@@ -274,6 +274,7 @@ namespace PluginFileReader.Helper
         public string ColumnName { get; set; }
         public bool IsKey { get; set; }
         public bool IsHeader { get; set; }
+        public bool IsGlobalHeader { get; set; }
         public int ColumnStart { get; set; }
         public int ColumnEnd { get; set; }
         public bool TrimWhitespace { get; set; }
@@ -283,6 +284,7 @@ namespace PluginFileReader.Helper
     {
         public AS400KeyValue KeyValue { get; set; }
         public bool SingleRecordPerLine { get; set; }
+        public bool IsGlobalHeader { get; set; }
         // single line definition
         public List<Column> Columns { get; set; }
         

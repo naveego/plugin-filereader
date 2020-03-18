@@ -39,6 +39,10 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             // foreach (var format in rootPath.Formats)
             foreach (var format in AS400.Format25)
             {
+                if (format.IsGlobalHeader)
+                {
+                    continue;
+                }
                 
                 tableName = $"{tableName}_{format.KeyValue.Name}";
                 var schemaId = $"[{schemaName}].[{tableName}]";

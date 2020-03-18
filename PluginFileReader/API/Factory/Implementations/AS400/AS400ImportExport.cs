@@ -30,24 +30,43 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
         public long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = long.MaxValue)
         {
             var formatCmdDictionary = new Dictionary<string, SqlDatabaseCommand>();
+            var recordGlobalHeaderMap = new Dictionary<string,string>();
             var recordHeaderMap = new Dictionary<string, Dictionary<string, string>>();
             var recordMap = new Dictionary<string, Dictionary<string, string>>();
+            
+            var columnsMap = new Dictionary<string, List<Column>>();
 
             foreach (var format in AS400.Format25)
             {
+                if (format.IsGlobalHeader)
+                {
+                    continue;
+                }
                 var schemaName = _schemaName;
                 var tableName = $"{_tableName}_{format.KeyValue.Name}";
 
                 if (format.SingleRecordPerLine)
                 {
-                    CreateTable(schemaName, tableName, format.Columns);
-                    formatCmdDictionary[format.KeyValue.Name] = GetInsertCmd(schemaName, tableName, format.Columns);
+                    var columns = new List<Column>(format.Columns);
+                    foreach (var globalFormat in AS400.Format25.FindAll(f => f.IsGlobalHeader))
+                    {
+                        columns.AddRange(globalFormat.Columns);
+                    }
+                    
+                    CreateTable(schemaName, tableName, columns);
+                    formatCmdDictionary[format.KeyValue.Name] = GetInsertCmd(schemaName, tableName, columns);
+                    columnsMap[format.KeyValue.Name] = columns;
                 }
                 else
                 {
-                    CreateTable(schemaName, tableName, format.MultiLineColumns);
-                    formatCmdDictionary[format.KeyValue.Name] =
-                        GetInsertCmd(schemaName, tableName, format.MultiLineColumns);
+                    var columns = new List<Column>(format.MultiLineColumns);
+                    foreach (var globalFormat in AS400.Format25.FindAll(f => f.IsGlobalHeader))
+                    {
+                        columns.AddRange(globalFormat.Columns);
+                    }
+                    CreateTable(schemaName, tableName, columns);
+                    formatCmdDictionary[format.KeyValue.Name] = GetInsertCmd(schemaName, tableName, columns);
+                    columnsMap[format.KeyValue.Name] = columns;
                 }
 
                 recordHeaderMap[format.KeyValue.Name] = new Dictionary<string, string>();
@@ -76,6 +95,21 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
 
                     if (format.SingleRecordPerLine)
                     {
+                        foreach (var column in format.Columns)
+                        {
+                            var valueLength = column.ColumnEnd -
+                                column.ColumnStart + 1;
+                            var rawValue = new string(line.Substring(column.ColumnStart)
+                                .Take(valueLength).ToArray());
+
+                            if (format.IsGlobalHeader)
+                            {
+                                recordGlobalHeaderMap.TryAdd(column.ColumnName, rawValue);
+                                continue;
+                            }
+
+                            // TODO handle not global header
+                        }
                     }
                     else
                     {
@@ -114,7 +148,8 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                             var cmd = formatCmdDictionary[format.KeyValue.Name];
                             if (cmd != null)
                             {
-                                foreach (var column in format.MultiLineColumns)
+                                var columns = columnsMap[format.KeyValue.Name];
+                                foreach (var column in columns)
                                 {
                                     string value;
 
@@ -126,7 +161,17 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                                             value = "";
                                         }
 
-                                        cmd.Parameters[$"@{column.ColumnName.Replace(".", "")}"].Value =
+                                        cmd.Parameters[$"@{GetParamName(column)}"].Value =
+                                            column.TrimWhitespace ? value.Trim() : value;
+                                    }
+                                    else if (column.IsGlobalHeader)
+                                    {
+                                        if (!recordGlobalHeaderMap.TryGetValue(column.ColumnName, out value))
+                                        {
+                                            value = "";
+                                        }
+
+                                        cmd.Parameters[$"@{GetParamName(column)}"].Value =
                                             column.TrimWhitespace ? value.Trim() : value;
                                     }
                                     else
@@ -137,7 +182,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                                             value = "";
                                         }
 
-                                        cmd.Parameters[$"@{column.ColumnName.Replace(".", "")}"].Value =
+                                        cmd.Parameters[$"@{GetParamName(column)}"].Value =
                                             column.TrimWhitespace ? value.Trim() : value;
                                     }
                                 }
@@ -145,7 +190,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                                 var hasKey = true;
                                 foreach (var keyColumn in format.MultiLineColumns.Where(c => c.IsKey))
                                 {
-                                    if (string.IsNullOrWhiteSpace(cmd.Parameters[$"@{keyColumn.ColumnName.Replace(".", "")}"].Value
+                                    if (string.IsNullOrWhiteSpace(cmd.Parameters[$"@{GetParamName(keyColumn)}"].Value
                                         .ToString()))
                                     {
                                         hasKey = false;
@@ -261,7 +306,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
 
             foreach (var column in columns)
             {
-                var paramName = $"@{column.ColumnName.Replace(".", "")}";
+                var paramName = $"@{GetParamName(column)}";
                 querySb.Append($"{paramName},");
                 cmd.Parameters.Add(paramName);
             }
@@ -277,13 +322,10 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
 
             return cmd;
         }
-    }
 
-
-    class AS400MultiLineValue
-    {
-        public string RecordId { get; set; }
-        public string ColumnName { get; set; }
-        public string Value { get; set; }
+        private string GetParamName(Column column)
+        {
+            return column.ColumnName.Replace(".", "").Replace(" ", "");
+        }
     }
 }
