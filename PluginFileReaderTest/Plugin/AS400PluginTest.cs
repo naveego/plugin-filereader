@@ -374,7 +374,8 @@ namespace PluginFileReaderTest.Plugin
             }
 
             // assert
-            Assert.Equal(31032, records.Count);
+            // Assert.Equal(31032, records.Count);
+            Assert.Equal(3443, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             Assert.Equal("0001", record["VEH.NUM"]);

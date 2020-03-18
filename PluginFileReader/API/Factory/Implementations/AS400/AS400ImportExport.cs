@@ -112,45 +112,59 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                         if (insert)
                         {
                             var cmd = formatCmdDictionary[format.KeyValue.Name];
-                            foreach (var column in format.MultiLineColumns)
+                            if (cmd != null)
                             {
-                                string value;
+                                foreach (var column in format.MultiLineColumns)
+                                {
+                                    string value;
 
-                                if (column.IsHeader)
-                                {
-                                    if (!recordHeaderMap[format.KeyValue.Name]
-                                        .TryGetValue(column.ColumnName, out value))
+                                    if (column.IsHeader)
                                     {
-                                        value = "";
+                                        if (!recordHeaderMap[format.KeyValue.Name]
+                                            .TryGetValue(column.ColumnName, out value))
+                                        {
+                                            value = "";
+                                        }
+
+                                        cmd.Parameters[$"@{column.ColumnName.Replace(".", "")}"].Value =
+                                            column.TrimWhitespace ? value.Trim() : value;
                                     }
-                                    cmd.Parameters[$"@{column.ColumnName.Replace(".", "")}"].Value =
-                                        column.TrimWhitespace ? value.Trim() : value;
+                                    else
+                                    {
+                                        if (!recordMap[format.KeyValue.Name]
+                                            .TryGetValue(column.ColumnName, out value))
+                                        {
+                                            value = "";
+                                        }
+
+                                        cmd.Parameters[$"@{column.ColumnName.Replace(".", "")}"].Value =
+                                            column.TrimWhitespace ? value.Trim() : value;
+                                    }
                                 }
-                                else
+
+                                var hasKey = true;
+                                foreach (var keyColumn in format.MultiLineColumns.Where(c => c.IsKey))
                                 {
-                                    if (!recordMap[format.KeyValue.Name]
-                                        .TryGetValue(column.ColumnName, out value))
+                                    if (string.IsNullOrWhiteSpace(cmd.Parameters[$"@{keyColumn.ColumnName.Replace(".", "")}"].Value
+                                        .ToString()))
                                     {
-                                        value = "";
+                                        hasKey = false;
+                                        break;
                                     }
-                                    cmd.Parameters[$"@{column.ColumnName.Replace(".", "")}"].Value =
-                                        column.TrimWhitespace ? value.Trim() : value;
+                                }
+                                
+                                // insert record
+                                if (recordHeaderMap[format.KeyValue.Name].Count > 0 && hasKey)
+                                {
+                                    cmd.ExecuteNonQuery();
+                                    recordsInserted++;
                                 }
                             }
 
-                            // var keyColumn = format.MultiLineColumns.First(c => c.IsKey);
-                            // var hasKey = !string.IsNullOrWhiteSpace(cmd.Parameters[$"@{keyColumn.ColumnName}"].Value.ToString());
 
-                            // insert record
-                            if (recordHeaderMap[format.KeyValue.Name].Count > 0)
-                            {
-                                cmd.ExecuteNonQuery();
-                                recordsInserted++;
-                            }
-                            
                             // clear storage
                             recordMap[format.KeyValue.Name].Clear();
-                            
+
                             if (headerTrigger)
                             {
                                 recordHeaderMap[format.KeyValue.Name].Clear();
@@ -195,7 +209,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             foreach (var column in columns)
             {
                 querySb.Append(
-                    $"[{column.ColumnName}] VARCHAR({int.MaxValue}){(column.IsKey ? " NOT NULL UNIQUE" : "")},");
+                    $"[{column.ColumnName}] VARCHAR({int.MaxValue}){(column.IsKey ? " NOT NULL" : "")},");
                 if (column.IsKey)
                 {
                     primaryKeySb.Append($"[{column.ColumnName}],");

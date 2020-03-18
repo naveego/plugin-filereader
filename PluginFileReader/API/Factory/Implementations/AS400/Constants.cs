@@ -38,7 +38,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                         ColumnName = "VEH.NUM",
                         IsHeader = true,
                         TrimWhitespace = true,
-                        IsKey = false
+                        IsKey = true
                     },
                     new Column
                     {
@@ -164,7 +164,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                         ColumnName = "COVCODE",
                         IsHeader = false,
                         TrimWhitespace = true,
-                        IsKey = false
+                        IsKey = true
                     },
                     new Column
                     {
