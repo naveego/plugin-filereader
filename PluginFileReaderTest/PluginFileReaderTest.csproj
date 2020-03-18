@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="MockData\AS400Data" />
       <Folder Include="MockData\ReadDirectoryDifferent" />
     </ItemGroup>
 

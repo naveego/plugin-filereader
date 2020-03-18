@@ -214,58 +214,38 @@ namespace PluginFileReader.Helper
             return true;
         }
         
-        private bool FormatsValidOnAS400Paths()
-        {
-            foreach (var rootPath in RootPaths)
-            {
-                if (rootPath.Mode == "AS400")
-                {
-                    if (rootPath.Formats.Count == 0)
-                    {
-                        throw new Exception(
-                            $"{rootPath.RootPath} is set to AS400 and has no Formats defined");
-                    }
-                    
-                    foreach (var format in rootPath.Formats)
-                    {
-                        if (format.Columns.Count == 0)
-                        {
-                            throw new Exception(
-                                $"{rootPath.RootPath} is set to AS400 and Format has no Columns defined");
-                        }
-
-                        if (string.IsNullOrWhiteSpace(format.KeyValue.Value))
-                        {
-                            throw new Exception(
-                                $"{rootPath.RootPath} is set to AS400 and Format has no Key Value defined");
-                        }
-                    }
-                    
-                }
-            }
-
-            return true;
-        }
-        
-        private bool ColumnsValidOnAS400Paths()
-        {
-            foreach (var rootPath in RootPaths)
-            {
-                if (rootPath.Mode == "AS400")
-                {
-                    foreach (var format in rootPath.Formats)
-                    {
-                        if (format.Columns.Count == 0)
-                        {
-                            throw new Exception(
-                                $"{rootPath.RootPath} is set to AS400 and Format has no Columns defined");
-                        }
-                    }
-                }
-            }
-
-            return true;
-        }
+        // private bool FormatsValidOnAS400Paths()
+        // {
+        //     foreach (var rootPath in RootPaths)
+        //     {
+        //         if (rootPath.Mode == "AS400")
+        //         {
+        //             if (rootPath.Formats.Count == 0)
+        //             {
+        //                 throw new Exception(
+        //                     $"{rootPath.RootPath} is set to AS400 and has no Formats defined");
+        //             }
+        //             
+        //             foreach (var format in rootPath.Formats)
+        //             {
+        //                 if (format.Columns.Count == 0)
+        //                 {
+        //                     throw new Exception(
+        //                         $"{rootPath.RootPath} is set to AS400 and Format has no Columns defined");
+        //                 }
+        //
+        //                 if (string.IsNullOrWhiteSpace(format.KeyValue.Value))
+        //                 {
+        //                     throw new Exception(
+        //                         $"{rootPath.RootPath} is set to AS400 and Format has no Key Value defined");
+        //                 }
+        //             }
+        //             
+        //         }
+        //     }
+        //
+        //     return true;
+        // }
     }
 
     public class RootPathObject
@@ -293,6 +273,7 @@ namespace PluginFileReader.Helper
     {
         public string ColumnName { get; set; }
         public bool IsKey { get; set; }
+        public bool IsHeader { get; set; }
         public int ColumnStart { get; set; }
         public int ColumnEnd { get; set; }
         public bool TrimWhitespace { get; set; }
@@ -301,13 +282,31 @@ namespace PluginFileReader.Helper
     public class Format
     {
         public AS400KeyValue KeyValue { get; set; }
+        public bool SingleRecordPerLine { get; set; }
+        // single line definition
         public List<Column> Columns { get; set; }
+        
+        // if multiline definition 
+        public AS400MultiLineDefinition MultiLineDefinition { get; set; }
+        public List<string> HeaderRecordKeys { get; set; }
+        public List<Column> MultiLineColumns { get; set; }
     }
-
+    
     public class AS400KeyValue
     {
         public int ColumnStart { get; set; }
         public int ColumnEnd { get; set; }
         public string Value { get; set; }
+        public string Name { get; set; }
+    }
+    
+    public class AS400MultiLineDefinition
+    {
+        public int TagNameStart { get; set; }
+        public int TagNameEnd { get; set; }
+        public char TagNameDelimiter { get; set; }
+        public int ValueLengthStart { get; set; }
+        public int ValueLengthEnd { get; set; }
+        public int ValueStart { get; set; }
     }
 }

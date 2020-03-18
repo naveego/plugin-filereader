@@ -14,7 +14,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
 
         public IDiscoverer MakeDiscoverer()
         {
-            throw new System.NotImplementedException();
+            return new AS400Discoverer();
         }
     }
 }

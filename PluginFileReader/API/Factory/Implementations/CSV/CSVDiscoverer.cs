@@ -15,7 +15,7 @@ namespace PluginFileReader.API.Factory.Implementations.CSV
         {
             if (paths.Count == 0)
             {
-                return null;
+                return new List<Schema>();
             }
             
             var schemaName = Constants.SchemaName;
