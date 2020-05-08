@@ -1,6 +1,7 @@
 
 
 using Naveego.Sdk.Plugins;
+using SQLDatabase.Net.SQLDatabaseClient;
 
 namespace PluginFileReader.Helper
 {
@@ -9,6 +10,8 @@ namespace PluginFileReader.Helper
         public int CommitSLA { get; set; }
         public Schema Schema { get; set; }
         public ReplicationWriteRequest Replication { get; set; }
+        public DataVersions DataVersions { get; set; }
+        public SqlDatabaseConnection Connection { get; set; }
 
         /// <summary>
         /// Returns if mode is set to replication

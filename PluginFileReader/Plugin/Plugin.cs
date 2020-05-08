@@ -8,6 +8,7 @@ using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginFileReader.API.Discover;
 using PluginFileReader.API.Read;
+using PluginFileReader.API.Replication;
 using PluginFileReader.API.Utility;
 using PluginFileReader.API.Write;
 using PluginFileReader.DataContracts;
@@ -303,80 +304,60 @@ namespace PluginFileReader.Plugin
         }
 
         /// <summary>
-        /// Creates a form and handles form updates for write backs
+        /// Configures replication writebacks to File
         /// </summary>
         /// <param name="request"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public override Task<ConfigureWriteResponse> ConfigureWrite(ConfigureWriteRequest request,
+        public override Task<ConfigureReplicationResponse> ConfigureReplication(ConfigureReplicationRequest request,
             ServerCallContext context)
         {
-            Logger.Info("Configuring write...");
+            Logger.SetLogPrefix("configure_replication");
+            Logger.Info($"Configuring write for schema name {request.Schema.Name}...");
 
-
-            var schemaJson = Write.GetSchemaJson();
-            var uiJson = Write.GetUIJson();
-
-            // if first call 
-            if (request.Form == null || request.Form.DataJson == "")
-            {
-                return Task.FromResult(new ConfigureWriteResponse
-                {
-                    Form = new ConfigurationFormResponse
-                    {
-                        DataJson = "",
-                        DataErrorsJson = "",
-                        Errors = { },
-                        SchemaJson = schemaJson,
-                        UiJson = uiJson,
-                        StateJson = ""
-                    },
-                    Schema = null
-                });
-            }
+            var schemaJson = Replication.GetSchemaJson();
+            var uiJson = Replication.GetUIJson();
 
             try
             {
-                // get form data
-                var formData = JsonConvert.DeserializeObject<ConfigureWriteFormData>(request.Form.DataJson);
-
-                // base schema to return
-                var schema = new Schema
+                var errors = new List<string>();
+                if (!string.IsNullOrWhiteSpace(request.Form.DataJson))
                 {
-                    Id = "",
-                    Name = "",
-                    Query = formData.Query,
-                    DataFlowDirection = Schema.Types.DataFlowDirection.Write
-                };
+                    // check for config errors
+                    var replicationFormData =
+                        JsonConvert.DeserializeObject<ConfigureReplicationFormData>(request.Form.DataJson);
 
-                // add parameters to properties
-                foreach (var param in formData.Parameters)
-                {
-                    schema.Properties.Add(new Property
+                    errors = replicationFormData.ValidateReplicationFormData();
+                    
+                    return Task.FromResult(new ConfigureReplicationResponse
                     {
-                        Id = param.ParamName,
-                        Name = param.ParamName,
-                        Type = Write.GetWritebackType(param.ParamType)
+                        Form = new ConfigurationFormResponse
+                        {
+                            DataJson = JsonConvert.SerializeObject(replicationFormData),
+                            Errors = {errors},
+                            SchemaJson = schemaJson,
+                            UiJson = uiJson,
+                            StateJson = request.Form.StateJson
+                        }
                     });
                 }
 
-                return Task.FromResult(new ConfigureWriteResponse
+                return Task.FromResult(new ConfigureReplicationResponse
                 {
                     Form = new ConfigurationFormResponse
                     {
                         DataJson = request.Form.DataJson,
-                        Errors = { },
+                        Errors = {},
                         SchemaJson = schemaJson,
                         UiJson = uiJson,
                         StateJson = request.Form.StateJson
-                    },
-                    Schema = schema
+                    }
                 });
             }
             catch (Exception e)
             {
                 Logger.Error(e.Message);
-                return Task.FromResult(new ConfigureWriteResponse
+                return Task.FromResult(new ConfigureReplicationResponse
                 {
                     Form = new ConfigurationFormResponse
                     {
@@ -385,38 +366,59 @@ namespace PluginFileReader.Plugin
                         SchemaJson = schemaJson,
                         UiJson = uiJson,
                         StateJson = request.Form.StateJson
-                    },
-                    Schema = null
+                    }
                 });
             }
         }
 
         /// <summary>
-        /// Prepares the plugin to handle a write request
+        /// Prepares writeback settings to write to file
         /// </summary>
         /// <param name="request"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public override Task<PrepareWriteResponse> PrepareWrite(PrepareWriteRequest request, ServerCallContext context)
+        public override async Task<PrepareWriteResponse> PrepareWrite(PrepareWriteRequest request,
+            ServerCallContext context)
         {
+            Logger.SetLogPrefix(request.DataVersions.JobId);
             Logger.Info("Preparing write...");
             _server.WriteConfigured = false;
 
-            var writeSettings = new WriteSettings
+            _server.WriteSettings = new WriteSettings
             {
                 CommitSLA = request.CommitSlaSeconds,
-                Schema = request.Schema
+                Schema = request.Schema,
+                Replication = request.Replication,
+                DataVersions = request.DataVersions,
+                Connection = Utility.GetSqlConnection(Constants.DiscoverDbPrefix, true)
             };
 
-            _server.WriteSettings = writeSettings;
+            if (_server.WriteSettings.IsReplication())
+            {
+                // reconcile job
+                Logger.Info($"Starting to reconcile Replication Job {request.DataVersions.JobId}");
+                try
+                {
+                    await Replication.ReconcileReplicationJobAsync(_server.WriteSettings.Connection, request);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e.Message);
+                    throw;
+                }
+
+                Logger.Info($"Finished reconciling Replication Job {request.DataVersions.JobId}");
+            }
+
             _server.WriteConfigured = true;
 
+            Logger.Debug(JsonConvert.SerializeObject(_server.WriteSettings, Formatting.Indented));
             Logger.Info("Write prepared.");
-            return Task.FromResult(new PrepareWriteResponse());
+            return new PrepareWriteResponse();
         }
 
         /// <summary>
-        /// Takes in records and writes them out then sends acks back to the client
+        /// Writes records to files
         /// </summary>
         /// <param name="requestStream"></param>
         /// <param name="responseStream"></param>
@@ -425,60 +427,54 @@ namespace PluginFileReader.Plugin
         public override async Task WriteStream(IAsyncStreamReader<Record> requestStream,
             IServerStreamWriter<RecordAck> responseStream, ServerCallContext context)
         {
-            // try
-            // {
-            //     Logger.Info("Writing records...");
-            //     var schema = _server.WriteSettings.Schema;
-            //     var sla = _server.WriteSettings.CommitSLA;
-            //     var inCount = 0;
-            //     var outCount = 0;
-            //
-            //     // get next record to publish while connected and configured
-            //     while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
-            //            _server.WriteConfigured)
-            //     {
-            //         var record = requestStream.Current;
-            //         inCount++;
-            //         
-            //         Logger.Debug($"Got Record {record.DataJson}");
-            //
-            //         // send record to source system
-            //         // timeout if it takes longer than the sla
-            //         var task = Task.Run(() => PutRecord(schema, record));
-            //         if (task.Wait(TimeSpan.FromSeconds(sla)))
-            //         {
-            //             // send ack
-            //             var ack = new RecordAck
-            //             {
-            //                 CorrelationId = record.CorrelationId,
-            //                 Error = task.Result
-            //             };
-            //             await responseStream.WriteAsync(ack);
-            //
-            //             if (String.IsNullOrEmpty(task.Result))
-            //             {
-            //                 outCount++;
-            //             }
-            //         }
-            //         else
-            //         {
-            //             // send timeout ack
-            //             var ack = new RecordAck
-            //             {
-            //                 CorrelationId = record.CorrelationId,
-            //                 Error = "timed out"
-            //             };
-            //             await responseStream.WriteAsync(ack);
-            //         }
-            //     }
-            //
-            //     Logger.Info($"Wrote {outCount} of {inCount} records.");
-            // }
-            // catch (Exception e)
-            // {
-            //     Logger.Error(e.Message);
-            //     throw;
-            // }
+            try
+            {
+                Logger.Info("Writing records to File...");
+
+                var schema = _server.WriteSettings.Schema;
+                var inCount = 0;
+
+                // get next record to publish while connected and configured
+                while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
+                       _server.WriteConfigured)
+                {
+                    var record = requestStream.Current;
+                    inCount++;
+
+                    Logger.Debug($"Got record: {record.DataJson}");
+
+                    if (_server.WriteSettings.IsReplication())
+                    {
+                        var config =
+                            JsonConvert.DeserializeObject<ConfigureReplicationFormData>(_server.WriteSettings
+                                .Replication
+                                .SettingsJson);
+
+                        // send record to source system
+                        // add await for unit testing 
+                        // removed to allow multiple to run at the same time
+                        Task.Run(
+                            async () => await Replication.WriteRecordAsync(_server.WriteSettings.Connection, schema, record, config,
+                                responseStream), context.CancellationToken);
+                    }
+                    else
+                    {
+                        // send record to source system
+                        // add await for unit testing 
+                        // removed to allow multiple to run at the same time
+                        // Task.Run(async () =>
+                        //         await Write.WriteRecordAsync(_connectionFactory, schema, record, responseStream),
+                        //     context.CancellationToken);
+                    }
+                }
+
+                Logger.Info($"Wrote {inCount} records to PostgreSQL.");
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
         }
 
         /// <summary>

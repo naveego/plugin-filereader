@@ -12,8 +12,9 @@ namespace PluginFileReader.API.Utility
         /// Creates a new sql connection
         /// </summary>
         /// <param name="dbFilePrefix"></param>
+        /// <param name="onDisk"></param>
         /// <returns>An open sql connection</returns>
-        public static SqlDatabaseConnection GetSqlConnection(string dbFilePrefix)
+        public static SqlDatabaseConnection GetSqlConnection(string dbFilePrefix, bool onDisk = false)
         {
             if (_connection != null)
             {
@@ -30,8 +31,7 @@ namespace PluginFileReader.API.Utility
                 DatabaseFileMode = DatabaseFileMode.OpenOrCreate,
                 DatabaseMode = DatabaseMode.ReadWrite,
                 SchemaName = Constants.SchemaName,
-                // Uri = $"file://{Path.Join(Constants.DbFolder, $"{dbFilePrefix}_{Constants.DbFile}")}"
-                Uri = "file://@memory"
+                Uri = onDisk ? $"file://{Path.Join(Constants.DbFolder, $"{dbFilePrefix}_{Constants.DbFile}")}" : "file://@memory" 
             };
             _connection = new SqlDatabaseConnection(connBuilder.ConnectionString);
             _connection.Open();
