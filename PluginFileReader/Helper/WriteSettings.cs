@@ -1,6 +1,7 @@
 
 
 using Naveego.Sdk.Plugins;
+using PluginFileReader.API.Factory;
 using SQLDatabase.Net.SQLDatabaseClient;
 
 namespace PluginFileReader.Helper
@@ -12,6 +13,8 @@ namespace PluginFileReader.Helper
         public ReplicationWriteRequest Replication { get; set; }
         public DataVersions DataVersions { get; set; }
         public SqlDatabaseConnection Connection { get; set; }
+        public IImportExportFile GoldenImportExport { get; set; }
+        public IImportExportFile VersionImportExport { get; set; }
 
         /// <summary>
         /// Returns if mode is set to replication

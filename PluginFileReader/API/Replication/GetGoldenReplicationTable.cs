@@ -22,12 +22,12 @@ namespace PluginFileReader.API.Replication
                 PrimaryKey = false,
                 Serialize = true
             });
-            goldenTable.Columns.Add(new ReplicationColumn
-            {
-                ColumnName = Constants.ReplicationLineNumber,
-                DataType = $"VARCHAR({int.MaxValue})",
-                PrimaryKey = false,
-            });
+            // goldenTable.Columns.Add(new ReplicationColumn
+            // {
+            //     ColumnName = Constants.ReplicationLineNumber,
+            //     DataType = $"VARCHAR({int.MaxValue})",
+            //     PrimaryKey = false,
+            // });
 
             return goldenTable;
         }

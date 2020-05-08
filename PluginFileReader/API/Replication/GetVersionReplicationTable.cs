@@ -21,12 +21,12 @@ namespace PluginFileReader.API.Replication
                 DataType = $"VARCHAR({int.MaxValue})",
                 PrimaryKey = false
             });
-            versionTable.Columns.Add(new ReplicationColumn
-            {
-                ColumnName = Constants.ReplicationLineNumber,
-                DataType = $"VARCHAR({int.MaxValue})",
-                PrimaryKey = false,
-            });
+            // versionTable.Columns.Add(new ReplicationColumn
+            // {
+            //     ColumnName = Constants.ReplicationLineNumber,
+            //     DataType = $"VARCHAR({int.MaxValue})",
+            //     PrimaryKey = false,
+            // });
 
             return versionTable;
         }

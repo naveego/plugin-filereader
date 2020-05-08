@@ -21,6 +21,9 @@ namespace PluginFileReaderTest.Plugin
         private const string ReadPath = "../../../MockData/ReadDirectory";
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
         private const string ArchivePath = "../../../MockData/ArchiveDirectory";
+        private const string ReplicationPath = "../../../MockData/ReplicationDirectory";
+        private const string GoldenReplicationFile = "golden.csv";
+        private const string VersionReplicationFile = "version.csv";
         private const string DefaultCleanupAction = "none";
         private const string DefaultFilter = "*.csv";
         private const string DelimitedMode = "Delimited";
@@ -145,14 +148,41 @@ namespace PluginFileReaderTest.Plugin
             };
         }
 
-        private Schema GetTestSchema(string query)
+        private Schema GetTestSchema(string query = "")
         {
             return new Schema
             {
                 Id = "test",
                 Name = "test",
-                Query = query
+                Query = query,
             };
+        }
+
+        private Schema GetReplicationSchema()
+        {
+            return new Schema
+            {
+                Id = "test",
+                Name = "test",
+                Query = "",
+                Properties =
+                {
+                    new Property
+                    {
+                        Id = "Id",
+                        Name = "Id",
+                        Type = PropertyType.Integer,
+                        IsKey = true
+                    },
+                    new Property
+                    {
+                        Id = "Name",
+                        Name = "Name",
+                        Type = PropertyType.String
+                    }
+                }
+            };
+            
         }
 
         [Fact]
@@ -948,6 +978,158 @@ on a.id = b.id"),
             Assert.Empty(secondRecords);
             Assert.Empty(readFiles);
             Assert.Empty(archiveFiles);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task PrepareWriteTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var request = new PrepareWriteRequest()
+            {
+                Schema = GetReplicationSchema(),
+                CommitSlaSeconds = 1,
+                Replication = new ReplicationWriteRequest
+                {
+                    SettingsJson = JsonConvert.SerializeObject(new ConfigureReplicationFormData
+                    {
+                        GoldenRecordFileDirectory = ReplicationPath,
+                        GoldenRecordFileName = GoldenReplicationFile,
+                        VersionRecordFileDirectory = ReplicationPath,
+                        VersionRecordFileName = VersionReplicationFile,
+                        Delimiter = ',',
+                        IncludeHeader = true
+                    })
+                },
+                DataVersions = new DataVersions
+                {
+                    JobId = "jobUnitTest",
+                    ShapeId = "shapeUnitTest",
+                    JobDataVersion = 1,
+                    ShapeDataVersion = 2
+                }
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var response = client.PrepareWrite(request);
+
+            // assert
+            Assert.IsType<PrepareWriteResponse>(response);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReplicationWriteTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var prepareWriteRequest = new PrepareWriteRequest()
+            {
+                Schema = GetReplicationSchema(),
+                CommitSlaSeconds = 1,
+                Replication = new ReplicationWriteRequest
+                {
+                    SettingsJson = JsonConvert.SerializeObject(new ConfigureReplicationFormData
+                    {
+                        GoldenRecordFileDirectory = ReplicationPath,
+                        GoldenRecordFileName = GoldenReplicationFile,
+                        VersionRecordFileDirectory = ReplicationPath,
+                        VersionRecordFileName = VersionReplicationFile,
+                        Delimiter = ',',
+                        IncludeHeader = true
+                    })
+                },
+                DataVersions = new DataVersions
+                {
+                    JobId = "jobUnitTest",
+                    ShapeId = "shapeUnitTest",
+                    JobDataVersion = 1,
+                    ShapeDataVersion = 2
+                }
+            };
+
+            var records = new List<Record>()
+            {
+                {
+                    new Record
+                    {
+                        Action = Record.Types.Action.Upsert,
+                        CorrelationId = "test",
+                        RecordId = "record1",
+                        DataJson = "{\"Id\":1,\"Name\":\"Test Company\"}",
+                        Versions = { new RecordVersion
+                        {
+                            RecordId = "version1",
+                            DataJson = "{\"Id\":1,\"Name\":\"Test Company\"}",
+                        }}
+                    }
+                }
+            };
+
+            var recordAcks = new List<RecordAck>();
+
+            // act
+            client.Connect(connectRequest);
+            client.PrepareWrite(prepareWriteRequest);
+
+            using (var call = client.WriteStream())
+            {
+                var responseReaderTask = Task.Run(async () =>
+                {
+                    while (await call.ResponseStream.MoveNext())
+                    {
+                        var ack = call.ResponseStream.Current;
+                        recordAcks.Add(ack);
+                    }
+                });
+
+                foreach (Record record in records)
+                {
+                    await call.RequestStream.WriteAsync(record);
+                }
+
+                await call.RequestStream.CompleteAsync();
+                await responseReaderTask;
+            }
+
+            // assert
+            Assert.Single(recordAcks);
+            Assert.Equal("", recordAcks[0].Error);
+            Assert.Equal("test", recordAcks[0].CorrelationId);
 
             // cleanup
             await channel.ShutdownAsync();

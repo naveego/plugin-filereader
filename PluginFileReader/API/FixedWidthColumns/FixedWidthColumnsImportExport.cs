@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using PluginFileReader.API.Factory;
@@ -23,9 +24,14 @@ namespace PluginFileReader.API.FixedWidthColumns
             _schemaName = schemaName;
         }
 
-        public int ExportTable(string filePathAndName, bool appendToFile = false)
+        public long ExportTable(string filePathAndName, bool appendToFile = false)
         {
             throw new System.NotImplementedException();
+        }
+        
+        public long WriteLineToFile(string filePathAndName, Dictionary<string, object> recordMap, bool includeHeader = false, long lineNumber = -1)
+        {
+            throw new NotImplementedException();
         }
 
         public long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = long.MaxValue)

@@ -4,6 +4,7 @@ using System.Data;
 using System.Text;
 using Newtonsoft.Json;
 using PluginFileReader.API.Factory;
+using PluginFileReader.API.Utility;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -36,10 +37,16 @@ namespace PluginFileReader.API.CSV
             SchemaName = schemaName;
             Delimiter = delimiter;
         }
-
-        public int ExportTable(string filePathAndName, bool appendToFile = false)
+        
+        public long WriteLineToFile(string filePathAndName, Dictionary<string, object> recordMap, bool includeHeader = false, long lineNumber = -1)
         {
-            int rowCount = 0;
+            throw new NotImplementedException();
+        }
+
+        public long ExportTable(string filePathAndName, bool appendToFile = false)
+        {
+            SQLDatabaseConnection.Open();
+            long rowCount = 0;
 
             using (SqlDatabaseCommand cmd = new SqlDatabaseCommand(SQLDatabaseConnection))
             {
@@ -54,11 +61,14 @@ namespace PluginFileReader.API.CSV
                     // Write header i.e. column names
                     for (int i = 0; i < dataReader.VisibleFieldCount; i++)
                     {
-                        if (dataReader.GetFieldType(i) != Type.GetType("byte[]")) // BLOB will not be written
+                        var name = dataReader.GetName(i);
+                        if (dataReader.GetFieldType(i) != Type.GetType("byte[]") 
+                            && name != Constants.ReplicationRecordId
+                            && name != Constants.ReplicationVersionIds
+                            && name != Constants.ReplicationVersionRecordId) // BLOB will not be written
                         {
-                            columnNames.Add(dataReader
-                                .GetName(i)); //maintain columns in the same order as the header line.
-                            CsvWriter.AddField(dataReader.GetName(i));
+                            columnNames.Add(name); //maintain columns in the same order as the header line.
+                            CsvWriter.AddField(name);
                         }
                     }
 

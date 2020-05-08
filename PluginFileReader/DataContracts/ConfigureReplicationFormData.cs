@@ -1,4 +1,5 @@
 using System.IO;
+using PluginFileReader.Helper;
 
 namespace PluginFileReader.DataContracts
 {
@@ -15,17 +16,37 @@ namespace PluginFileReader.DataContracts
         {
             return Path.GetFileNameWithoutExtension(GoldenRecordFileName);
         }
-        
+
+        public RootPathObject GetGoldenRootPath()
+        {
+            return new RootPathObject
+            {
+                Delimiter = Delimiter,
+                HasHeader = IncludeHeader,
+                RootPath = GetGoldenFilePath(),
+            };
+        }
+
         public string GetGoldenFilePath()
         {
             return Path.Join(GoldenRecordFileDirectory, GoldenRecordFileName);
         }
-        
+
         public string GetVersionTableName()
         {
             return Path.GetFileNameWithoutExtension(VersionRecordFileName);
         }
         
+        public RootPathObject GetVersionRootPath()
+        {
+            return new RootPathObject
+            {
+                Delimiter = Delimiter,
+                HasHeader = IncludeHeader,
+                RootPath = GetVersionFilePath(),
+            };
+        }
+
         public string GetVersionFilePath()
         {
             return Path.Join(VersionRecordFileDirectory, VersionRecordFileName);

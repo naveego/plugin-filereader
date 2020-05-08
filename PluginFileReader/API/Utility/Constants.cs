@@ -32,31 +32,31 @@ namespace PluginFileReader.API.Utility
             new ReplicationColumn
             {
                 ColumnName = ReplicationMetaDataJobId,
-                DataType = "varchar(255)",
+                DataType = $"varchar({int.MaxValue})",
                 PrimaryKey = true
             },
             new ReplicationColumn
             {
                 ColumnName = ReplicationMetaDataRequest,
                 PrimaryKey = false,
-                DataType = "text"
+                DataType = $"varchar({int.MaxValue})"
             },
             new ReplicationColumn
             {
                 ColumnName = ReplicationMetaDataReplicatedShapeId,
-                DataType = "varchar(255)",
+                DataType = $"varchar({int.MaxValue})",
                 PrimaryKey = false
             },
             new ReplicationColumn
             {
                 ColumnName = ReplicationMetaDataReplicatedShapeName,
-                DataType = "text",
+                DataType = $"varchar({int.MaxValue})",
                 PrimaryKey = false
             },
             new ReplicationColumn
             {
                 ColumnName = ReplicationMetaDataTimestamp,
-                DataType = "varchar(255)",
+                DataType = $"varchar({int.MaxValue})",
                 PrimaryKey = false
             }
         };

@@ -10,11 +10,11 @@ namespace PluginFileReader.API.Utility
         /// <summary>
         /// Gets an instance of the correct IImportExportFactory
         /// </summary>
-        /// <param name="rootPath"></param>
+        /// <param name="mode"></param>
         /// <returns></returns>
-        public static IImportExportFactory GetImportExportFactory(RootPathObject rootPath)
+        public static IImportExportFactory GetImportExportFactory(string mode)
         {
-            switch (rootPath.Mode)
+            switch (mode)
             {
                 case "Delimited":
                     return new CsvImportExportFactory();

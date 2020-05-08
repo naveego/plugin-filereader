@@ -126,7 +126,7 @@ namespace PluginFileReader.Plugin
                     Logger.Info($"Schemas attempted: {files.Count}");
 
                     var schemas = _server.Settings.RootPaths.Select(p =>
-                            Discover.GetSchemaForDirectory(Utility.GetImportExportFactory(p), p, files[p.RootPath],
+                            Discover.GetSchemaForDirectory(Utility.GetImportExportFactory(p.Mode), p, files[p.RootPath],
                                 sampleSize))
                         .ToArray();
 
@@ -192,7 +192,8 @@ namespace PluginFileReader.Plugin
                 if (schema.PublisherMetaJson != "")
                 {
                     // schema is not query based so we can stream each file as it is loaded
-                    var schemaMetaJson = JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
+                    var schemaMetaJson =
+                        JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
                     var rootPath = _server.Settings.RootPaths.Find(r => r.RootPath == schemaMetaJson.RootPath.RootPath);
                     var files = filesByDirectory[rootPath.RootPath];
                     var schemaName = Constants.SchemaName;
@@ -204,9 +205,10 @@ namespace PluginFileReader.Plugin
                         // load file and then stream file one by one
                         foreach (var file in files)
                         {
-                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath), conn, rootPath,
-                                tableName, schemaName, new List<string>{file});
-                                
+                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn,
+                                rootPath,
+                                tableName, schemaName, new List<string> {file});
+
                             var records = Read.ReadRecords(schema, jobId);
 
                             foreach (var record in records)
@@ -232,9 +234,10 @@ namespace PluginFileReader.Plugin
                 {
                     // schema is query based
                     var rootPaths = _server.Settings.GetRootPathsFromQuery(schema.Query);
-                    
-                    Logger.Info($"Query root paths {JsonConvert.SerializeObject(rootPaths.Select(r => r.RootPath).ToList(), Formatting.Indented)}");
-                    
+
+                    Logger.Info(
+                        $"Query root paths {JsonConvert.SerializeObject(rootPaths.Select(r => r.RootPath).ToList(), Formatting.Indented)}");
+
                     // schema is query based so everything in query needs to be loaded first
                     foreach (var rootPath in rootPaths)
                     {
@@ -245,15 +248,16 @@ namespace PluginFileReader.Plugin
                             : rootPath.Name;
                         if (files.Count > 0)
                         {
-                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath), conn, rootPath,
+                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn,
+                                rootPath,
                                 tableName, schemaName, files);
                         }
                         else
                         {
                             Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
                         }
-                    } 
-                    
+                    }
+
                     var records = Read.ReadRecords(schema, jobId);
 
                     foreach (var record in records)
@@ -328,7 +332,7 @@ namespace PluginFileReader.Plugin
                         JsonConvert.DeserializeObject<ConfigureReplicationFormData>(request.Form.DataJson);
 
                     errors = replicationFormData.ValidateReplicationFormData();
-                    
+
                     return Task.FromResult(new ConfigureReplicationResponse
                     {
                         Form = new ConfigurationFormResponse
@@ -347,7 +351,7 @@ namespace PluginFileReader.Plugin
                     Form = new ConfigurationFormResponse
                     {
                         DataJson = request.Form.DataJson,
-                        Errors = {},
+                        Errors = { },
                         SchemaJson = schemaJson,
                         UiJson = uiJson,
                         StateJson = request.Form.StateJson
@@ -383,18 +387,33 @@ namespace PluginFileReader.Plugin
             Logger.SetLogPrefix(request.DataVersions.JobId);
             Logger.Info("Preparing write...");
             _server.WriteConfigured = false;
-
+            
+            var conn = Utility.GetSqlConnection(request.DataVersions.JobId, true);
+            
             _server.WriteSettings = new WriteSettings
             {
                 CommitSLA = request.CommitSlaSeconds,
                 Schema = request.Schema,
                 Replication = request.Replication,
                 DataVersions = request.DataVersions,
-                Connection = Utility.GetSqlConnection(Constants.DiscoverDbPrefix, true)
+                Connection = conn,
             };
 
             if (_server.WriteSettings.IsReplication())
             {
+                // setup import export helpers
+                var factory = Utility.GetImportExportFactory("Delimited");
+                var replicationSettings =
+                    JsonConvert.DeserializeObject<ConfigureReplicationFormData>(request.Replication.SettingsJson);
+                _server.WriteSettings.GoldenImportExport = factory.MakeImportExportFile(conn,replicationSettings.GetGoldenRootPath(),
+                    replicationSettings.GetGoldenTableName(), Constants.SchemaName);
+                _server.WriteSettings.VersionImportExport = factory.MakeImportExportFile(conn,replicationSettings.GetVersionRootPath(),
+                    replicationSettings.GetVersionTableName(), Constants.SchemaName);
+                
+                // prepare write locations
+                Directory.CreateDirectory(replicationSettings.GoldenRecordFileDirectory);
+                Directory.CreateDirectory(replicationSettings.VersionRecordFileDirectory);
+                
                 // reconcile job
                 Logger.Info($"Starting to reconcile Replication Job {request.DataVersions.JobId}");
                 try
@@ -412,7 +431,7 @@ namespace PluginFileReader.Plugin
 
             _server.WriteConfigured = true;
 
-            Logger.Debug(JsonConvert.SerializeObject(_server.WriteSettings, Formatting.Indented));
+            // Logger.Debug(JsonConvert.SerializeObject(_server.WriteSettings, Formatting.Indented));
             Logger.Info("Write prepared.");
             return new PrepareWriteResponse();
         }
@@ -454,7 +473,9 @@ namespace PluginFileReader.Plugin
                         // add await for unit testing 
                         // removed to allow multiple to run at the same time
                         Task.Run(
-                            async () => await Replication.WriteRecordAsync(_server.WriteSettings.Connection, schema, record, config,
+                            async () => await Replication.WriteRecordAsync(_server.WriteSettings.GoldenImportExport,
+                                _server.WriteSettings.VersionImportExport, _server.WriteSettings.Connection, schema,
+                                record, config,
                                 responseStream), context.CancellationToken);
                     }
                     else

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
+using PluginFileReader.API.Factory;
 using PluginFileReader.API.Utility;
 using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
@@ -17,7 +18,7 @@ namespace PluginFileReader.API.Replication
     public static partial class Replication
     {
         private static readonly SemaphoreSlim ReplicationSemaphoreSlim = new SemaphoreSlim(1, 1);
-        
+
         /// <summary>
         /// Adds and removes records to replication db
         /// Adds and updates available shapes
@@ -28,45 +29,47 @@ namespace PluginFileReader.API.Replication
         /// <param name="config"></param>
         /// <param name="responseStream"></param>
         /// <returns>Error message string</returns>
-        public static async Task<string> WriteRecordAsync(SqlDatabaseConnection conn, Schema schema, Record record,
+        public static async Task<string> WriteRecordAsync(IImportExportFile GoldenImportExport,
+            IImportExportFile VersionImportExport, SqlDatabaseConnection conn, Schema schema, Record record,
             ConfigureReplicationFormData config, IServerStreamWriter<RecordAck> responseStream)
         {
             // debug
             Logger.Debug($"Starting timer for {record.RecordId}");
             var timer = Stopwatch.StartNew();
-            
+
             try
             {
                 // debug
                 Logger.Debug(JsonConvert.SerializeObject(record, Formatting.Indented));
-                
+
                 // semaphore
                 await ReplicationSemaphoreSlim.WaitAsync();
-            
+
                 // setup
                 var safeSchemaName = Constants.SchemaName;
                 var safeGoldenTableName = config.GetGoldenTableName();
                 var safeVersionTableName = config.GetVersionTableName();
-            
+
                 var goldenTable = GetGoldenReplicationTable(schema, safeSchemaName, safeGoldenTableName);
                 var versionTable = GetVersionReplicationTable(schema, safeSchemaName, safeVersionTableName);
-            
+
                 // transform data
                 var recordVersionIds = record.Versions.Select(v => v.RecordId).ToList();
                 var recordData = GetNamedRecordData(schema, record.DataJson);
                 recordData[Constants.ReplicationRecordId] = record.RecordId;
                 recordData[Constants.ReplicationVersionIds] = recordVersionIds;
-            
+
                 // get previous golden record
                 List<string> previousRecordVersionIds;
                 if (await RecordExistsAsync(conn, goldenTable, record.RecordId))
                 {
                     var recordMap = await GetRecordAsync(conn, goldenTable, record.RecordId);
-            
+
                     if (recordMap.ContainsKey(Constants.ReplicationVersionIds))
                     {
                         previousRecordVersionIds =
-                            JsonConvert.DeserializeObject<List<string>>(recordMap[Constants.ReplicationVersionIds].ToString());
+                            JsonConvert.DeserializeObject<List<string>>(recordMap[Constants.ReplicationVersionIds]
+                                .ToString());
                     }
                     else
                     {
@@ -77,7 +80,7 @@ namespace PluginFileReader.API.Replication
                 {
                     previousRecordVersionIds = recordVersionIds;
                 }
-            
+
                 // write data
                 // check if 2 since we always add 2 things to the dictionary
                 if (recordData.Count == 2)
@@ -98,7 +101,7 @@ namespace PluginFileReader.API.Replication
                     // update record and remove/add versions
                     Logger.Debug($"shapeId: {safeSchemaName} | recordId: {record.RecordId} - UPSERT");
                     await UpsertRecordAsync(conn, goldenTable, recordData);
-                
+
                     // delete missing versions
                     var missingVersions = previousRecordVersionIds.Except(recordVersionIds);
                     foreach (var versionId in missingVersions)
@@ -107,7 +110,7 @@ namespace PluginFileReader.API.Replication
                             $"shapeId: {safeSchemaName} | recordId: {record.RecordId} | versionId: {versionId} - DELETE");
                         await DeleteRecordAsync(conn, versionTable, versionId);
                     }
-                
+
                     // upsert other versions
                     foreach (var version in record.Versions)
                     {
@@ -119,17 +122,21 @@ namespace PluginFileReader.API.Replication
                         await UpsertRecordAsync(conn, versionTable, versionData);
                     }
                 }
-            
+
+                // write out to disk
+                GoldenImportExport.ExportTable(config.GetGoldenFilePath());
+                VersionImportExport.ExportTable(config.GetVersionFilePath());
+
                 var ack = new RecordAck
                 {
                     CorrelationId = record.CorrelationId,
                     Error = ""
                 };
                 await responseStream.WriteAsync(ack);
-            
+
                 timer.Stop();
                 Logger.Debug($"Acknowledged Record {record.RecordId} time: {timer.ElapsedMilliseconds}");
-            
+
                 return "";
             }
             catch (Exception e)
@@ -142,10 +149,10 @@ namespace PluginFileReader.API.Replication
                     Error = e.Message
                 };
                 await responseStream.WriteAsync(ack);
-            
+
                 timer.Stop();
                 Logger.Debug($"Failed Record {record.RecordId} time: {timer.ElapsedMilliseconds}");
-            
+
                 return e.Message;
             }
             finally

@@ -41,11 +41,9 @@ namespace PluginFileReader.API.Replication
                 
                 var reader = await cmd.ExecuteReaderAsync();
 
-                if (reader.HasRows)
+                if (await reader.ReadAsync())
                 {
                     // metadata exists
-                    await reader.ReadAsync();
-
                     var request = JsonConvert.DeserializeObject<PrepareWriteRequest>(
                         reader[Constants.ReplicationMetaDataRequest].ToString());
                     var shapeName = reader[Constants.ReplicationMetaDataReplicatedShapeName]
