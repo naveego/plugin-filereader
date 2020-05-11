@@ -8,7 +8,6 @@
 
     <ItemGroup>
       <Folder Include="API\CleanUp" />
-      <Folder Include="API\Replication" />
       <Folder Include="Helper" />
     </ItemGroup>
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Naveego.Sdk.Plugins;
@@ -449,45 +450,67 @@ namespace PluginFileReader.Plugin
             try
             {
                 Logger.Info("Writing records to File...");
-
+                
                 var schema = _server.WriteSettings.Schema;
                 var inCount = 0;
 
-                // get next record to publish while connected and configured
-                while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
-                       _server.WriteConfigured)
+                if (_server.WriteSettings.IsReplication())
                 {
-                    var record = requestStream.Current;
-                    inCount++;
-
-                    Logger.Debug($"Got record: {record.DataJson}");
-
-                    if (_server.WriteSettings.IsReplication())
+                    var config =
+                        JsonConvert.DeserializeObject<ConfigureReplicationFormData>(_server.WriteSettings
+                            .Replication
+                            .SettingsJson);
+                    
+                    // watcher to periodically write file to disk
+                    Task.Run(() =>
                     {
-                        var config =
-                            JsonConvert.DeserializeObject<ConfigureReplicationFormData>(_server.WriteSettings
-                                .Replication
-                                .SettingsJson);
+                        while (_server.Connected)
+                        {
+                            Replication.WriteToDisk(_server.WriteSettings.GoldenImportExport,
+                                _server.WriteSettings.VersionImportExport, config);
+                            Thread.Sleep(1000);
+                        }
+                    });
 
+                    while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
+                           _server.WriteConfigured)
+                    {
+                        var record = requestStream.Current;
+                        inCount++;
+                        
                         // send record to source system
                         // add await for unit testing 
                         // removed to allow multiple to run at the same time
                         Task.Run(
-                            async () => await Replication.WriteRecordAsync(_server.WriteSettings.GoldenImportExport,
-                                _server.WriteSettings.VersionImportExport, _server.WriteSettings.Connection, schema,
+                            async () => await Replication.WriteRecordAsync(_server.WriteSettings.Connection, schema,
                                 record, config,
                                 responseStream), context.CancellationToken);
                     }
-                    else
-                    {
-                        // send record to source system
-                        // add await for unit testing 
-                        // removed to allow multiple to run at the same time
-                        // Task.Run(async () =>
-                        //         await Write.WriteRecordAsync(_connectionFactory, schema, record, responseStream),
-                        //     context.CancellationToken);
-                    }
                 }
+
+                // // get next record to publish while connected and configured
+                // while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
+                //        _server.WriteConfigured)
+                // {
+                //     var record = requestStream.Current;
+                //     inCount++;
+                //
+                //     Logger.Debug($"Got record: {record.DataJson}");
+                //
+                //     if (_server.WriteSettings.IsReplication() && config != null)
+                //     {
+                //
+                //     }
+                //     else
+                //     {
+                //         // send record to source system
+                //         // add await for unit testing 
+                //         // removed to allow multiple to run at the same time
+                //         // Task.Run(async () =>
+                //         //         await Write.WriteRecordAsync(_connectionFactory, schema, record, responseStream),
+                //         //     context.CancellationToken);
+                //     }
+                // }
 
                 Logger.Info($"Wrote {inCount} records to PostgreSQL.");
             }

@@ -29,8 +29,7 @@ namespace PluginFileReader.API.Replication
         /// <param name="config"></param>
         /// <param name="responseStream"></param>
         /// <returns>Error message string</returns>
-        public static async Task<string> WriteRecordAsync(IImportExportFile GoldenImportExport,
-            IImportExportFile VersionImportExport, SqlDatabaseConnection conn, Schema schema, Record record,
+        public static async Task<string> WriteRecordAsync(SqlDatabaseConnection conn, Schema schema, Record record,
             ConfigureReplicationFormData config, IServerStreamWriter<RecordAck> responseStream)
         {
             // debug
@@ -122,10 +121,9 @@ namespace PluginFileReader.API.Replication
                         await UpsertRecordAsync(conn, versionTable, versionData);
                     }
                 }
-
-                // write out to disk
-                GoldenImportExport.ExportTable(config.GetGoldenFilePath());
-                VersionImportExport.ExportTable(config.GetVersionFilePath());
+                
+                //update last write time
+                LastWriteTime = DateTime.Now;
 
                 var ack = new RecordAck
                 {
