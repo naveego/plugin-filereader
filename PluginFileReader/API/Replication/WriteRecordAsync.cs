@@ -122,8 +122,9 @@ namespace PluginFileReader.API.Replication
                     }
                 }
                 
-                //update last write time
+                // set triggers for async file write
                 LastWriteTime = DateTime.Now;
+                PendingWrites = true;
 
                 var ack = new RecordAck
                 {
