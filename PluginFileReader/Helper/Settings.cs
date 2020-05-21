@@ -17,11 +17,6 @@ namespace PluginFileReader.Helper
         /// <exception cref="Exception"></exception>
         public void Validate()
         {
-            if (RootPaths == null)
-            {
-                RootPaths = new List<RootPathObject>();
-            }
-
             if (RootPaths.Count > 0)
             {
                 if (!RootPathsAreDirectories())
@@ -128,6 +123,11 @@ namespace PluginFileReader.Helper
         /// </summary>
         public void ReconcileColumnsConfigurationFiles()
         {
+            if (RootPaths == null)
+            {
+                RootPaths = new List<RootPathObject>();
+            }
+            
             var globalConfigurationColumns = new Dictionary<string, List<Column>>();
             var serializer = new JsonSerializer();
 
