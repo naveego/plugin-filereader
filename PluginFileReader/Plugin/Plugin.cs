@@ -402,19 +402,27 @@ namespace PluginFileReader.Plugin
 
             if (_server.WriteSettings.IsReplication())
             {
-                // setup import export helpers
-                var factory = Utility.GetImportExportFactory("Delimited");
-                var replicationSettings =
-                    JsonConvert.DeserializeObject<ConfigureReplicationFormData>(request.Replication.SettingsJson);
-                _server.WriteSettings.GoldenImportExport = factory.MakeImportExportFile(conn,replicationSettings.GetGoldenRootPath(),
-                    replicationSettings.GetGoldenTableName(), Constants.SchemaName);
-                _server.WriteSettings.VersionImportExport = factory.MakeImportExportFile(conn,replicationSettings.GetVersionRootPath(),
-                    replicationSettings.GetVersionTableName(), Constants.SchemaName);
+                try
+                {
+                    // setup import export helpers
+                    var factory = Utility.GetImportExportFactory("Delimited");
+                    var replicationSettings =
+                        JsonConvert.DeserializeObject<ConfigureReplicationFormData>(request.Replication.SettingsJson);
+                    _server.WriteSettings.GoldenImportExport = factory.MakeImportExportFile(conn,replicationSettings.GetGoldenRootPath(),
+                        replicationSettings.GetGoldenTableName(), Constants.SchemaName);
+                    _server.WriteSettings.VersionImportExport = factory.MakeImportExportFile(conn,replicationSettings.GetVersionRootPath(),
+                        replicationSettings.GetVersionTableName(), Constants.SchemaName);
                 
-                // prepare write locations
-                Directory.CreateDirectory(replicationSettings.GoldenRecordFileDirectory);
-                Directory.CreateDirectory(replicationSettings.VersionRecordFileDirectory);
-                
+                    // prepare write locations
+                    Directory.CreateDirectory(replicationSettings.GoldenRecordFileDirectory);
+                    Directory.CreateDirectory(replicationSettings.VersionRecordFileDirectory);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e.Message);
+                    throw;
+                }
+
                 // reconcile job
                 Logger.Info($"Starting to reconcile Replication Job {request.DataVersions.JobId}");
                 try

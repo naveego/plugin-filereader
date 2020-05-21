@@ -10,7 +10,7 @@ namespace PluginFileReader.DataContracts
         public string VersionRecordFileDirectory { get; set; }
         public string VersionRecordFileName { get; set; }
         public bool IncludeHeader { get; set; }
-        public char Delimiter { get; set; }
+        public string Delimiter { get; set; }
 
         public string GetGoldenTableName()
         {
@@ -21,10 +21,21 @@ namespace PluginFileReader.DataContracts
         {
             return new RootPathObject
             {
-                Delimiter = Delimiter,
+                Delimiter = GetDelimiter(Delimiter),
                 HasHeader = IncludeHeader,
                 RootPath = GetGoldenFilePath(),
             };
+        }
+
+        private char GetDelimiter(string delimiter)
+        {
+            switch (delimiter)
+            {
+                case "\\t":
+                    return '\t';
+                default:
+                    return char.Parse(delimiter);
+            }
         }
 
         public string GetGoldenFilePath()
@@ -41,7 +52,7 @@ namespace PluginFileReader.DataContracts
         {
             return new RootPathObject
             {
-                Delimiter = Delimiter,
+                Delimiter = GetDelimiter(Delimiter),
                 HasHeader = IncludeHeader,
                 RootPath = GetVersionFilePath(),
             };

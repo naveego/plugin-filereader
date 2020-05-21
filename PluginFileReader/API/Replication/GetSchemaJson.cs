@@ -49,8 +49,6 @@ namespace PluginFileReader.API.Replication
                         {"title", "Delimiter"},
                         {"description", "Delimiter to use in the output files."},
                         {"default", ","},
-                        {"minLength", 1},
-                        {"maxLength", 1},
                     }},
                 }},
                 {"required", new []

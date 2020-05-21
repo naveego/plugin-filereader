@@ -1095,7 +1095,7 @@ on a.id = b.id"),
                         GoldenRecordFileName = GoldenReplicationFile,
                         VersionRecordFileDirectory = ReplicationPath,
                         VersionRecordFileName = VersionReplicationFile,
-                        Delimiter = ',',
+                        Delimiter = "\\t",
                         IncludeHeader = true
                     })
                 },
@@ -1150,7 +1150,7 @@ on a.id = b.id"),
                         GoldenRecordFileName = GoldenReplicationFile,
                         VersionRecordFileDirectory = ReplicationPath,
                         VersionRecordFileName = VersionReplicationFile,
-                        Delimiter = ',',
+                        Delimiter = ",",
                         IncludeHeader = true
                     })
                 },

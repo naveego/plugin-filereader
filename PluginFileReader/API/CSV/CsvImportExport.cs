@@ -56,6 +56,7 @@ namespace PluginFileReader.API.CSV
                 cmd.CommandText = $@"SELECT * FROM [{SchemaName}].[{TableName}]";
                 using (CsvWriter = new CsvFileWriter(filePathAndName, appendToFile, Encoding.UTF8))
                 {
+                    CsvWriter.Delimiter = Delimiter;
                     SqlDatabaseDataReader dataReader = cmd.ExecuteReader();
                     List<string> columnNames = new List<string>();
                     // Write header i.e. column names
