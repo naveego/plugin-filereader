@@ -140,11 +140,7 @@ namespace PluginFileReaderTest.Plugin
         {
             if (empty)
             {
-                var emptySettings = new Settings
-                {
-                    RootPaths = new List<RootPathObject>(),
-                    GlobalColumnsConfigurationFile = ""
-                };
+                var emptySettings = new Settings();
                 
                 return new ConnectRequest
                 {

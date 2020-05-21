@@ -45,8 +45,8 @@ namespace PluginFileReader.Plugin
             try
             {
                 _server.Settings = JsonConvert.DeserializeObject<Settings>(request.SettingsJson);
-                _server.Settings.ReconcileColumnsConfigurationFiles();
                 _server.Settings.Validate();
+                _server.Settings.ReconcileColumnsConfigurationFiles();
             }
             catch (Exception e)
             {

@@ -17,10 +17,10 @@ namespace PluginFileReader.Helper
         /// <exception cref="Exception"></exception>
         public void Validate()
         {
-            // if (RootPaths.Count == 0)
-            // {
-            //     throw new Exception("At least one RootPath must be defined");
-            // }
+            if (RootPaths == null)
+            {
+                RootPaths = new List<RootPathObject>();
+            }
 
             if (RootPaths.Count > 0)
             {
