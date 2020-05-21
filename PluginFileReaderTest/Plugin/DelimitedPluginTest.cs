@@ -136,8 +136,24 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, char delimiter = ',',
-            string filter = null, bool multiRoot = false)
+            string filter = null, bool multiRoot = false, bool empty = false)
         {
+            if (empty)
+            {
+                var emptySettings = new Settings
+                {
+                    RootPaths = new List<RootPathObject>(),
+                    GlobalColumnsConfigurationFile = ""
+                };
+                
+                return new ConnectRequest
+                {
+                    SettingsJson = JsonConvert.SerializeObject(emptySettings),
+                    OauthConfiguration = new OAuthConfiguration(),
+                    OauthStateJson = ""
+                };
+            }
+            
             var settings = GetSettings(cleanupAction, delimiter, filter, multiRoot);
 
             return new ConnectRequest
@@ -254,6 +270,37 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
+        
+        [Fact]
+        public async Task ConnectEmptyTest()
+        {
+            // setup
+            PrepareTestEnvironment();
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var request = GetConnectSettings(null, ',', null, false, true);
+
+            // act
+            var response = client.Connect(request);
+
+            // assert
+            Assert.IsType<ConnectResponse>(response);
+            Assert.Equal("", response.SettingsError);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
 
         [Fact]
         public async Task DiscoverSchemasAllTest()
@@ -303,6 +350,44 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal(PropertyType.String, property.Type);
             Assert.False(property.IsKey);
             Assert.True(property.IsNullable);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task DiscoverSchemasAllEmptyTest()
+        {
+            // setup
+            PrepareTestEnvironment();
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings(null, ',', null, false, true);
+
+            var request = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+                SampleSize = 10
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var response = client.DiscoverSchemas(request);
+
+            // assert
+            Assert.IsType<DiscoverSchemasResponse>(response);
+            Assert.Empty(response.Schemas);
 
             // cleanup
             await channel.ShutdownAsync();

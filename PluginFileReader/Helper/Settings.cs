@@ -17,24 +17,27 @@ namespace PluginFileReader.Helper
         /// <exception cref="Exception"></exception>
         public void Validate()
         {
-            if (RootPaths.Count == 0)
-            {
-                throw new Exception("At least one RootPath must be defined");
-            }
+            // if (RootPaths.Count == 0)
+            // {
+            //     throw new Exception("At least one RootPath must be defined");
+            // }
 
-            if (!RootPathsAreDirectories())
+            if (RootPaths.Count > 0)
             {
-                throw new Exception("A RootPath is not a directory");
-            }
+                if (!RootPathsAreDirectories())
+                {
+                    throw new Exception("A RootPath is not a directory");
+                }
 
-            if (!ModeIsSetOnAllRootPaths())
-            {
-                throw new Exception("A RootPath does not have a Mode set");
-            }
+                if (!ModeIsSetOnAllRootPaths())
+                {
+                    throw new Exception("A RootPath does not have a Mode set");
+                }
 
-            if (!ColumnsValidOnFixedWidthColumnsRootPaths())
-            {
-                throw new Exception("A RootPath set to Fixed Width Columns has no columns defined");
+                if (!ColumnsValidOnFixedWidthColumnsRootPaths())
+                {
+                    throw new Exception("A RootPath set to Fixed Width Columns has no columns defined");
+                }
             }
         }
 

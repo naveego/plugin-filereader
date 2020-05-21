@@ -56,7 +56,7 @@
           "title": "Root Paths",
           "description": "The folder(s) containing the files.",
           "type": "array",
-          "minItems": 1,
+          "minItems": 0,
           "items": {
             "type": "object",
             "properties": {
