@@ -10,31 +10,24 @@ namespace PluginFileReader.DataContracts
         public string VersionRecordFileDirectory { get; set; }
         public string VersionRecordFileName { get; set; }
         public bool IncludeHeader { get; set; }
+        public bool QuoteWrap { get; set; }
         public string Delimiter { get; set; }
+        public string NullValue { get; set; }
+        public string CustomHeader { get; set; }
 
         public string GetGoldenTableName()
         {
             return Path.GetFileNameWithoutExtension(GoldenRecordFileName);
         }
 
-        public RootPathObject GetGoldenRootPath()
+        public char GetDelimiter()
         {
-            return new RootPathObject
-            {
-                Delimiter = GetDelimiter(Delimiter),
-                HasHeader = IncludeHeader,
-                RootPath = GetGoldenFilePath(),
-            };
-        }
-
-        private char GetDelimiter(string delimiter)
-        {
-            switch (delimiter)
+            switch (Delimiter)
             {
                 case "\\t":
                     return '\t';
                 default:
-                    return char.Parse(delimiter);
+                    return char.Parse(Delimiter);
             }
         }
 
@@ -46,16 +39,6 @@ namespace PluginFileReader.DataContracts
         public string GetVersionTableName()
         {
             return Path.GetFileNameWithoutExtension(VersionRecordFileName);
-        }
-        
-        public RootPathObject GetVersionRootPath()
-        {
-            return new RootPathObject
-            {
-                Delimiter = GetDelimiter(Delimiter),
-                HasHeader = IncludeHeader,
-                RootPath = GetVersionFilePath(),
-            };
         }
 
         public string GetVersionFilePath()

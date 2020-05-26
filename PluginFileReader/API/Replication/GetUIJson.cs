@@ -16,7 +16,10 @@ namespace PluginFileReader.API.Replication
                     "VersionRecordFileDirectory",
                     "VersionRecordFileName",
                     "IncludeHeader",
+                    "QuoteWrap",
                     "Delimiter",
+                    "NullValue",
+                    "CustomHeader",
                 }}
             };
 

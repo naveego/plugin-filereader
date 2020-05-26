@@ -17,6 +17,8 @@ namespace PluginFileReader.API.CSV
         public char QuoteChar { get; set; } = '"';
         public string CommentLineStartsWith { get; set; } = "#";
         public int NumberOfFields { get; set; } = 0;
+        public bool QuoteWrap { get; set; } = true;
+        public string NullValue { get; set; } = "null";
 
         public CsvFileWriter(string path)
         {
@@ -43,9 +45,13 @@ namespace PluginFileReader.API.CSV
         {
             string value;
             if (columnValue == null)
-                value = "null";
+            {
+                value = QuoteWrap ? $"\"{NullValue}\"" : NullValue;
+            }
             else
+            {
                 value = QuoteValue(columnValue);
+            }
 
             _fields.Add(value);
         }
@@ -66,6 +72,15 @@ namespace PluginFileReader.API.CSV
             {
                 _writer.WriteLine(CommentLineStartsWith + line);
             }
+        }
+
+        public void WriteLineToFile(string line)
+        {
+            _writer.AutoFlush = true;
+            _writer.WriteLine(line);
+            _writer.Flush();
+            _writer.BaseStream.Flush();
+            System.Threading.Thread.Sleep(1);
         }
 
         public void SaveAndCommitLine()
@@ -110,7 +125,7 @@ namespace PluginFileReader.API.CSV
                 value = value.ToString().Replace(QuoteChar.ToString(), sb.ToString());
             }
 
-            return QuoteChar + value + QuoteChar;
+            return QuoteWrap ? $"{QuoteChar}{value}{QuoteChar}" : value;
         }
 
         public void Dispose()

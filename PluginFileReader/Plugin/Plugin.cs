@@ -408,9 +408,9 @@ namespace PluginFileReader.Plugin
                     var factory = Utility.GetImportExportFactory("Delimited");
                     var replicationSettings =
                         JsonConvert.DeserializeObject<ConfigureReplicationFormData>(request.Replication.SettingsJson);
-                    _server.WriteSettings.GoldenImportExport = factory.MakeImportExportFile(conn,replicationSettings.GetGoldenRootPath(),
+                    _server.WriteSettings.GoldenImportExport = factory.MakeImportExportFile(conn, replicationSettings,
                         replicationSettings.GetGoldenTableName(), Constants.SchemaName);
-                    _server.WriteSettings.VersionImportExport = factory.MakeImportExportFile(conn,replicationSettings.GetVersionRootPath(),
+                    _server.WriteSettings.VersionImportExport = factory.MakeImportExportFile(conn, replicationSettings,
                         replicationSettings.GetVersionTableName(), Constants.SchemaName);
                 
                     // prepare write locations

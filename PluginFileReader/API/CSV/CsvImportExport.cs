@@ -5,6 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using PluginFileReader.API.Factory;
 using PluginFileReader.API.Utility;
+using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -17,11 +18,12 @@ namespace PluginFileReader.API.CSV
         private string SchemaName { get; set; }
         private char Delimiter { get; set; }
         private SqlDatabaseTransaction SQLDatabaseTransaction { get; set; } = null;
-
+        private ConfigureReplicationFormData ReplicationFormData { get; set; } = new ConfigureReplicationFormData();
+        
         private CsvFileReader CsvReader { get; set; }
         private CsvFileWriter CsvWriter { get; set; }
 
-        public CsvImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, char delimiter)
+        public CsvImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, RootPathObject rootPath)
         {
             if (string.IsNullOrWhiteSpace(tableName))
                 throw new Exception("TableName parameter is required.");
@@ -35,7 +37,25 @@ namespace PluginFileReader.API.CSV
             SQLDatabaseConnection = sqlDatabaseConnection;
             TableName = tableName;
             SchemaName = schemaName;
-            Delimiter = delimiter;
+            Delimiter = rootPath.Delimiter;
+        }
+        
+        public CsvImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, ConfigureReplicationFormData replicationFormData)
+        {
+            if (string.IsNullOrWhiteSpace(tableName))
+                throw new Exception("TableName parameter is required.");
+            
+            if (string.IsNullOrWhiteSpace(schemaName))
+                throw new Exception("SchemaName parameter is required.");
+
+            if (sqlDatabaseConnection.State == System.Data.ConnectionState.Closed)
+                sqlDatabaseConnection.Open();
+
+            SQLDatabaseConnection = sqlDatabaseConnection;
+            TableName = tableName;
+            SchemaName = schemaName;
+            Delimiter = replicationFormData.GetDelimiter();
+            ReplicationFormData = replicationFormData;
         }
         
         public long WriteLineToFile(string filePathAndName, Dictionary<string, object> recordMap, bool includeHeader = false, long lineNumber = -1)
@@ -56,7 +76,17 @@ namespace PluginFileReader.API.CSV
                 cmd.CommandText = $@"SELECT * FROM [{SchemaName}].[{TableName}]";
                 using (CsvWriter = new CsvFileWriter(filePathAndName, appendToFile, Encoding.UTF8))
                 {
+                    // set variables
                     CsvWriter.Delimiter = Delimiter;
+                    CsvWriter.QuoteWrap = ReplicationFormData.QuoteWrap;
+                    CsvWriter.NullValue = ReplicationFormData.NullValue;
+                    
+                    // write custom header to file if not empty
+                    if (!string.IsNullOrWhiteSpace(ReplicationFormData.CustomHeader))
+                    {
+                        CsvWriter.WriteLineToFile(ReplicationFormData.CustomHeader);
+                    }
+                    
                     SqlDatabaseDataReader dataReader = cmd.ExecuteReader();
                     List<string> columnNames = new List<string>();
                     // Write header i.e. column names

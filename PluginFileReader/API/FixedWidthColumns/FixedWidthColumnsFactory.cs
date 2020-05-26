@@ -1,4 +1,5 @@
 using PluginFileReader.API.Factory;
+using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -10,6 +11,12 @@ namespace PluginFileReader.API.FixedWidthColumns
             string tableName, string schemaName)
         {
             return new FixedWidthColumnsImportExport(sqlDatabaseConnection, rootPath, tableName, schemaName);
+        }
+
+        public IImportExportFile MakeImportExportFile(SqlDatabaseConnection sqlDatabaseConnection,
+            ConfigureReplicationFormData replicationFormData, string tableName, string schemaName)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

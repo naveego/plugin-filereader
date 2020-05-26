@@ -40,7 +40,14 @@ namespace PluginFileReader.API.Replication
                     {
                         {"type", "boolean"},
                         {"title", "Include Header"},
-                        {"description", "Include a header row in the output files?"},
+                        {"description", "Include a header row of the column names in the output files?"},
+                        {"default", false},
+                    }},
+                    {"QuoteWrap", new Dictionary<string, object>
+                    {
+                        {"type", "boolean"},
+                        {"title", "Quote Wrap"},
+                        {"description", "Wrap all values in output file in double quotes?"},
                         {"default", false},
                     }},
                     {"Delimiter", new Dictionary<string, object>
@@ -49,6 +56,20 @@ namespace PluginFileReader.API.Replication
                         {"title", "Delimiter"},
                         {"description", "Delimiter to use in the output files."},
                         {"default", ","},
+                    }},
+                    {"NullValue", new Dictionary<string, object>
+                    {
+                        {"type", "string"},
+                        {"title", "Null Value"},
+                        {"description", "The value to write when the property value is null."},
+                        {"default", "null"},
+                    }},
+                    {"CustomHeader", new Dictionary<string, object>
+                    {
+                        {"type", "string"},
+                        {"title", "Custom Header"},
+                        {"description", "Custom header to place on the first line of the output file."},
+                        {"default", ""},
                     }},
                 }},
                 {"required", new []
