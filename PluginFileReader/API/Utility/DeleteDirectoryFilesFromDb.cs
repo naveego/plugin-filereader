@@ -22,8 +22,8 @@ namespace PluginFileReader.API.Utility
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
-                Logger.Error("Skipping delete");
+                Logger.Error(e, e.Message);
+                Logger.Error(e, "Skipping delete");
             }
         }
     }

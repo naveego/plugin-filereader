@@ -14,8 +14,8 @@ namespace PluginFileReader.API.Utility
             }
             catch (Exception e)
             {
-                Logger.Error($"Unable to delete file {path}");
-                Logger.Error(e.Message);
+                Logger.Error(e, $"Unable to delete file {path}");
+                Logger.Error(e, e.Message);
             }
         }
     }

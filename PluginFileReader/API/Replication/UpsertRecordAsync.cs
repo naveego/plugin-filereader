@@ -86,7 +86,7 @@ namespace PluginFileReader.API.Replication
                 catch (Exception e)
                 {
                     await conn.CloseAsync();
-                    Logger.Error($"Error Update: {e.Message}");
+                    Logger.Error(e,$"Error Update: {e.Message}");
                     throw;
                 }
                 finally
@@ -158,7 +158,7 @@ namespace PluginFileReader.API.Replication
                 catch (Exception e)
                 {
                     await conn.CloseAsync();
-                    Logger.Error($"Error Insert: {e.Message}");
+                    Logger.Error(e, $"Error Insert: {e.Message}");
                     throw;
                 }
                 finally

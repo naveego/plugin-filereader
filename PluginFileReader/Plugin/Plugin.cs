@@ -50,7 +50,7 @@ namespace PluginFileReader.Plugin
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
+                Logger.Error(e, e.Message, context);
                 return Task.FromResult(new ConnectResponse
                 {
                     OauthStateJson = "",
@@ -139,8 +139,8 @@ namespace PluginFileReader.Plugin
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e.Message);
-                    throw;
+                    Logger.Error(e, e.Message, context);
+                    return Task.FromResult(new DiscoverSchemasResponse());
                 }
             }
 
@@ -161,8 +161,8 @@ namespace PluginFileReader.Plugin
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
-                throw;
+                Logger.Error(e, e.Message, context);
+                return Task.FromResult(new DiscoverSchemasResponse());
             }
         }
 
@@ -303,8 +303,7 @@ namespace PluginFileReader.Plugin
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
-                throw;
+                Logger.Error(e, e.Message, context);
             }
         }
 
@@ -361,7 +360,7 @@ namespace PluginFileReader.Plugin
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
+                Logger.Error(e, e.Message, context);
                 return Task.FromResult(new ConfigureReplicationResponse
                 {
                     Form = new ConfigurationFormResponse
@@ -419,8 +418,8 @@ namespace PluginFileReader.Plugin
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e.Message);
-                    throw;
+                    Logger.Error(e, e.Message, context);
+                    return new PrepareWriteResponse();
                 }
 
                 // reconcile job
@@ -431,8 +430,8 @@ namespace PluginFileReader.Plugin
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e.Message);
-                    throw;
+                    Logger.Error(e, e.Message, context);
+                    return new PrepareWriteResponse();
                 }
 
                 Logger.Info($"Finished reconciling Replication Job {request.DataVersions.JobId}");
@@ -524,8 +523,7 @@ namespace PluginFileReader.Plugin
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
-                throw;
+                Logger.Error(e, e.Message, context);
             }
         }
 

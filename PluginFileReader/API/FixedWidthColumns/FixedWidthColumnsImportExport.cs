@@ -138,7 +138,7 @@ namespace PluginFileReader.API.FixedWidthColumns
             {
                 // rollback on error
                 trans.Rollback();
-                Logger.Error(e.Message);
+                Logger.Error(e, e.Message);
                 throw;
             }
 

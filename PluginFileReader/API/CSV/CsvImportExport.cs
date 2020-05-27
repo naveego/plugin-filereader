@@ -254,7 +254,7 @@ namespace PluginFileReader.API.CSV
                     catch (Exception e)
                     {
                         trans.Rollback();
-                        Logger.Error(e.Message);
+                        Logger.Error(e, e.Message);
                         throw;
                     }
                 }

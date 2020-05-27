@@ -100,7 +100,7 @@ namespace PluginFileReader.API.Discover
                     return schema;
                 }
 
-                Logger.Error(e.Message);
+                Logger.Error(e, e.Message);
                 throw;
             }
         }

@@ -17,8 +17,8 @@ namespace PluginFileReader.API.Utility
             }
             catch (Exception e)
             {
-                Logger.Error($"Unable to archive file {path}");
-                Logger.Error(e.Message);
+                Logger.Error(e, $"Unable to archive file {path}");
+                Logger.Error(e, e.Message);
             }
         }
         

@@ -35,34 +35,14 @@ WHERE {Utility.Utility.GetSafeName(Constants.ReplicationMetaDataJobId)} = '{{6}}
         
         public static async Task UpsertReplicationMetaDataAsync(SqlDatabaseConnection conn, ReplicationTable table, ReplicationMetaData metaData)
         {
-            await conn.OpenAsync();
-            
-            try
-            {
-                // try to insert
-                var query = string.Format(InsertMetaDataQuery,
-                    Utility.Utility.GetSafeName(table.SchemaName),
-                    Utility.Utility.GetSafeName(table.TableName),
-                    metaData.Request.DataVersions.JobId,
-                    JsonConvert.SerializeObject(metaData.Request),
-                    metaData.ReplicatedShapeId,
-                    metaData.ReplicatedShapeName,
-                    metaData.Timestamp
-                );
-                
-                var cmd = new SqlDatabaseCommand
-                {
-                    Connection = conn,
-                    CommandText = query
-                };
 
-                await cmd.ExecuteNonQueryAsync();
-            }
-            catch (Exception e)
+            if (await RecordExistsAsync(conn, table, metaData.Request.DataVersions.JobId))
             {
                 try
                 {
-                    // update if it failed
+                    // update 
+                    await conn.OpenAsync();
+
                     var query = string.Format(UpdateMetaDataQuery,
                         Utility.Utility.GetSafeName(table.SchemaName),
                         Utility.Utility.GetSafeName(table.TableName),
@@ -72,24 +52,60 @@ WHERE {Utility.Utility.GetSafeName(Constants.ReplicationMetaDataJobId)} = '{{6}}
                         metaData.Timestamp,
                         metaData.Request.DataVersions.JobId
                     );
-                    
+
                     var cmd = new SqlDatabaseCommand
                     {
                         Connection = conn,
                         CommandText = query
                     };
-                
+
                     await cmd.ExecuteNonQueryAsync();
                 }
-                catch (Exception exception)
+                catch (Exception e)
                 {
-                    Logger.Error($"Error Insert: {e.Message}");
-                    Logger.Error($"Error Update: {exception.Message}");
+                    Logger.Error(e, $"Error Update: {e.Message}");
                     throw;
                 }
+                finally
+                {
+                    await conn.CloseAsync();
+                }
             }
+            else
+            {
+                try
+                {
+                    // insert
+                    await conn.OpenAsync();
 
-            await conn.CloseAsync();
+                    var query = string.Format(InsertMetaDataQuery,
+                        Utility.Utility.GetSafeName(table.SchemaName),
+                        Utility.Utility.GetSafeName(table.TableName),
+                        metaData.Request.DataVersions.JobId,
+                        JsonConvert.SerializeObject(metaData.Request),
+                        metaData.ReplicatedShapeId,
+                        metaData.ReplicatedShapeName,
+                        metaData.Timestamp
+                    );
+
+                    var cmd = new SqlDatabaseCommand
+                    {
+                        Connection = conn,
+                        CommandText = query
+                    };
+
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"Error Insert: {e.Message}");
+                    throw;
+                }
+                finally
+                {
+                    await conn.CloseAsync();
+                }
+            }
         }
     }
 }

@@ -32,7 +32,7 @@ namespace PluginFileReader.API.Read
             }
             catch (Exception e)
             {
-                Logger.Error(e.Message);
+                Logger.Error(e, e.Message);
                 yield break;
             }
             
@@ -58,8 +58,8 @@ namespace PluginFileReader.API.Read
                         }
                         catch (Exception e)
                         {
-                            Logger.Error($"No column with property Id: {property.Id}");
-                            Logger.Error(e.Message);
+                            Logger.Error(e, $"No column with property Id: {property.Id}");
+                            Logger.Error(e, e.Message);
                             recordMap[property.Id] = "";
                         }
                     }
