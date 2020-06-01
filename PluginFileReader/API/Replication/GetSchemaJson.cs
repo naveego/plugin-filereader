@@ -33,7 +33,7 @@ namespace PluginFileReader.API.Replication
                     {"VersionRecordFileName", new Dictionary<string, string>
                     {
                         {"type", "string"},
-                        {"title", "Golden Record File Name"},
+                        {"title", "Version Record File Name"},
                         {"description", "Name of Version Record file."},
                     }},
                     {"IncludeHeader", new Dictionary<string, object>
