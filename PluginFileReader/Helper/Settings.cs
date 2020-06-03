@@ -229,11 +229,23 @@ namespace PluginFileReader.Helper
 
         // FLAT FILE MODE SETTINGS
         public bool HasHeader { get; set; }
-        public char Delimiter { get; set; }
+        public string Delimiter { get; set; }
 
         // FIXED COLUMN WIDTH MODE SETTINGS
         public string ColumnsConfigurationFile { get; set; }
         public List<Column> Columns { get; set; }
+        
+        
+        public char GetDelimiter()
+        {
+            switch (Delimiter)
+            {
+                case "\\t":
+                    return '\t';
+                default:
+                    return char.Parse(Delimiter);
+            }
+        }
     }
 
     public class Column

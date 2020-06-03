@@ -91,7 +91,7 @@ namespace PluginFileReaderTest.Plugin
             }
         }
 
-        private Settings GetSettings(string cleanupAction = null, char delimiter = ',',
+        private Settings GetSettings(string cleanupAction = null, string delimiter = ",",
             string filter = null, bool multiRoot = false)
         {
             return new Settings
@@ -136,7 +136,7 @@ namespace PluginFileReaderTest.Plugin
             };
         }
 
-        private ConnectRequest GetConnectSettings(string cleanupAction = null, char delimiter = ',',
+        private ConnectRequest GetConnectSettings(string cleanupAction = null, string delimiter = ",",
             string filter = null, bool multiRoot = false, bool empty = false)
         {
             if (empty)
@@ -285,7 +285,7 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var request = GetConnectSettings(null, ',', null, false, true);
+            var request = GetConnectSettings(null, ",", null, false, true);
 
             // act
             var response = client.Connect(request);
@@ -370,7 +370,7 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings(null, ',', null, false, true);
+            var connectRequest = GetConnectSettings(null, ",", null, false, true);
 
             var request = new DiscoverSchemasRequest
             {
@@ -408,7 +408,7 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings(null, ',', null, true);
+            var connectRequest = GetConnectSettings(null, ",", null, true);
 
             var request = new DiscoverSchemasRequest
             {
@@ -479,7 +479,45 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings("none", '|', "*.psv");
+            var connectRequest = GetConnectSettings("none", "|", "*.psv");
+
+            var request = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+                SampleSize = 10
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var response = client.DiscoverSchemas(request);
+
+            // assert
+            Assert.IsType<DiscoverSchemasResponse>(response);
+            Assert.Single(response.Schemas);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task DiscoverSchemasAllDelimiterTabTest()
+        {
+            // setup
+            PrepareTestEnvironment();
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings("none", "\\t", "*.tsv");
 
             var request = new DiscoverSchemasRequest
             {
@@ -606,7 +644,7 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings(null, ',', null, true);
+            var connectRequest = GetConnectSettings(null, ",", null, true);
 
             var discoverAllRequest = new DiscoverSchemasRequest
             {

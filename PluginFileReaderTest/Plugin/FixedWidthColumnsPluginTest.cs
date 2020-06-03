@@ -81,7 +81,7 @@ namespace PluginFileReaderTest.Plugin
             }
         }
 
-        private Settings GetSettings(string cleanupAction = null, char delimiter = ',',
+        private Settings GetSettings(string cleanupAction = null, string delimiter = ",",
             string filter = null, bool multiRoot = false)
         {
             return new Settings
@@ -243,7 +243,7 @@ namespace PluginFileReaderTest.Plugin
             };
         }
 
-        private ConnectRequest GetConnectSettings(string cleanupAction = null, char delimiter = ',',
+        private ConnectRequest GetConnectSettings(string cleanupAction = null, string delimiter = ",",
             string filter = null, bool multiRoot = false, bool fromConfigFile = false, bool fromGlobalConfigFile = false, bool withName = false)
         {
             var settings = GetSettings(cleanupAction, delimiter, filter, multiRoot);
@@ -377,7 +377,7 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var request = GetConnectSettings(null, ',', null, false, true);
+            var request = GetConnectSettings(null, ",", null, false, true);
 
             // act
             var response = client.Connect(request);
@@ -408,7 +408,7 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var request = GetConnectSettings(null, ',', null, false, false, true);
+            var request = GetConnectSettings(null, ",", null, false, false, true);
 
             // act
             var response = client.Connect(request);
@@ -439,7 +439,7 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var request = GetConnectSettings(null, ',', null, false, false, true, true);
+            var request = GetConnectSettings(null, ",", null, false, false, true, true);
 
             // act
             var response = client.Connect(request);
@@ -470,7 +470,7 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var request = GetConnectSettings(null, ',', null, false, true, true);
+            var request = GetConnectSettings(null, ",", null, false, true, true);
 
             // act
             var response = client.Connect(request);
@@ -556,7 +556,7 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings(null, ',', null, true);
+            var connectRequest = GetConnectSettings(null, ",", null, true);
 
             var request = new DiscoverSchemasRequest
             {

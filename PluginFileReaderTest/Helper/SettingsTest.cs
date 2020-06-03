@@ -20,7 +20,7 @@ namespace PluginFileReaderTest.Helper
                         RootPath = "../../../MockData/DelimitedData",
                         Filter = "*.csv",
                         Mode = "Delimited",
-                        Delimiter = ',',
+                        Delimiter = ",",
                         HasHeader = true,
                         CleanupAction = "none",
                         ArchivePath = ""
@@ -63,7 +63,7 @@ namespace PluginFileReaderTest.Helper
                         RootPath = "../../../MockData/DelimitedData",
                         Mode = "Delimited",
                         Filter = "*.csv",
-                        Delimiter = ',',
+                        Delimiter = ",",
                         HasHeader = true,
                         CleanupAction = "none",
                         ArchivePath = ""
@@ -73,7 +73,7 @@ namespace PluginFileReaderTest.Helper
                         RootPath = "NotADir",
                         Mode = "Delimited",
                         Filter = "*.csv",
-                        Delimiter = ',',
+                        Delimiter = ",",
                         HasHeader = true,
                         CleanupAction = "none",
                         ArchivePath = ""
@@ -100,7 +100,7 @@ namespace PluginFileReaderTest.Helper
                     {
                         RootPath = "../../../MockData/DelimitedData",
                         Filter = "*.csv",
-                        Delimiter = ',',
+                        Delimiter = ",",
                         HasHeader = true,
                         CleanupAction = "none",
                         ArchivePath = ""
@@ -128,7 +128,7 @@ namespace PluginFileReaderTest.Helper
                         RootPath = "../../../MockData/DelimitedData",
                         Filter = "*.csv",
                         Mode = "Fixed Width Columns",
-                        Delimiter = ',',
+                        Delimiter = ",",
                         HasHeader = true,
                         CleanupAction = "none",
                         ArchivePath = "",

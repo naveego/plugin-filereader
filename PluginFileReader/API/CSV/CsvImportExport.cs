@@ -37,7 +37,7 @@ namespace PluginFileReader.API.CSV
             SQLDatabaseConnection = sqlDatabaseConnection;
             TableName = tableName;
             SchemaName = schemaName;
-            Delimiter = rootPath.Delimiter;
+            Delimiter = rootPath.GetDelimiter();
         }
         
         public CsvImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, ConfigureReplicationFormData replicationFormData)
