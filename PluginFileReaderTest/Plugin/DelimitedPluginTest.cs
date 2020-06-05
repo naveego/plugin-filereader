@@ -537,6 +537,53 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
+        
+        [Fact]
+        public async Task DiscoverSchemasAllDuplicateColumnTest()
+        {
+            // setup
+            PrepareTestEnvironment();
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings("none", ",", "*.txt");
+
+            var request = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+                SampleSize = 10
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var response = client.DiscoverSchemas(request);
+
+            // assert
+            Assert.IsType<DiscoverSchemasResponse>(response);
+            Assert.Single(response.Schemas);
+            
+            var property = response.Schemas[0].Properties[0];
+            Assert.Equal("id", property.Id);
+            Assert.Equal("id", property.Name);
+
+            var propertyDupe = response.Schemas[0].Properties[3];
+            Assert.Equal("id_DUPLICATE", propertyDupe.Id);
+            Assert.Equal("id_DUPLICATE", propertyDupe.Name);
+            
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
 
         [Fact]
         public async Task DiscoverSchemasRefreshTest()
