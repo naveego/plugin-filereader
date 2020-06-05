@@ -576,8 +576,8 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal("id", property.Name);
 
             var propertyDupe = response.Schemas[0].Properties[3];
-            Assert.Equal("id_DUPLICATE", propertyDupe.Id);
-            Assert.Equal("id_DUPLICATE", propertyDupe.Name);
+            Assert.Equal("id_DUPLICATE_4", propertyDupe.Id);
+            Assert.Equal("id_DUPLICATE_4", propertyDupe.Name);
             
             // cleanup
             await channel.ShutdownAsync();

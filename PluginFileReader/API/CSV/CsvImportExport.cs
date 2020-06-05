@@ -144,7 +144,7 @@ namespace PluginFileReader.API.CSV
                         {
                             if (headerColumns.Contains(field))
                             {
-                                headerColumns.Add($"{field}_DUPLICATE");
+                                headerColumns.Add($"{field}_DUPLICATE_{columnCount}");
                             }
                             else
                             {
