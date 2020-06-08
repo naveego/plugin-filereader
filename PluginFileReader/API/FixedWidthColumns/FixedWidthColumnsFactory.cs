@@ -18,5 +18,11 @@ namespace PluginFileReader.API.FixedWidthColumns
         {
             throw new System.NotImplementedException();
         }
+
+        public IImportExportFile MakeImportExportFile(SqlDatabaseConnection sqlDatabaseConnection,
+            ConfigureWriteFormData writeFormData, string tableName, string schemaName)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

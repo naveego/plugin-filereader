@@ -1,4 +1,5 @@
 using System.IO;
+using PluginFileReader.API.Utility;
 using PluginFileReader.Helper;
 
 namespace PluginFileReader.DataContracts
@@ -14,12 +15,7 @@ namespace PluginFileReader.DataContracts
         public string Delimiter { get; set; }
         public string NullValue { get; set; }
         public string CustomHeader { get; set; }
-
-        public string GetGoldenTableName()
-        {
-            return Path.GetFileNameWithoutExtension(GoldenRecordFileName);
-        }
-
+        
         public char GetDelimiter()
         {
             switch (Delimiter)
@@ -31,6 +27,15 @@ namespace PluginFileReader.DataContracts
             }
         }
 
+        public string GetGoldenTableName()
+        {
+            if (string.IsNullOrWhiteSpace(GoldenRecordFileName))
+            {
+                return Constants.DefaultGoldenTable;
+            }
+            return Path.GetFileNameWithoutExtension(GoldenRecordFileName);
+        }
+
         public string GetGoldenFilePath()
         {
             return Path.Join(GoldenRecordFileDirectory, GoldenRecordFileName);
@@ -38,6 +43,10 @@ namespace PluginFileReader.DataContracts
 
         public string GetVersionTableName()
         {
+            if (string.IsNullOrWhiteSpace(VersionRecordFileName))
+            {
+                return Constants.DefaultVersionTable;
+            }
             return Path.GetFileNameWithoutExtension(VersionRecordFileName);
         }
 

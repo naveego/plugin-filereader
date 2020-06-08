@@ -15,6 +15,7 @@ namespace PluginFileReader.Helper
         public SqlDatabaseConnection Connection { get; set; }
         public IImportExportFile GoldenImportExport { get; set; }
         public IImportExportFile VersionImportExport { get; set; }
+        public IImportExportFile TargetImportExport { get; set; }
 
         /// <summary>
         /// Returns if mode is set to replication

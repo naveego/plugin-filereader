@@ -58,6 +58,24 @@ namespace PluginFileReader.API.CSV
             ReplicationFormData = replicationFormData;
         }
         
+        public CsvImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, ConfigureWriteFormData writeFormData)
+        {
+            if (string.IsNullOrWhiteSpace(tableName))
+                throw new Exception("TableName parameter is required.");
+            
+            if (string.IsNullOrWhiteSpace(schemaName))
+                throw new Exception("SchemaName parameter is required.");
+
+            if (sqlDatabaseConnection.State == System.Data.ConnectionState.Closed)
+                sqlDatabaseConnection.Open();
+
+            SQLDatabaseConnection = sqlDatabaseConnection;
+            TableName = tableName;
+            SchemaName = schemaName;
+            Delimiter = writeFormData.GetDelimiter();
+            ReplicationFormData = writeFormData.GetReplicationFormData();
+        }
+        
         public long WriteLineToFile(string filePathAndName, Dictionary<string, object> recordMap, bool includeHeader = false, long lineNumber = -1)
         {
             throw new NotImplementedException();

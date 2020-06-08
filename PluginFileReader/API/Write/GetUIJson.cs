@@ -11,11 +11,25 @@ namespace PluginFileReader.API.Write
             {
                 {"ui:order", new []
                 {
-                    "Query", "Parameters"
+                    "TargetFileDirectory",
+                    "TargetFileName",
+                    "IncludeHeader",
+                    "QuoteWrap",
+                    "Delimiter",
+                    "NullValue",
+                    "CustomHeader",
+                    "Columns"
                 }},
-                {"Query", new Dictionary<string, object>
+                {"Columns", new Dictionary<string, object>
                 {
-                    {"ui:widget", "textarea"}
+                    {"items", new Dictionary<string,object>
+                    {
+                        {"ui:order", new []
+                        {
+                            "Name",
+                            "DefaultValue",
+                        }},
+                    }}
                 }}
             };
             
@@ -23,3 +37,17 @@ namespace PluginFileReader.API.Write
         }
     }
 }
+
+// "ui": {
+// "ui:order": ["GlobalColumnsConfigurationFile","RootPaths"],
+// "RootPaths": {
+//     "items": {
+//         "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "Delimiter", "HasHeader", "ColumnsConfigurationFile", "Columns"],
+//         "Columns": {
+//             "items": {
+//                 "ui:order": ["ColumnName", "IsKey", "TrimWhitespace", "ColumnStart", "ColumnEnd"]
+//             }
+//         }
+//     }
+// }
+// }

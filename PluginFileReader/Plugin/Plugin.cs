@@ -308,6 +308,78 @@ namespace PluginFileReader.Plugin
         }
 
         /// <summary>
+        /// Configures writebacks to File
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override Task<ConfigureWriteResponse> ConfigureWrite(ConfigureWriteRequest request,
+            ServerCallContext context)
+        {
+            Logger.SetLogPrefix("configure_write");
+            Logger.Info("Configuring write...");
+
+            var schemaJson = Write.GetSchemaJson();
+            var uiJson = Write.GetUIJson();
+
+            // if first call 
+            if (request.Form == null || request.Form.DataJson == "")
+            {
+                return Task.FromResult(new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = "",
+                        DataErrorsJson = "",
+                        Errors = { },
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = ""
+                    },
+                    Schema = null
+                });
+            }
+
+            try
+            {
+                // get form data
+                var formData = JsonConvert.DeserializeObject<ConfigureWriteFormData>(request.Form.DataJson);
+
+                // base schema to return
+                var schema = Write.GetSchemaFromForm(formData);
+
+                return Task.FromResult(new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = request.Form.DataJson,
+                        Errors = { },
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = request.Form.StateJson
+                    },
+                    Schema = schema
+                });
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, e.Message, context);
+                return Task.FromResult(new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = request.Form.DataJson,
+                        Errors = {e.Message},
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = request.Form.StateJson
+                    },
+                    Schema = null
+                });
+            }
+        }
+
+        /// <summary>
         /// Configures replication writebacks to File
         /// </summary>
         /// <param name="request"></param>
@@ -387,9 +459,9 @@ namespace PluginFileReader.Plugin
             Logger.SetLogPrefix(request.DataVersions.JobId);
             Logger.Info("Preparing write...");
             _server.WriteConfigured = false;
-            
+
             var conn = Utility.GetSqlConnection(request.DataVersions.JobId, true);
-            
+
             _server.WriteSettings = new WriteSettings
             {
                 CommitSLA = request.CommitSlaSeconds,
@@ -411,7 +483,7 @@ namespace PluginFileReader.Plugin
                         replicationSettings.GetGoldenTableName(), Constants.SchemaName);
                     _server.WriteSettings.VersionImportExport = factory.MakeImportExportFile(conn, replicationSettings,
                         replicationSettings.GetVersionTableName(), Constants.SchemaName);
-                
+
                     // prepare write locations
                     Directory.CreateDirectory(replicationSettings.GoldenRecordFileDirectory);
                     Directory.CreateDirectory(replicationSettings.VersionRecordFileDirectory);
@@ -436,6 +508,38 @@ namespace PluginFileReader.Plugin
 
                 Logger.Info($"Finished reconciling Replication Job {request.DataVersions.JobId}");
             }
+            else
+            {
+                try
+                {
+                    // setup import export helper
+                    var factory = Utility.GetImportExportFactory("Delimited");
+                    var writeFormData =
+                        JsonConvert.DeserializeObject<ConfigureWriteFormData>(request.Schema.PublisherMetaJson);
+                    _server.WriteSettings.TargetImportExport = factory.MakeImportExportFile(conn, writeFormData,
+                        writeFormData.GetTargetTableName(), Constants.SchemaName);
+
+                    // prepare write location
+                    Directory.CreateDirectory(writeFormData.TargetFileDirectory);
+
+                    // reconcile job
+                    Logger.Info($"Starting to reconcile Replication Job {request.DataVersions.JobId}");
+
+                    request.Replication = new ReplicationWriteRequest
+                    {
+                        SettingsJson = JsonConvert.SerializeObject(writeFormData.GetReplicationFormData())
+                    };
+
+                    await Replication.ReconcileReplicationJobAsync(_server.WriteSettings.Connection, request);
+
+                    Logger.Info($"Finished reconciling Replication Job {request.DataVersions.JobId}");
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, e.Message, context);
+                    return new PrepareWriteResponse();
+                }
+            }
 
             _server.WriteConfigured = true;
 
@@ -457,7 +561,7 @@ namespace PluginFileReader.Plugin
             try
             {
                 Logger.Info("Writing records to File...");
-                
+
                 var schema = _server.WriteSettings.Schema;
                 var inCount = 0;
 
@@ -467,7 +571,7 @@ namespace PluginFileReader.Plugin
                         JsonConvert.DeserializeObject<ConfigureReplicationFormData>(_server.WriteSettings
                             .Replication
                             .SettingsJson);
-                    
+
                     // watcher to periodically write file to disk
                     Task.Run(() =>
                     {
@@ -484,7 +588,7 @@ namespace PluginFileReader.Plugin
                     {
                         var record = requestStream.Current;
                         inCount++;
-                        
+
                         // send record to source system
                         // add await for unit testing 
                         // removed to allow multiple to run at the same time
@@ -494,32 +598,38 @@ namespace PluginFileReader.Plugin
                                 responseStream), context.CancellationToken);
                     }
                 }
+                else
+                {
+                    var writeConfig = JsonConvert.DeserializeObject<ConfigureWriteFormData>(schema.PublisherMetaJson);
+                    var config = writeConfig.GetReplicationFormData();
 
-                // // get next record to publish while connected and configured
-                // while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
-                //        _server.WriteConfigured)
-                // {
-                //     var record = requestStream.Current;
-                //     inCount++;
-                //
-                //     Logger.Debug($"Got record: {record.DataJson}");
-                //
-                //     if (_server.WriteSettings.IsReplication() && config != null)
-                //     {
-                //
-                //     }
-                //     else
-                //     {
-                //         // send record to source system
-                //         // add await for unit testing 
-                //         // removed to allow multiple to run at the same time
-                //         // Task.Run(async () =>
-                //         //         await Write.WriteRecordAsync(_connectionFactory, schema, record, responseStream),
-                //         //     context.CancellationToken);
-                //     }
-                // }
+                    // watcher to periodically write file to disk
+                    Task.Run(() =>
+                    {
+                        while (_server.Connected)
+                        {
+                            Write.WriteToDisk(_server.WriteSettings.TargetImportExport, writeConfig);
+                            Thread.Sleep(1000);
+                        }
+                    });
 
-                Logger.Info($"Wrote {inCount} records to PostgreSQL.");
+                    while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
+                           _server.WriteConfigured)
+                    {
+                        var record = requestStream.Current;
+                        inCount++;
+
+                        // send record to source system
+                        // add await for unit testing 
+                        // removed to allow multiple to run at the same time
+                        Task.Run(
+                            async () => await Write.WriteRecordAsync(_server.WriteSettings.Connection, schema,
+                                record, config,
+                                responseStream), context.CancellationToken);
+                    }
+                }
+
+                Logger.Info($"Wrote {inCount} records to File.");
             }
             catch (Exception e)
             {

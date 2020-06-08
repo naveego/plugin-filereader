@@ -15,6 +15,9 @@ namespace PluginFileReader.API.Utility
         public static string ImportMetaDataPathColumn = "path";
         public static string ImportMetaDataLastModifiedDate = "last_modified";
         
+        public static string DefaultGoldenTable = "NaveegoDefaultGolden";
+        public static string DefaultVersionTable = "NaveegoDefaultVersion";
+        
         public static string ReplicationRecordId = "NaveegoReplicationRecordId";
         public static string ReplicationVersionIds = "NaveegoVersionIds";
         public static string ReplicationLineNumber = "NaveegoLineNumber";

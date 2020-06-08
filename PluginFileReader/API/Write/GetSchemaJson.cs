@@ -7,56 +7,119 @@ namespace PluginFileReader.API.Write
     {
         public static string GetSchemaJson()
         {
+            // var schemaJsonObj = new Dictionary<string, object>
+            // {
+            //     {"type", "object"},
+            //     {"properties", new Dictionary<string, object>
+            //     {
+            //         {"Query", new Dictionary<string, string>
+            //         {
+            //             {"type", "string"},
+            //             {"title", "Query"},
+            //             {"description", "Query to execute for write back with parameter place holders"},
+            //         }},
+            //         
+            //     }},
+            //     {"required", new []
+            //     {
+            //         "Query"
+            //     }}
+            // };
+            //
+            // return JsonConvert.SerializeObject(schemaJsonObj);
+            
             var schemaJsonObj = new Dictionary<string, object>
             {
                 {"type", "object"},
                 {"properties", new Dictionary<string, object>
                 {
-                    {"Query", new Dictionary<string, string>
+                    {"TargetFileDirectory", new Dictionary<string, string>
                     {
                         {"type", "string"},
-                        {"title", "Query"},
-                        {"description", "Query to execute for write back with parameter place holders"},
+                        {"title", "Target File Directory"},
+                        {"description", "Path to the folder to place the target file."},
                     }},
-                    {"Parameters", new Dictionary<string, object>
+                    {"TargetFileName", new Dictionary<string, string>
+                    {
+                        {"type", "string"},
+                        {"title", "Target File Name"},
+                        {"description", "Name of target file"},
+                    }},
+                    {"IncludeHeader", new Dictionary<string, object>
+                    {
+                        {"type", "boolean"},
+                        {"title", "Include Header"},
+                        {"description", "Include a header row of the column names in the output files?"},
+                        {"default", false},
+                    }},
+                    {"QuoteWrap", new Dictionary<string, object>
+                    {
+                        {"type", "boolean"},
+                        {"title", "Quote Wrap"},
+                        {"description", "Wrap all values in output file in double quotes?"},
+                        {"default", false},
+                    }},
+                    {"Delimiter", new Dictionary<string, object>
+                    {
+                        {"type", "string"},
+                        {"title", "Delimiter"},
+                        {"description", "Delimiter to use in the output files."},
+                        {"default", ","},
+                    }},
+                    {"NullValue", new Dictionary<string, object>
+                    {
+                        {"type", "string"},
+                        {"title", "Null Value"},
+                        {"description", "The value to write when the property value is null."},
+                        {"default", "null"},
+                    }},
+                    {"CustomHeader", new Dictionary<string, object>
+                    {
+                        {"type", "string"},
+                        {"title", "Custom Header"},
+                        {"description", "Custom header to place on the first line of the output file."},
+                        {"default", ""},
+                    }},
+                    {"Columns", new Dictionary<string, object>
                     {
                         {"type", "array"},
-                        {"title", "Parameters"},
-                        {"description", "Parameters to replace the place holders in the query"},
+                        {"title", "Columns"},
+                        {"description", "Columns to writeback."},
                         {"items", new Dictionary<string, object>
                         {
                             {"type", "object"},
                             {"properties", new Dictionary<string, object>
                             {
-                                {"ParamName", new Dictionary<string, object>
+                                {"Name", new Dictionary<string, object>
                                 {
                                     {"type", "string"},
-                                    {"title", "Name"}
+                                    {"title", "Name"},
+                                    {"description", "Name of the column."},
+                                    {"default", ""},
                                 }},
-                                {"ParamType", new Dictionary<string, object>
+                                {"DefaultValue", new Dictionary<string, object>
                                 {
                                     {"type", "string"},
-                                    {"title", "Type"},
-                                    {"enum", new []
-                                    {
-                                        "string", "bool", "int", "float", "decimal"
-                                    }},
-                                    {"enumNames", new []
-                                    {
-                                        "String", "Bool", "Int", "Float", "Decimal"
-                                    }},
+                                    {"title", "Default Value"},
+                                    {"description", "Default value of the column."},
+                                    {"default", ""},
                                 }},
                             }},
                             {"required", new []
                             {
-                                "ParamName", "ParamType"
+                                "Name"
                             }}
                         }}
                     }},
                 }},
                 {"required", new []
                 {
-                    "Query"
+                    "TargetFileDirectory",
+                    "TargetFileName",
+                    "VersionRecordFileDirectory",
+                    "VersionRecordFileName",
+                    "IncludeHeader",
+                    "Delimiter",
                 }}
             };
             

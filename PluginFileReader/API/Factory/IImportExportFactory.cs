@@ -10,5 +10,7 @@ namespace PluginFileReader.API.Factory
             string schemaName);
         IImportExportFile MakeImportExportFile(SqlDatabaseConnection sqlDatabaseConnection, ConfigureReplicationFormData replicationFormData, string tableName,
             string schemaName);
+        IImportExportFile MakeImportExportFile(SqlDatabaseConnection sqlDatabaseConnection, ConfigureWriteFormData writeFormData, string tableName,
+            string schemaName);
     }
 }

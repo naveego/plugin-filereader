@@ -18,5 +18,11 @@ namespace PluginFileReader.API.CSV
         {
             return new CsvImportExport(sqlDatabaseConnection, tableName, schemaName, replicationFormData);
         }
+
+        public IImportExportFile MakeImportExportFile(SqlDatabaseConnection sqlDatabaseConnection,
+            ConfigureWriteFormData writeFormData, string tableName, string schemaName)
+        {
+            return new CsvImportExport(sqlDatabaseConnection, tableName, schemaName, writeFormData);
+        }
     }
 }
