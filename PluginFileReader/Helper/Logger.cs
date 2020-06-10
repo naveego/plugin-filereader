@@ -33,7 +33,7 @@ namespace PluginFileReader.Helper
             {
                 // ensure log directory exists
                 Directory.CreateDirectory("logs");
-                
+
                 // Append text to the file
                 var filePath = $"logs/{_logPrefix}{_path}";
                 using (StreamWriter sw = File.AppendText(filePath))
@@ -41,6 +41,9 @@ namespace PluginFileReader.Helper
                     sw.WriteLine($"{DateTime.Now} {message}");
                     sw.Close();
                 }
+            }
+            catch
+            {
             }
             finally
             {

@@ -318,13 +318,15 @@ namespace PluginFileReader.Plugin
         {
             Logger.SetLogPrefix("configure_write");
             Logger.Info("Configuring write...");
+            Logger.Debug(JsonConvert.SerializeObject(request, Formatting.Indented));
 
             var schemaJson = Write.GetSchemaJson();
             var uiJson = Write.GetUIJson();
 
             // if first call 
-            if (request.Form == null || request.Form.DataJson == "")
+            if (string.IsNullOrWhiteSpace(request.Form.DataJson) || request.Form.DataJson == "{}")
             {
+                Logger.Info("first call...");
                 return Task.FromResult(new ConfigureWriteResponse
                 {
                     Form = new ConfigurationFormResponse
@@ -342,6 +344,7 @@ namespace PluginFileReader.Plugin
 
             try
             {
+                Logger.Info("second call...");
                 // get form data
                 var formData = JsonConvert.DeserializeObject<ConfigureWriteFormData>(request.Form.DataJson);
 
@@ -458,6 +461,7 @@ namespace PluginFileReader.Plugin
         {
             Logger.SetLogPrefix(request.DataVersions.JobId);
             Logger.Info("Preparing write...");
+            Logger.Debug(JsonConvert.SerializeObject(request, Formatting.Indented));
             _server.WriteConfigured = false;
 
             var conn = Utility.GetSqlConnection(request.DataVersions.JobId, true);

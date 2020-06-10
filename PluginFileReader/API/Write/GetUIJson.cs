@@ -37,17 +37,3 @@ namespace PluginFileReader.API.Write
         }
     }
 }
-
-// "ui": {
-// "ui:order": ["GlobalColumnsConfigurationFile","RootPaths"],
-// "RootPaths": {
-//     "items": {
-//         "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "Delimiter", "HasHeader", "ColumnsConfigurationFile", "Columns"],
-//         "Columns": {
-//             "items": {
-//                 "ui:order": ["ColumnName", "IsKey", "TrimWhitespace", "ColumnStart", "ColumnEnd"]
-//             }
-//         }
-//     }
-// }
-// }

@@ -7,27 +7,6 @@ namespace PluginFileReader.API.Write
     {
         public static string GetSchemaJson()
         {
-            // var schemaJsonObj = new Dictionary<string, object>
-            // {
-            //     {"type", "object"},
-            //     {"properties", new Dictionary<string, object>
-            //     {
-            //         {"Query", new Dictionary<string, string>
-            //         {
-            //             {"type", "string"},
-            //             {"title", "Query"},
-            //             {"description", "Query to execute for write back with parameter place holders"},
-            //         }},
-            //         
-            //     }},
-            //     {"required", new []
-            //     {
-            //         "Query"
-            //     }}
-            // };
-            //
-            // return JsonConvert.SerializeObject(schemaJsonObj);
-            
             var schemaJsonObj = new Dictionary<string, object>
             {
                 {"type", "object"},
@@ -116,8 +95,6 @@ namespace PluginFileReader.API.Write
                 {
                     "TargetFileDirectory",
                     "TargetFileName",
-                    "VersionRecordFileDirectory",
-                    "VersionRecordFileName",
                     "IncludeHeader",
                     "Delimiter",
                 }}

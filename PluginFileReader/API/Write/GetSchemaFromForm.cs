@@ -22,9 +22,11 @@ namespace PluginFileReader.API.Write
             {
                 properties.Add(new Property
                 {
-                    Id = $"{column.Name}_{column.DefaultValue}",
+                    // Id = $"{column.Name}{(string.IsNullOrWhiteSpace(column.DefaultValue) ? "" : $"_{column.DefaultValue}")}",
+                    Id = column.Name,
                     Name = column.Name,
-                    Type = PropertyType.String
+                    Type = PropertyType.String,
+                    PublisherMetaJson = JsonConvert.SerializeObject(column)
                 });
             }
 

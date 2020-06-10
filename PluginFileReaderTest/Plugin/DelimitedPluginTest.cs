@@ -23,6 +23,7 @@ namespace PluginFileReaderTest.Plugin
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
         private const string ArchivePath = "../../../MockData/ArchiveDirectory";
         private const string ReplicationPath = "../../../MockData/ReplicationDirectory";
+        private const string TargetWriteFile = "target.csv";
         private const string GoldenReplicationFile = "golden.csv";
         private const string VersionReplicationFile = "version.csv";
         private const string DefaultCleanupAction = "none";
@@ -1196,7 +1197,7 @@ on a.id = b.id"),
         }
         
         [Fact]
-        public async Task PrepareWriteTest()
+        public async Task PrepareWriteReplicationTest()
         {
             // setup
             Server server = new Server
@@ -1341,6 +1342,142 @@ on a.id = b.id"),
             Assert.Single(recordAcks);
             Assert.Equal("", recordAcks[0].Error);
             Assert.Equal("test", recordAcks[0].CorrelationId);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ConfigureWriteTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var request = new ConfigureWriteRequest
+            {
+                Form = new ConfigurationFormRequest
+                {
+                    DataJson = JsonConvert.SerializeObject(new ConfigureWriteFormData
+                    {
+                        TargetFileName = TargetWriteFile,
+                        TargetFileDirectory = ReplicationPath,
+                        Delimiter = ",",
+                        CustomHeader = "custom header",
+                        NullValue = "null",
+                        IncludeHeader = true,
+                        QuoteWrap = false,
+                        Columns = new List<WriteColumn>
+                        {
+                            new WriteColumn
+                            {
+                                Name = "C1",
+                                DefaultValue = ""
+                            },
+                            new WriteColumn
+                            {
+                                Name = "C2",
+                                DefaultValue = "default"
+                            },
+                        }
+                    })
+                }
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var response = client.ConfigureWrite(request);
+
+            // assert
+            Assert.IsType<ConfigureWriteResponse>(response);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task PrepareWriteWritebackTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+            
+            var configRequest = new ConfigureWriteRequest
+            {
+                Form = new ConfigurationFormRequest
+                {
+                    DataJson = JsonConvert.SerializeObject(new ConfigureWriteFormData
+                    {
+                        TargetFileName = TargetWriteFile,
+                        TargetFileDirectory = ReplicationPath,
+                        Delimiter = ",",
+                        CustomHeader = "custom header",
+                        NullValue = "null",
+                        IncludeHeader = true,
+                        QuoteWrap = false,
+                        Columns = new List<WriteColumn>
+                        {
+                            new WriteColumn
+                            {
+                                Name = "C1",
+                                DefaultValue = ""
+                            },
+                            new WriteColumn
+                            {
+                                Name = "C2",
+                                DefaultValue = "default"
+                            },
+                        }
+                    })
+                }
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var configResponse = client.ConfigureWrite(configRequest);
+            
+            var request = new PrepareWriteRequest()
+            {
+                Schema = configResponse.Schema,
+                CommitSlaSeconds = 1,
+                Replication = null,
+                DataVersions = new DataVersions
+                {
+                    JobId = "jobUnitTest",
+                    ShapeId = "shapeUnitTest",
+                    JobDataVersion = 1,
+                    ShapeDataVersion = 2
+                }
+            };
+            
+            var response = client.PrepareWrite(request);
+
+            // assert
+            Assert.IsType<PrepareWriteResponse>(response);
 
             // cleanup
             await channel.ShutdownAsync();

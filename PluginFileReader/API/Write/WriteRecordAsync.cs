@@ -64,6 +64,19 @@ namespace PluginFileReader.API.Write
                 }
                 else
                 {
+                    // add in all default values
+                    foreach (var property in schema.Properties)
+                    {
+                        if (!recordData.ContainsKey(property.Id) && !string.IsNullOrWhiteSpace(property.PublisherMetaJson))
+                        {
+                            Logger.Debug("adding default value");
+                            var columnConfig = JsonConvert.DeserializeObject<WriteColumn>(property.PublisherMetaJson);
+                            recordData[property.Id] = columnConfig.DefaultValue;
+                        }
+                    }
+                    
+                    Logger.Debug(JsonConvert.SerializeObject(recordData, Formatting.Indented));
+                    
                     // update record
                     Logger.Debug($"shapeId: {safeSchemaName} | recordId: {record.RecordId} - UPSERT");
                     await Replication.Replication.UpsertRecordAsync(conn, targetTable, recordData);
