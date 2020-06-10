@@ -1483,5 +1483,124 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
+        
+        [Fact]
+        public async Task WritebackTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+            
+            var configRequest = new ConfigureWriteRequest
+            {
+                Form = new ConfigurationFormRequest
+                {
+                    DataJson = JsonConvert.SerializeObject(new ConfigureWriteFormData
+                    {
+                        TargetFileName = TargetWriteFile,
+                        TargetFileDirectory = ReplicationPath,
+                        Delimiter = ",",
+                        CustomHeader = "custom header",
+                        NullValue = "null",
+                        IncludeHeader = true,
+                        QuoteWrap = false,
+                        Columns = new List<WriteColumn>
+                        {
+                            new WriteColumn
+                            {
+                                Name = "Id",
+                                DefaultValue = ""
+                            },
+                            new WriteColumn
+                            {
+                                Name = "Name",
+                                DefaultValue = "default"
+                            },
+                        }
+                    })
+                }
+            };
+
+            // act
+            client.Connect(connectRequest);
+            
+            var configResponse = client.ConfigureWrite(configRequest);
+            
+            var prepareWriteRequest = new PrepareWriteRequest()
+            {
+                Schema = configResponse.Schema,
+                CommitSlaSeconds = 1,
+                Replication = null,
+                DataVersions = new DataVersions
+                {
+                    JobId = "jobUnitTest_write",
+                    ShapeId = "shapeUnitTest",
+                    JobDataVersion = 1,
+                    ShapeDataVersion = 2
+                }
+            };
+            
+            client.PrepareWrite(prepareWriteRequest);
+            
+            var records = new List<Record>()
+            {
+                {
+                    new Record
+                    {
+                        Action = Record.Types.Action.Upsert,
+                        CorrelationId = "test",
+                        RecordId = "record1",
+                        DataJson = "{\"Id\":1}",
+                        Versions = { new RecordVersion
+                        {
+                            RecordId = "version1",
+                            DataJson = "{\"Id\":1}",
+                        }}
+                    }
+                }
+            };
+
+            var recordAcks = new List<RecordAck>();
+
+            using (var call = client.WriteStream())
+            {
+                var responseReaderTask = Task.Run(async () =>
+                {
+                    while (await call.ResponseStream.MoveNext())
+                    {
+                        var ack = call.ResponseStream.Current;
+                        recordAcks.Add(ack);
+                    }
+                });
+
+                foreach (Record record in records)
+                {
+                    await call.RequestStream.WriteAsync(record);
+                }
+
+                await call.RequestStream.CompleteAsync();
+                await responseReaderTask;
+            }
+
+            // assert
+            Assert.Single(recordAcks);
+            Assert.Equal("", recordAcks[0].Error);
+            Assert.Equal("test", recordAcks[0].CorrelationId);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
     }
 }
