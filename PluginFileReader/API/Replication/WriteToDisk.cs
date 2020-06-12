@@ -22,5 +22,12 @@ namespace PluginFileReader.API.Replication
                 PendingWrites = false;
             }
         }
+        
+        public static void PurgeReplicationFiles()
+        {
+            // set triggers for async file write
+            LastWriteTime = DateTime.Now;
+            PendingWrites = true;
+        }
     }
 }

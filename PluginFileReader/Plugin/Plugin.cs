@@ -459,6 +459,7 @@ namespace PluginFileReader.Plugin
         public override async Task<PrepareWriteResponse> PrepareWrite(PrepareWriteRequest request,
             ServerCallContext context)
         {
+            // Logger.SetLogLevel(Logger.LogLevel.Debug);
             Logger.SetLogPrefix(request.DataVersions.JobId);
             Logger.Info("Preparing write...");
             Logger.Debug(JsonConvert.SerializeObject(request, Formatting.Indented));
@@ -626,7 +627,7 @@ namespace PluginFileReader.Plugin
                         // send record to source system
                         // add await for unit testing 
                         // removed to allow multiple to run at the same time
-                        Task.Run(
+                        await Task.Run(
                             async () => await Write.WriteRecordAsync(_server.WriteSettings.Connection, schema,
                                 record, config,
                                 responseStream), context.CancellationToken);

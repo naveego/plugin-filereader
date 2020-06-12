@@ -19,5 +19,12 @@ namespace PluginFileReader.API.Write
                 PendingWrites = false;
             }
         }
+
+        public static void PurgeWriteFile()
+        {
+            // set triggers for async file write
+            LastWriteTime = DateTime.Now;
+            PendingWrites = true;
+        }
     }
 }

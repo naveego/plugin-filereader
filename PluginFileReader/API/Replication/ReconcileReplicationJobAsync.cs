@@ -118,6 +118,10 @@ namespace PluginFileReader.API.Replication
                     await DropTableAsync(conn, previousGoldenTable);
 
                     await EnsureTableAsync(conn, goldenTable);
+                    
+                    // set triggers for async file write
+                    PurgeReplicationFiles();
+                    Write.Write.PurgeWriteFile();
                 }
 
                 // drop previous version table
@@ -127,6 +131,10 @@ namespace PluginFileReader.API.Replication
                     await DropTableAsync(conn, previousVersionTable);
 
                     await EnsureTableAsync(conn, versionTable);
+                    
+                    // set triggers for async file write
+                    PurgeReplicationFiles();
+                    Write.Write.PurgeWriteFile();
                 }
             }
 
