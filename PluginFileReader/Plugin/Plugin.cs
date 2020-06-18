@@ -150,6 +150,25 @@ namespace PluginFileReader.Plugin
 
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
 
+                var files = _server.Settings.GetAllFilesByDirectory();
+                var conn = Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
+
+                if (sampleSize == 0)
+                {
+                    sampleSize = 5;
+                }
+
+                foreach (var rootPath in _server.Settings.RootPaths) {
+                    var schemaName = Constants.SchemaName;
+                    var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                        ? new DirectoryInfo(rootPath.RootPath).Name
+                        : rootPath.Name;
+
+                    Utility.LoadDirectoryFilesIntoDb(
+                        Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath, 
+                        tableName, schemaName, files[rootPath.RootPath].Take(1).ToList(), sampleSize);
+                }
+
                 var schemas = refreshSchemas.Select(s => Discover.GetSchemaForQuery(s, sampleSize))
                     .ToArray();
 
