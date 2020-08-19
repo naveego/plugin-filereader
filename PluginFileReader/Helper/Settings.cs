@@ -226,6 +226,7 @@ namespace PluginFileReader.Helper
         public string Mode { get; set; }
         public string CleanupAction { get; set; }
         public string ArchivePath { get; set; }
+        public int SkipLines { get; set; }
 
         // FLAT FILE MODE SETTINGS
         public bool HasHeader { get; set; }

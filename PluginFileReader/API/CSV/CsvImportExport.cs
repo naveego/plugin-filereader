@@ -245,10 +245,11 @@ namespace PluginFileReader.API.CSV
                 {
                     CsvReader.Delimiter = Delimiter;
                     CsvReader.OnEmptyLine = BlankLine.SkipEntireLine;
+                    CsvReader.SkipLines = rootPath.SkipLines;
 
                     //Skip the header line.
                     if (rootPath.HasHeader)
-                        CsvReader.SkipLines = 1;
+                        CsvReader.SkipLines += 1;
 
                     var trans = SQLDatabaseConnection.BeginTransaction();
                     

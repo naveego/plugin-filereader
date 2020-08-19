@@ -79,6 +79,7 @@ namespace PluginFileReader.API.FixedWidthColumns
             var file = new StreamReader(filePathAndName);
             string line;
             var rowsRead = 0;
+            var rowsSkipped = 0;
 
             // prepare insert cmd with parameters
             querySb = new StringBuilder($"INSERT INTO [{_schemaName}].[{_tableName}] (");
@@ -110,6 +111,15 @@ namespace PluginFileReader.API.FixedWidthColumns
             
             try
             {
+                // skip lines
+                if (rootPath.SkipLines > 0)
+                {
+                    while (file.ReadLine() != null && rowsSkipped < rootPath.SkipLines)
+                    {
+                        rowsSkipped++;
+                    }
+                }
+                
                 // read all lines from file
                 while ((line = file.ReadLine()) != null && rowsRead < limit)
                 {

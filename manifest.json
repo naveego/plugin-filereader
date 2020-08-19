@@ -96,7 +96,7 @@
                 "title": "Mode",
                 "description": "Mode to use when reading target files.",
                 "default": "Delimited",
-                "enum": ["Delimited", "Fixed Width Columns"]
+                "enum": ["Delimited", "Fixed Width Columns", "Excel"]
               },
               "Delimiter": {
                 "type": "string",
@@ -112,6 +112,12 @@
                 "description": "Does the file have a header row?",
                 "default": false,
                 "examples": [true]
+              },
+              "SkipLines": {
+                "title": "Skip Lines",
+                "description": "The number of lines to skip at the top of the file.",
+                "default": 0,
+                "type": "number"
               },
               "ColumnsConfigurationFile": {
                 "type": "string",
