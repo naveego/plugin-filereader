@@ -93,7 +93,7 @@ namespace PluginFileReader.API.FixedWidthColumns
 
             foreach (var column in rootPath.Columns)
             {
-                var paramName = $"@{column.ColumnName}";
+                var paramName = $"@param{rootPath.Columns.IndexOf(column)}";
                 querySb.Append($"{paramName},");
                 cmd.Parameters.Add(paramName);
             }
@@ -126,7 +126,7 @@ namespace PluginFileReader.API.FixedWidthColumns
                     foreach (var column in rootPath.Columns)
                     {
                         var rawValue = line.Substring(column.ColumnStart, column.ColumnEnd - column.ColumnStart + 1);
-                        cmd.Parameters[$"@{column.ColumnName}"].Value = column.TrimWhitespace ? rawValue.Trim() : rawValue;
+                        cmd.Parameters[$"@param{rootPath.Columns.IndexOf(column)}"].Value = column.TrimWhitespace ? rawValue.Trim() : rawValue;
                     }
 
                     cmd.ExecuteNonQuery();

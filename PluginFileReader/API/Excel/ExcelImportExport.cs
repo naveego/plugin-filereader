@@ -116,7 +116,7 @@ namespace PluginFileReader.API.Excel
 
                     foreach (var column in headerColumns)
                     {
-                        var paramName = $"@{column}";
+                        var paramName = $"@param{headerColumns.IndexOf(column)}";
                         querySb.Append($"{paramName},");
                         cmd.Parameters.Add(paramName);
                     }
@@ -140,8 +140,8 @@ namespace PluginFileReader.API.Excel
                         {
                             foreach (var column in headerColumns)
                             {
-                                var rawValue = reader.GetString(headerColumns.IndexOf(column));
-                                cmd.Parameters[$"@{column}"].Value = rawValue;
+                                var rawValue = reader.GetValue(headerColumns.IndexOf(column))?.ToString();
+                                cmd.Parameters[$"@param{headerColumns.IndexOf(column)}"].Value = rawValue;
                             }
 
                             cmd.ExecuteNonQuery();
