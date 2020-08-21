@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ExcelDataReader;
+using Newtonsoft.Json;
 using PluginFileReader.API.Factory;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
@@ -63,7 +64,12 @@ namespace PluginFileReader.API.Excel
                     {
                         if (rootPath.HasHeader)
                         {
-                            var field = reader.GetString(i);
+                            var field = reader.GetValue(i)?.ToString();
+
+                            if (string.IsNullOrWhiteSpace(field))
+                            {
+                                field = $"NO_HEADER_COLUMN_{i}";
+                            }
                             
                             if (headerColumns.Contains(field))
                             {
