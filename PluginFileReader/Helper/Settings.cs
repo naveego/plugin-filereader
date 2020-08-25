@@ -236,6 +236,9 @@ namespace PluginFileReader.Helper
         public string ColumnsConfigurationFile { get; set; }
         public List<Column> Columns { get; set; }
         
+        // EXCEL FILE MODE SETTINGS
+        public string ExcelColumns { get; set; }
+        
         
         public char GetDelimiter()
         {
@@ -246,6 +249,20 @@ namespace PluginFileReader.Helper
                 default:
                     return char.Parse(Delimiter);
             }
+        }
+        
+        public List<int> GetAllExcelColumnIndexes()
+        {
+            if (string.IsNullOrWhiteSpace(ExcelColumns))
+            {
+                return new List<int>();
+            }
+            
+            return ExcelColumns.Replace(" ", "").Split(',')
+                .Select(x => x.Split('-'))
+                .Select(p => new { First = int.Parse(p.First()), Last = int.Parse(p.Last()) })
+                .SelectMany(x => Enumerable.Range(x.First, x.Last - x.First + 1))
+                .OrderBy(z=>z).ToList();
         }
     }
 

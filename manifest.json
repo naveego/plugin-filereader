@@ -35,7 +35,7 @@
       "ui:order": ["GlobalColumnsConfigurationFile","RootPaths"],
       "RootPaths": {
         "items": {
-          "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "SkipLines", "Delimiter", "HasHeader", "ColumnsConfigurationFile", "Columns"],
+          "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "SkipLines", "Delimiter", "HasHeader", "ExcelColumns", "ColumnsConfigurationFile", "Columns"],
           "Columns": {
             "items": {
               "ui:order": ["ColumnName", "IsKey", "TrimWhitespace", "ColumnStart", "ColumnEnd"]
@@ -118,6 +118,13 @@
                 "description": "The number of lines to skip at the top of the file.",
                 "default": 0,
                 "type": "number"
+              },
+              "ExcelColumns": {
+                "type": "string",
+                "title": "Excel Columns",
+                "description": "The columns to read from an Excel file (ex. 0, 2-5, 7, 10, 12-15).",
+                "default": "",
+                "pattern": ""
               },
               "ColumnsConfigurationFile": {
                 "type": "string",

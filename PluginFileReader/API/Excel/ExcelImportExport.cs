@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using ExcelDataReader;
 using Newtonsoft.Json;
@@ -45,6 +46,7 @@ namespace PluginFileReader.API.Excel
             var rowsRead = 0;
             var rowsSkipped = 0;
             List<string> headerColumns = new List<string>();
+            List<int> columnIndexes;
             
             using (var stream = File.OpenRead(filePathAndName))
             {
@@ -59,8 +61,16 @@ namespace PluginFileReader.API.Excel
                         }
                     }
                     
+                    // get desired column indexes
+                    columnIndexes = rootPath.GetAllExcelColumnIndexes();
+
+                    if (columnIndexes.Count == 0)
+                    {
+                        columnIndexes = Enumerable.Range(0, reader.FieldCount).ToList();
+                    }
+                    
                     // get column names
-                    for (var i = 0; i < reader.FieldCount; i++)
+                    foreach (var i in columnIndexes)
                     {
                         if (rootPath.HasHeader)
                         {
@@ -146,7 +156,7 @@ namespace PluginFileReader.API.Excel
                         {
                             foreach (var column in headerColumns)
                             {
-                                var rawValue = reader.GetValue(headerColumns.IndexOf(column))?.ToString();
+                                var rawValue = reader.GetValue(columnIndexes[headerColumns.IndexOf(column)])?.ToString();
                                 cmd.Parameters[$"@param{headerColumns.IndexOf(column)}"].Value = rawValue;
                             }
 
