@@ -1,4 +1,5 @@
 using PluginFileReader.API.CSV;
+using PluginFileReader.API.Excel;
 using PluginFileReader.API.Factory;
 using PluginFileReader.API.FixedWidthColumns;
 using PluginFileReader.Helper;
@@ -20,6 +21,8 @@ namespace PluginFileReader.API.Utility
                     return new CsvImportExportFactory();
                 case "Fixed Width Columns":
                     return new FixedWidthColumnsFactory();
+                case "Excel":
+                    return new ExcelImportExportFactory();
                 default:
                     return null;
             }

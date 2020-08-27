@@ -14,7 +14,7 @@ using Record = Naveego.Sdk.Plugins.Record;
 
 namespace PluginFileReaderTest.Plugin
 {
-    public class DelimitiedPluginTest
+    public class DelimitedPluginTest
     {
         private readonly string DiscoverDatabasePath = $"{Path.Join(Constants.DbFolder, $"{Constants.DiscoverDbPrefix}_{Constants.DbFile}")}";
         private readonly string ReadDatabasePath = $"{Path.Join(Constants.DbFolder, $"test_{Constants.DbFile}")}";

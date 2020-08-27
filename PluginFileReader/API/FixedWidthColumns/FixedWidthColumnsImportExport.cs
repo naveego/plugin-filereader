@@ -79,6 +79,7 @@ namespace PluginFileReader.API.FixedWidthColumns
             var file = new StreamReader(filePathAndName);
             string line;
             var rowsRead = 0;
+            var rowsSkipped = 0;
 
             // prepare insert cmd with parameters
             querySb = new StringBuilder($"INSERT INTO [{_schemaName}].[{_tableName}] (");
@@ -92,7 +93,7 @@ namespace PluginFileReader.API.FixedWidthColumns
 
             foreach (var column in rootPath.Columns)
             {
-                var paramName = $"@{column.ColumnName}";
+                var paramName = $"@param{rootPath.Columns.IndexOf(column)}";
                 querySb.Append($"{paramName},");
                 cmd.Parameters.Add(paramName);
             }
@@ -110,13 +111,22 @@ namespace PluginFileReader.API.FixedWidthColumns
             
             try
             {
+                // skip lines
+                if (rootPath.SkipLines > 0)
+                {
+                    while (file.ReadLine() != null && rowsSkipped < rootPath.SkipLines)
+                    {
+                        rowsSkipped++;
+                    }
+                }
+                
                 // read all lines from file
                 while ((line = file.ReadLine()) != null && rowsRead < limit)
                 {
                     foreach (var column in rootPath.Columns)
                     {
                         var rawValue = line.Substring(column.ColumnStart, column.ColumnEnd - column.ColumnStart + 1);
-                        cmd.Parameters[$"@{column.ColumnName}"].Value = column.TrimWhitespace ? rawValue.Trim() : rawValue;
+                        cmd.Parameters[$"@param{rootPath.Columns.IndexOf(column)}"].Value = column.TrimWhitespace ? rawValue.Trim() : rawValue;
                     }
 
                     cmd.ExecuteNonQuery();

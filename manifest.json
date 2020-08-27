@@ -35,7 +35,7 @@
       "ui:order": ["GlobalColumnsConfigurationFile","RootPaths"],
       "RootPaths": {
         "items": {
-          "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "Delimiter", "HasHeader", "ColumnsConfigurationFile", "Columns"],
+          "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "SkipLines", "Delimiter", "HasHeader", "ExcelColumns", "ColumnsConfigurationFile", "Columns"],
           "Columns": {
             "items": {
               "ui:order": ["ColumnName", "IsKey", "TrimWhitespace", "ColumnStart", "ColumnEnd"]
@@ -96,7 +96,7 @@
                 "title": "Mode",
                 "description": "Mode to use when reading target files.",
                 "default": "Delimited",
-                "enum": ["Delimited", "Fixed Width Columns"]
+                "enum": ["Delimited", "Fixed Width Columns", "Excel"]
               },
               "Delimiter": {
                 "type": "string",
@@ -112,6 +112,19 @@
                 "description": "Does the file have a header row?",
                 "default": false,
                 "examples": [true]
+              },
+              "SkipLines": {
+                "title": "Skip Lines",
+                "description": "The number of lines to skip at the top of the file.",
+                "default": 0,
+                "type": "number"
+              },
+              "ExcelColumns": {
+                "type": "string",
+                "title": "Excel Columns",
+                "description": "The columns to read from an Excel file (ex. 0, 2-5, 7, 10, 12-15).",
+                "default": "",
+                "pattern": ""
               },
               "ColumnsConfigurationFile": {
                 "type": "string",

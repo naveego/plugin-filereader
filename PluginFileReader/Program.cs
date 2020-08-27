@@ -20,7 +20,7 @@ namespace PluginFileReader
                 
                 // clean old logs on start up
                 Logger.Clean();
-            
+
                 // create new server and start it
                 Server server = new Server
                 {
