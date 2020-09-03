@@ -39,6 +39,9 @@
           "Columns": {
             "items": {
               "ui:order": ["ColumnName", "IsKey", "TrimWhitespace", "ColumnStart", "ColumnEnd"]
+            },
+            "ExcelCells": {
+              "ui:order": ["ColumnName", "ColumnIndex", "RowIndex"]
             }
           }
         }
@@ -125,6 +128,33 @@
                 "description": "The columns to read from an Excel file (ex. 0, 2-5, 7, 10, 12-15).",
                 "default": "",
                 "pattern": ""
+              },
+              "ExcelCells": {
+                "readOnly": true,
+                "type": "array",
+                "title": "Excel Cells",
+                "description": "Cells to include on all records.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ColumnName": {
+                      "title": "Column Name",
+                      "description": "The name of the column.",
+                      "type": "string"
+                    },
+                    "ColumnIndex": {
+                      "title": "Column Index",
+                      "description": "The column index of the cell.",
+                      "type": "number"
+                    },
+                    "RowIndex": {
+                      "title": "Row Index",
+                      "description": "The row index of the cell.",
+                      "type": "number"
+                    }
+                  },
+                  "required": ["ColumnName", "ColumnIndex", "RowIndex"]
+                }
               },
               "ColumnsConfigurationFile": {
                 "type": "string",

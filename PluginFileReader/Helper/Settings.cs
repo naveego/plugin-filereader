@@ -238,6 +238,7 @@ namespace PluginFileReader.Helper
         
         // EXCEL FILE MODE SETTINGS
         public string ExcelColumns { get; set; }
+        public List<ExcelCell> ExcelCells { get; set; }
         
         
         public char GetDelimiter()
@@ -264,6 +265,11 @@ namespace PluginFileReader.Helper
                 .SelectMany(x => Enumerable.Range(x.First, x.Last - x.First + 1))
                 .OrderBy(z=>z).ToList();
         }
+
+        public List<ExcelCell> GetOrderedExcelCells()
+        {
+            return ExcelCells.OrderBy(x => x.RowIndex).ThenBy(x => x.ColumnIndex).ToList();
+        }
     }
 
     public class Column
@@ -273,5 +279,17 @@ namespace PluginFileReader.Helper
         public int ColumnStart { get; set; }
         public int ColumnEnd { get; set; }
         public bool TrimWhitespace { get; set; }
+    }
+    
+    public class ExcelCell
+    {
+        public string ColumnName { get; set; }
+        public int ColumnIndex { get; set; }
+        public int RowIndex { get; set; }
+
+        public string GetUniqueName()
+        {
+            return $"{ColumnName}_{RowIndex}_{ColumnIndex}";
+        }
     }
 }

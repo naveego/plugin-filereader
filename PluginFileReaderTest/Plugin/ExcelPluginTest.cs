@@ -15,7 +15,9 @@ namespace PluginFileReaderTest.Plugin
 {
     public class ExcelPluginTest
     {
-                private readonly string DiscoverDatabasePath = $"{Path.Join(Constants.DbFolder, $"{Constants.DiscoverDbPrefix}_{Constants.DbFile}")}";
+        private readonly string DiscoverDatabasePath =
+            $"{Path.Join(Constants.DbFolder, $"{Constants.DiscoverDbPrefix}_{Constants.DbFile}")}";
+
         private readonly string ReadDatabasePath = $"{Path.Join(Constants.DbFolder, $"test_{Constants.DbFile}")}";
         private const string BasePath = "../../../MockData/ExcelData";
         private const string ReadPath = "../../../MockData/ReadDirectory";
@@ -39,7 +41,7 @@ namespace PluginFileReaderTest.Plugin
             catch
             {
             }
-            
+
             try
             {
                 File.Delete(ReadDatabasePath);
@@ -90,9 +92,9 @@ namespace PluginFileReaderTest.Plugin
                 }
             }
         }
-        
+
         private Settings GetSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, string excelColumns = null)
+            string filter = null, bool multiRoot = false, string excelColumns = null, List<ExcelCell> excelCells = null)
         {
             return new Settings
             {
@@ -108,7 +110,8 @@ namespace PluginFileReaderTest.Plugin
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
-                            ExcelColumns = excelColumns
+                            ExcelColumns = excelColumns,
+                            ExcelCells = excelCells
                         },
                         new RootPathObject
                         {
@@ -119,7 +122,8 @@ namespace PluginFileReaderTest.Plugin
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
-                            ExcelColumns = excelColumns
+                            ExcelColumns = excelColumns,
+                            ExcelCells = excelCells
                         }
                     }
                     : new List<RootPathObject>
@@ -133,19 +137,21 @@ namespace PluginFileReaderTest.Plugin
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
-                            ExcelColumns = excelColumns
+                            ExcelColumns = excelColumns,
+                            ExcelCells = excelCells
                         }
                     }
             };
         }
-        
+
         private ConnectRequest GetConnectSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, bool empty = false, string excelColumns = null)
+            string filter = null, bool multiRoot = false, bool empty = false, string excelColumns = null,
+            List<ExcelCell> excelCells = null)
         {
             if (empty)
             {
                 var emptySettings = new Settings();
-                
+
                 return new ConnectRequest
                 {
                     SettingsJson = JsonConvert.SerializeObject(emptySettings),
@@ -153,8 +159,8 @@ namespace PluginFileReaderTest.Plugin
                     OauthStateJson = ""
                 };
             }
-            
-            var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, excelColumns);
+
+            var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, excelColumns, excelCells);
 
             return new ConnectRequest
             {
@@ -173,7 +179,7 @@ namespace PluginFileReaderTest.Plugin
                 Query = query,
             };
         }
-        
+
         [Fact]
         public async Task ConnectSessionTest()
         {
@@ -243,7 +249,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasAllTest()
         {
@@ -360,7 +366,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasExcelColumnsTest()
         {
@@ -415,7 +421,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamTest()
         {
@@ -460,7 +466,7 @@ namespace PluginFileReaderTest.Plugin
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(schemaRequest);
             request.Schema = schemasResponse.Schemas[0];
-            
+
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
             var records = new List<Record>();
@@ -480,6 +486,85 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal("115.892", record["Payment Limit"]);
             Assert.Equal("", record["Vaccine AWP%"]);
             Assert.Equal("", record["Vaccine Limit"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
+        public async Task ReadStreamExcelCellsTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings(null, 8, "*.xls", false, false, null, new List<ExcelCell>
+            {
+                new ExcelCell
+                {
+                    ColumnIndex = 0,
+                    RowIndex = 2,
+                    ColumnName = "Special Column"
+                }
+            });
+
+            var schemaRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+
+            var settings = GetSettings();
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                RootPath = settings.RootPaths.First()
+            });
+
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(schemaRequest);
+            request.Schema = schemasResponse.Schemas[0];
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(616, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal("90371", record["HCPCS Code"]);
+            Assert.Equal("Hep b ig im", record["Short Description"]);
+            Assert.Equal("1 ML", record["HCPCS Code Dosage"]);
+            Assert.Equal("115.892", record["Payment Limit"]);
+            Assert.Equal("", record["Vaccine AWP%"]);
+            Assert.Equal("", record["Vaccine Limit"]);
+            Assert.Equal("Effective July 1, 2020 through September 30, 2020", record["Special Column"]);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -509,7 +594,7 @@ namespace PluginFileReaderTest.Plugin
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
-            
+
             var settings = GetSettings();
             var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
             schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson

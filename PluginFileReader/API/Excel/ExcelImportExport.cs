@@ -47,6 +47,30 @@ namespace PluginFileReader.API.Excel
             var rowsSkipped = 0;
             List<string> headerColumns = new List<string>();
             List<int> columnIndexes;
+            List<ExcelCell> orderedExcelCells = rootPath.GetOrderedExcelCells();
+            Dictionary<string, object> excelCellsValues = new Dictionary<string, object>();
+
+            using (var stream = File.OpenRead(filePathAndName))
+            {
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    var currentRow = 0;
+                    foreach (var cell in orderedExcelCells)
+                    {
+                        while (reader.Read() && currentRow < cell.RowIndex)
+                        {
+                            currentRow++;
+                        }
+
+                        var rawValue = reader.GetValue(cell.ColumnIndex);
+
+                        if(!excelCellsValues.TryAdd(cell.ColumnName, rawValue))
+                        {
+                            excelCellsValues.Add(cell.GetUniqueName(), rawValue);
+                        }
+                    }
+                }
+            }
             
             using (var stream = File.OpenRead(filePathAndName))
             {
@@ -105,6 +129,12 @@ namespace PluginFileReader.API.Excel
                             $"[{column}] VARCHAR({int.MaxValue}),");
                     }
 
+                    foreach (var cell in excelCellsValues)
+                    {
+                        querySb.Append(
+                            $"[{cell.Key}] VARCHAR({int.MaxValue}),");
+                    }
+
                     querySb.Length--;
                     querySb.Append(");");
 
@@ -126,6 +156,11 @@ namespace PluginFileReader.API.Excel
                     {
                         querySb.Append($"[{column}],");
                     }
+                    
+                    foreach (var cell in excelCellsValues)
+                    {
+                        querySb.Append($"[{cell.Key}],");
+                    }
 
                     querySb.Length--;
                     querySb.Append(") VALUES (");
@@ -133,6 +168,13 @@ namespace PluginFileReader.API.Excel
                     foreach (var column in headerColumns)
                     {
                         var paramName = $"@param{headerColumns.IndexOf(column)}";
+                        querySb.Append($"{paramName},");
+                        cmd.Parameters.Add(paramName);
+                    }
+                    
+                    foreach (var cell in excelCellsValues)
+                    {
+                        var paramName = $"@param{cell.Key.Replace(" ", "")}";
                         querySb.Append($"{paramName},");
                         cmd.Parameters.Add(paramName);
                     }
@@ -158,6 +200,12 @@ namespace PluginFileReader.API.Excel
                             {
                                 var rawValue = reader.GetValue(columnIndexes[headerColumns.IndexOf(column)])?.ToString();
                                 cmd.Parameters[$"@param{headerColumns.IndexOf(column)}"].Value = rawValue;
+                            }
+                            
+                            foreach (var cell in excelCellsValues)
+                            {
+                                var rawValue = cell.Value?.ToString();
+                                cmd.Parameters[$"@param{cell.Key.Replace(" ", "")}"].Value = rawValue;
                             }
 
                             cmd.ExecuteNonQuery();
