@@ -35,7 +35,7 @@
       "ui:order": ["GlobalColumnsConfigurationFile","RootPaths"],
       "RootPaths": {
         "items": {
-          "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "SkipLines", "Delimiter", "HasHeader", "ExcelColumns", "ColumnsConfigurationFile", "Columns"],
+          "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "SkipLines", "Delimiter", "HasHeader", "ExcelColumns", "ExcelCells", "ColumnsConfigurationFile", "Columns"],
           "Columns": {
             "items": {
               "ui:order": ["ColumnName", "IsKey", "TrimWhitespace", "ColumnStart", "ColumnEnd"]
