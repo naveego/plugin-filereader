@@ -130,7 +130,7 @@
                 "pattern": ""
               },
               "ExcelCells": {
-                "readOnly": true,
+                "readOnly": false,
                 "type": "array",
                 "title": "Excel Cells",
                 "description": "Cells to include on all records.",
@@ -162,7 +162,7 @@
                 "description": "Path to the columns configuration file for fixed width files (optional)"
               },
               "Columns": {
-                "readOnly": true,
+                "readOnly": false,
                 "type": "array",
                 "title": "Columns",
                 "description": "Columns for fixed column width files",

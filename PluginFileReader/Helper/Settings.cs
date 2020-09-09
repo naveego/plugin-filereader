@@ -127,7 +127,7 @@ namespace PluginFileReader.Helper
             {
                 RootPaths = new List<RootPathObject>();
             }
-            
+
             var globalConfigurationColumns = new Dictionary<string, List<Column>>();
             var serializer = new JsonSerializer();
 
@@ -235,12 +235,12 @@ namespace PluginFileReader.Helper
         // FIXED COLUMN WIDTH MODE SETTINGS
         public string ColumnsConfigurationFile { get; set; }
         public List<Column> Columns { get; set; }
-        
+
         // EXCEL FILE MODE SETTINGS
         public string ExcelColumns { get; set; }
         public List<ExcelCell> ExcelCells { get; set; }
-        
-        
+
+
         public char GetDelimiter()
         {
             switch (Delimiter)
@@ -251,24 +251,26 @@ namespace PluginFileReader.Helper
                     return char.Parse(Delimiter);
             }
         }
-        
+
         public List<int> GetAllExcelColumnIndexes()
         {
             if (string.IsNullOrWhiteSpace(ExcelColumns))
             {
                 return new List<int>();
             }
-            
+
             return ExcelColumns.Replace(" ", "").Split(',')
                 .Select(x => x.Split('-'))
-                .Select(p => new { First = int.Parse(p.First()), Last = int.Parse(p.Last()) })
+                .Select(p => new {First = int.Parse(p.First()), Last = int.Parse(p.Last())})
                 .SelectMany(x => Enumerable.Range(x.First, x.Last - x.First + 1))
-                .OrderBy(z=>z).ToList();
+                .OrderBy(z => z).ToList();
         }
 
         public List<ExcelCell> GetOrderedExcelCells()
         {
-            return ExcelCells.OrderBy(x => x.RowIndex).ThenBy(x => x.ColumnIndex).ToList();
+            return ExcelCells != null
+                ? ExcelCells.OrderBy(x => x.RowIndex).ThenBy(x => x.ColumnIndex).ToList()
+                : new List<ExcelCell>();
         }
     }
 
@@ -280,7 +282,7 @@ namespace PluginFileReader.Helper
         public int ColumnEnd { get; set; }
         public bool TrimWhitespace { get; set; }
     }
-    
+
     public class ExcelCell
     {
         public string ColumnName { get; set; }
