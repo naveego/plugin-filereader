@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Icon Include="$(MSBuildProjectDirectory)/../icon.png" />
+        <Icon Include="$(MSBuildProjectDirectory)/../icon.svg" />
         <License Include="$(MSBuildProjectDirectory)/../LICENSE" />
         <Manifest Include="$(MSBuildProjectDirectory)/../manifest.json" />
     </ItemGroup>

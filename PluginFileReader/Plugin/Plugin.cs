@@ -214,7 +214,7 @@ namespace PluginFileReader.Plugin
                     // schema is not query based so we can stream each file as it is loaded
                     var schemaMetaJson =
                         JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
-                    var rootPath = _server.Settings.RootPaths.Find(r => r.RootPath == schemaMetaJson.RootPath.RootPath);
+                    var rootPath = _server.Settings.RootPaths.First(r => r.RootPath == schemaMetaJson.RootPath.RootPath);
                     var files = filesByDirectory[rootPath.RootPath];
                     var schemaName = Constants.SchemaName;
                     var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
@@ -322,7 +322,7 @@ namespace PluginFileReader.Plugin
             }
             catch (Exception e)
             {
-                Logger.Error(e, e.Message, context);
+                Logger.Error(e, e.StackTrace, context);
             }
         }
 

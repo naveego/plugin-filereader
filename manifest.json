@@ -5,7 +5,7 @@
   "apiVersion": "2",
   "versionDescription": "Version 4",
   "version": "4.0.0",
-  "iconFile": "icon.png",
+  "iconFile": "icon.svg",
   "executable": "PluginFileReader",
   "kind": "publisher",
   "os": "$GOOS",
