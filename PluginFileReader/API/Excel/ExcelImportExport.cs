@@ -68,6 +68,8 @@ namespace PluginFileReader.API.Excel
                         {
                             excelCellsValues.Add(cell.GetUniqueName(), rawValue);
                         }
+                        
+                        currentRow++;
                     }
                 }
             }
