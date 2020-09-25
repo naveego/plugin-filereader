@@ -43,7 +43,7 @@ namespace PluginFileReader.API.Discover
             {
                 Id = schemaId,
                 Name = tableName,
-                DataFlowDirection = Schema.Types.DataFlowDirection.ReadWrite,
+                DataFlowDirection = Schema.Types.DataFlowDirection.Read,
                 Query = $"SELECT * FROM {schemaId}",
                 Properties = {},
             };

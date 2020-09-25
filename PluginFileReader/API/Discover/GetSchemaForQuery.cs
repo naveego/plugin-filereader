@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Naveego.Sdk.Plugins;
+using Newtonsoft.Json;
 using PluginFileReader.API.Utility;
+using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -15,6 +17,28 @@ namespace PluginFileReader.API.Discover
         {
             try
             {
+                Logger.Debug(JsonConvert.SerializeObject(schema, Formatting.Indented));
+                
+                if (schema.DataFlowDirection == Schema.Types.DataFlowDirection.Write)
+                {
+                    Logger.Info("Returning Write schema unchanged");
+                    return schema;
+                }
+
+                if (string.IsNullOrWhiteSpace(schema.Query))
+                {
+                    if (!string.IsNullOrWhiteSpace(schema.PublisherMetaJson))
+                    {
+                        JsonConvert.DeserializeObject<ConfigureWriteFormData>(schema.PublisherMetaJson);
+                        Logger.Info("Returning Write schema with direction changed");
+                        schema.DataFlowDirection = Schema.Types.DataFlowDirection.Write;
+                        return schema;
+                    }
+                    
+                    Logger.Info("Returning null schema for null query");
+                    return null;
+                }
+                
                 var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
                 var cmd = new SqlDatabaseCommand
