@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using PluginFileReader.Helper;
 using Xunit;
 
@@ -7,116 +8,203 @@ namespace PluginFileReaderTest.Helper
 {
     public class LoggerTest
     {
-        private static string _path = @"logs/plugin-filereader-log.txt";
-        
+        private static string _logDirectory = "logs";
+
         [Fact]
         public void VerboseTest()
         {
-            // setup
-            File.Delete(_path);
-            Logger.SetLogLevel(Logger.LogLevel.Verbose);
+            var files = Directory.GetFiles(_logDirectory);
             
+            // setup
+            try
+            {
+                foreach (var file in files)
+                {
+                    File.Delete(file);
+                }
+            }
+            catch
+            {
+            }
+
+            Logger.Init();
+            Logger.SetLogLevel(Logger.LogLevel.Verbose);
+
             // act
             Logger.Verbose("verbose");
             Logger.Debug("debug");
             Logger.Info("info");
             Logger.Error(new Exception("error"), "error");
+            Logger.CloseAndFlush();
 
             // assert
-            string[] lines = File.ReadAllLines(_path);
-
-            Assert.Equal(4, lines.Length);
+            files = Directory.GetFiles(_logDirectory);
+            Assert.Single(files);
             
+            string[] lines = File.ReadAllLines(files.First());
+
+            Assert.Equal(5, lines.Length);
+
             // cleanup
-            File.Delete(_path);
+            File.Delete(files.First());
         }
-        
+
         [Fact]
         public void DebugTest()
         {
-            // setup
-            File.Delete(_path);
-            Logger.SetLogLevel(Logger.LogLevel.Debug);
+            var files = Directory.GetFiles(_logDirectory);
             
+            // setup
+            try
+            {
+                foreach (var file in files)
+                {
+                    File.Delete(file);
+                }
+            }
+            catch
+            {
+            }
+
+            Logger.Init();
+            Logger.SetLogLevel(Logger.LogLevel.Debug);
+
             // act
             Logger.Verbose("verbose");
             Logger.Debug("debug");
             Logger.Info("info");
             Logger.Error(new Exception("error"), "error");
+            Logger.CloseAndFlush();
 
             // assert
-            string[] lines = File.ReadAllLines(_path);
-
-            Assert.Equal(3, lines.Length);
+            files = Directory.GetFiles(_logDirectory);
+            Assert.Single(files);
             
+            string[] lines = File.ReadAllLines(files.First());
+
+            Assert.Equal(4, lines.Length);
+
             // cleanup
-            File.Delete(_path);
+            File.Delete(files.First());
         }
-        
+
         [Fact]
         public void InfoTest()
         {
-            // setup
-            File.Delete(_path);
-            Logger.SetLogLevel(Logger.LogLevel.Info);
+            var files = Directory.GetFiles(_logDirectory);
             
+            // setup
+            try
+            {
+                foreach (var file in files)
+                {
+                    File.Delete(file);
+                }
+            }
+            catch
+            {
+            }
+
+            Logger.Init();
+            Logger.SetLogLevel(Logger.LogLevel.Info);
+
             // act
             Logger.Verbose("verbose");
             Logger.Debug("debug");
             Logger.Info("info");
             Logger.Error(new Exception("error"), "error");
+            Logger.CloseAndFlush();
 
             // assert
-            string[] lines = File.ReadAllLines(_path);
-
-            Assert.Equal(2, lines.Length);
+            files = Directory.GetFiles(_logDirectory);
+            Assert.Single(files);
             
+            string[] lines = File.ReadAllLines(files.First());
+
+            Assert.Equal(3, lines.Length);
+
             // cleanup
-            File.Delete(_path);
+            File.Delete(files.First());
         }
-        
+
         [Fact]
         public void ErrorTest()
         {
-            // setup
-            File.Delete(_path);
-            Logger.SetLogLevel(Logger.LogLevel.Error);
+            var files = Directory.GetFiles(_logDirectory);
             
+            // setup
+            try
+            {
+                foreach (var file in files)
+                {
+                    File.Delete(file);
+                }
+            }
+            catch
+            {
+            }
+
+            Logger.Init();
+            Logger.SetLogLevel(Logger.LogLevel.Error);
+
             // act
             Logger.Verbose("verbose");
             Logger.Debug("debug");
             Logger.Info("info");
             Logger.Error(new Exception("error"), "error");
+            Logger.CloseAndFlush();
 
             // assert
-            string[] lines = File.ReadAllLines(_path);
-
-            Assert.Single(lines);
+            files = Directory.GetFiles(_logDirectory);
+            Assert.Single(files);
             
+            string[] lines = File.ReadAllLines(files.First());
+
+            Assert.Equal(2, lines.Length);
+
             // cleanup
-            File.Delete(_path);
+            File.Delete(files.First());
         }
-        
+
         [Fact]
         public void OffTest()
         {
-            // setup
-            File.Delete(_path);
-            Logger.SetLogLevel(Logger.LogLevel.Off);
+            var files = Directory.GetFiles(_logDirectory);
             
+            // setup
+            try
+            {
+                foreach (var file in files)
+                {
+                    File.Delete(file);
+                }
+            }
+            catch
+            {
+            }
+
+            Logger.Init();
+            Logger.SetLogLevel(Logger.LogLevel.Off);
+
             // act
             Logger.Verbose("verbose");
             Logger.Debug("debug");
             Logger.Info("info");
             Logger.Error(new Exception("error"), "error");
+            Logger.CloseAndFlush();
 
             // assert
-            string[] lines = File.Exists(_path) ? File.ReadAllLines(_path) : new string[0];
+            files = Directory.GetFiles(_logDirectory);
+            Assert.Empty(files);
 
-            Assert.Empty(lines);
-            
             // cleanup
-            File.Delete(_path);
+            try
+            {
+                File.Delete(files.First());
+            }
+            catch (Exception e)
+            {
+            }
         }
     }
 }
