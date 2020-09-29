@@ -16,8 +16,6 @@ namespace PluginFileReaderTest.Plugin
 {
     public class DelimitedPluginTest
     {
-        private readonly string DiscoverDatabasePath = $"{Path.Join(Constants.DbFolder, $"{Constants.DiscoverDbPrefix}_{Constants.DbFile}")}";
-        private readonly string ReadDatabasePath = $"{Path.Join(Constants.DbFolder, $"test_{Constants.DbFile}")}";
         private const string BasePath = "../../../MockData/DelimitedData";
         private const string ReadPath = "../../../MockData/ReadDirectory";
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
@@ -33,22 +31,6 @@ namespace PluginFileReaderTest.Plugin
         private void PrepareTestEnvironment(bool configureInvalid = false, bool configureArchiveFull = false,
             bool configureEmpty = false)
         {
-            try
-            {
-                File.Delete(DiscoverDatabasePath);
-            }
-            catch
-            {
-            }
-            
-            try
-            {
-                File.Delete(ReadDatabasePath);
-            }
-            catch
-            {
-            }
-
             foreach (var filePath in Directory.GetFiles(ArchivePath))
             {
                 File.Delete(filePath);

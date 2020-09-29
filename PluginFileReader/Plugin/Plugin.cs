@@ -29,6 +29,28 @@ namespace PluginFileReader.Plugin
         }
 
         /// <summary>
+        /// Configures the plugin
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override Task<ConfigureResponse> Configure(ConfigureRequest request, ServerCallContext context)
+        {
+            // ensure all directories are created
+            Directory.CreateDirectory(request.TemporaryDirectory);
+            Directory.CreateDirectory(request.PermanentDirectory);
+            Directory.CreateDirectory(request.LogDirectory);
+            
+            // configure logger
+            Logger.SetLogLevel(request.LogLevel);
+            Logger.Init(request.LogDirectory);
+
+            _server.Config = request;
+
+            return Task.FromResult(new ConfigureResponse());
+        }
+
+        /// <summary>
         /// Establishes a connection with an odbc data source
         /// </summary>
         /// <param name="request"></param>
@@ -484,7 +506,7 @@ namespace PluginFileReader.Plugin
             Logger.Debug(JsonConvert.SerializeObject(request, Formatting.Indented));
             _server.WriteConfigured = false;
 
-            var conn = Utility.GetSqlConnection(request.DataVersions.JobId, true);
+            var conn = Utility.GetSqlConnection(request.DataVersions.JobId, true, _server?.Config?.PermanentDirectory);
 
             _server.WriteSettings = new WriteSettings
             {

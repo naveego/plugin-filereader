@@ -8,7 +8,7 @@ namespace PluginFileReader.API.Utility
         public static string SchemaName = "dbo";
         
         public static string DbFolder = "db";
-        public static string DbFile = "plugincsv.db";
+        public static string DbFile = "plugin-filereader.db";
         public static string DiscoverDbPrefix = "discover";
         
         public static string ImportMetaDataTableName = "naveego_import_metadata";

@@ -16,8 +16,6 @@ namespace PluginFileReaderTest.Plugin
 {
     public class FixedWidthColumnsPluginTest
     {
-        private readonly string DiscoverDatabasePath = $"{Path.Join(Constants.DbFolder, $"{Constants.DiscoverDbPrefix}_{Constants.DbFile}")}";
-        private readonly string ReadDatabasePath = $"{Path.Join(Constants.DbFolder, $"test_{Constants.DbFile}")}";
         private const string BasePath = "../../../MockData/FixedWidthColumnsData";
         private const string ReadPath = "../../../MockData/ReadDirectory";
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
@@ -31,23 +29,6 @@ namespace PluginFileReaderTest.Plugin
 
         private void PrepareTestEnvironment(bool configureInvalid)
         {
-            try
-            {
-                File.Delete(DiscoverDatabasePath);
-            }
-            catch
-            {
-            }
-
-            try
-            {
-                File.Delete(ReadDatabasePath);
-            }
-            catch 
-            {
-            }
-            
-
             foreach (var filePath in Directory.GetFiles(ArchivePath))
             {
                 File.Delete(filePath);

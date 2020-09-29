@@ -2,21 +2,13 @@ using System;
 using System.IO;
 using System.Threading;
 using Grpc.Core;
+using Naveego.Sdk.Plugins;
 using Serilog;
 
 namespace PluginFileReader.Helper
 {
     public static class Logger
     {
-        public enum LogLevel
-        {
-            Verbose,
-            Debug,
-            Info,
-            Error,
-            Off
-        }
-
         private static string _logPrefix = "";
         private static string _fileName = @"plugin-filereader-log.txt";
         private static LogLevel _level = LogLevel.Info;
@@ -24,10 +16,13 @@ namespace PluginFileReader.Helper
         /// <summary>
         /// Initializes the logger
         /// </summary>
-        public static void Init()
+        public static void Init(string logPath = "logs")
         {
+            // remove any existing loggers
+            CloseAndFlush();
+            
             // ensure log directory exists
-            Directory.CreateDirectory("logs");
+            Directory.CreateDirectory(logPath);
             
             // setup serilog
             Log.Logger = new LoggerConfiguration()
@@ -37,7 +32,7 @@ namespace PluginFileReader.Helper
                     sinkConfig =>
                     {
                         sinkConfig.File(
-                            $"logs/{_fileName}",
+                            $"{logPath}/{_fileName}",
                             rollingInterval: RollingInterval.Day,
                             shared: true,
                             rollOnFileSizeLimit: true
@@ -75,7 +70,7 @@ namespace PluginFileReader.Helper
         /// <param name="message"></param>
         public static void Verbose(string message)
         {
-            if (_level > LogLevel.Verbose)
+            if (_level < LogLevel.Trace)
             {
                 return;
             }
@@ -91,7 +86,7 @@ namespace PluginFileReader.Helper
         /// <param name="message"></param>
         public static void Debug(string message)
         {
-            if (_level > LogLevel.Debug)
+            if (_level < LogLevel.Debug)
             {
                 return;
             }
@@ -106,7 +101,7 @@ namespace PluginFileReader.Helper
         /// <param name="message"></param>
         public static void Info(string message)
         {
-            if (_level > LogLevel.Info)
+            if (_level < LogLevel.Info)
             {
                 return;
             }
@@ -123,7 +118,7 @@ namespace PluginFileReader.Helper
         /// <param name="message"></param>
         public static void Error(Exception exception, string message)
         {
-            if (_level > LogLevel.Error)
+            if (_level < LogLevel.Error)
             {
                 return;
             }
@@ -141,7 +136,7 @@ namespace PluginFileReader.Helper
         /// <param name="context"></param>
         public static void Error(Exception exception, string message, ServerCallContext context)
         {
-            if (_level > LogLevel.Error)
+            if (_level < LogLevel.Error)
             {
                 return;
             }

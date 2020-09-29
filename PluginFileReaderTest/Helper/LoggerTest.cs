@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Naveego.Sdk.Plugins;
 using PluginFileReader.Helper;
 using Xunit;
 
@@ -27,8 +28,8 @@ namespace PluginFileReaderTest.Helper
             {
             }
 
-            Logger.Init();
-            Logger.SetLogLevel(Logger.LogLevel.Verbose);
+            Logger.Init(_logDirectory);
+            Logger.SetLogLevel(LogLevel.Trace);
 
             // act
             Logger.Verbose("verbose");
@@ -66,8 +67,8 @@ namespace PluginFileReaderTest.Helper
             {
             }
 
-            Logger.Init();
-            Logger.SetLogLevel(Logger.LogLevel.Debug);
+            Logger.Init(_logDirectory);
+            Logger.SetLogLevel(LogLevel.Debug);
 
             // act
             Logger.Verbose("verbose");
@@ -105,8 +106,8 @@ namespace PluginFileReaderTest.Helper
             {
             }
 
-            Logger.Init();
-            Logger.SetLogLevel(Logger.LogLevel.Info);
+            Logger.Init(_logDirectory);
+            Logger.SetLogLevel(LogLevel.Info);
 
             // act
             Logger.Verbose("verbose");
@@ -144,8 +145,8 @@ namespace PluginFileReaderTest.Helper
             {
             }
 
-            Logger.Init();
-            Logger.SetLogLevel(Logger.LogLevel.Error);
+            Logger.Init(_logDirectory);
+            Logger.SetLogLevel(LogLevel.Error);
 
             // act
             Logger.Verbose("verbose");
@@ -164,47 +165,6 @@ namespace PluginFileReaderTest.Helper
 
             // cleanup
             File.Delete(files.First());
-        }
-
-        [Fact]
-        public void OffTest()
-        {
-            var files = Directory.GetFiles(_logDirectory);
-            
-            // setup
-            try
-            {
-                foreach (var file in files)
-                {
-                    File.Delete(file);
-                }
-            }
-            catch
-            {
-            }
-
-            Logger.Init();
-            Logger.SetLogLevel(Logger.LogLevel.Off);
-
-            // act
-            Logger.Verbose("verbose");
-            Logger.Debug("debug");
-            Logger.Info("info");
-            Logger.Error(new Exception("error"), "error");
-            Logger.CloseAndFlush();
-
-            // assert
-            files = Directory.GetFiles(_logDirectory);
-            Assert.Empty(files);
-
-            // cleanup
-            try
-            {
-                File.Delete(files.First());
-            }
-            catch (Exception e)
-            {
-            }
         }
     }
 }
