@@ -36,6 +36,9 @@ namespace PluginFileReader.Plugin
         /// <returns></returns>
         public override Task<ConfigureResponse> Configure(ConfigureRequest request, ServerCallContext context)
         {
+            Logger.Debug("Got configure request");
+            Logger.Debug(JsonConvert.SerializeObject(request, Formatting.Indented));
+            
             // ensure all directories are created
             Directory.CreateDirectory(request.TemporaryDirectory);
             Directory.CreateDirectory(request.PermanentDirectory);
@@ -704,6 +707,7 @@ namespace PluginFileReader.Plugin
             }
 
             Logger.Info("Disconnected");
+            Logger.CloseAndFlush();
             return Task.FromResult(new DisconnectResponse());
         }
     }

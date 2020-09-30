@@ -166,5 +166,62 @@ namespace PluginFileReaderTest.Helper
             // cleanup
             File.Delete(files.First());
         }
+        
+        [Fact]
+        public void ConfigureTest()
+        {
+            var files = Directory.GetFiles(_logDirectory);
+            var newLogsPath = "newlogs";
+            var newFiles = Directory.GetFiles(newLogsPath);
+            
+            // setup
+            try
+            {
+                foreach (var file in files)
+                {
+                    File.Delete(file);
+                }
+                
+                foreach (var file in newFiles)
+                {
+                    File.Delete(file);
+                }
+            }
+            catch
+            {
+            }
+
+            Logger.Init(_logDirectory);
+            Logger.SetLogLevel(LogLevel.Error);
+
+            // act
+            Logger.Verbose("verbose");
+            Logger.Debug("debug");
+            Logger.Info("info");
+            Logger.Error(new Exception("error"), "error");
+
+
+            Logger.Init(newLogsPath);
+            Logger.Verbose("verbose");
+            Logger.Debug("debug");
+            Logger.Info("info");
+            Logger.Error(new Exception("error"), "error");
+            Logger.CloseAndFlush();
+
+            // assert
+            files = Directory.GetFiles(_logDirectory);
+            Assert.Single(files);
+            
+            newFiles = Directory.GetFiles(newLogsPath);
+            Assert.Single(newFiles);
+            
+            string[] lines = File.ReadAllLines(newFiles.First());
+
+            Assert.Equal(2, lines.Length);
+
+            // cleanup
+            File.Delete(files.First());
+            File.Delete(newFiles.First());
+        }
     }
 }
