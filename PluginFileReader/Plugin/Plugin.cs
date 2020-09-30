@@ -707,7 +707,6 @@ namespace PluginFileReader.Plugin
             }
 
             Logger.Info("Disconnected");
-            Logger.CloseAndFlush();
             return Task.FromResult(new DisconnectResponse());
         }
     }
