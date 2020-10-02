@@ -20,7 +20,7 @@ namespace PluginFileReader.API.Replication
             {
                 var column = new ReplicationColumn
                 {
-                    ColumnName = property.Id,
+                    ColumnName = property.Name,
                     DataType = $"VARCHAR({int.MaxValue})",
                     PrimaryKey = false
                 };

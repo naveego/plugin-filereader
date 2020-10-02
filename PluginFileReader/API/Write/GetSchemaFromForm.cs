@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Naveego.Sdk.Plugins;
@@ -24,9 +25,13 @@ namespace PluginFileReader.API.Write
             var properties = new List<Property>();
             foreach (var column in formData.Columns)
             {
+                if (properties.Exists(p => p.Id == column.Name))
+                {
+                    throw new Exception($"Duplicate column {column.Name} defined.");
+                }
+                
                 properties.Add(new Property
                 {
-                    // Id = $"{column.Name}{(string.IsNullOrWhiteSpace(column.DefaultValue) ? "" : $"_{column.DefaultValue}")}",
                     Id = column.Name,
                     Name = column.Name,
                     Type = PropertyType.String,
