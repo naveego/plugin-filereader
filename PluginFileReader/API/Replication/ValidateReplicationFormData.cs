@@ -29,6 +29,16 @@ namespace PluginFileReader.API.Replication
                 errors.Add("Version Record file name is empty.");
             }
 
+            if (string.IsNullOrWhiteSpace(data.NullValue))
+            {
+                data.NullValue = "";
+            }
+
+            if (string.IsNullOrWhiteSpace(data.CustomHeader))
+            {
+                data.CustomHeader = "";
+            }
+
             return errors;
         }
     }
