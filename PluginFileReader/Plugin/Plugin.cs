@@ -22,6 +22,8 @@ namespace PluginFileReader.Plugin
         private readonly ServerStatus _server;
 
         private TaskCompletionSource<bool> _tcs;
+        
+        private static readonly SemaphoreSlim DiscoverSemaphoreSlim = new SemaphoreSlim(1, 1);
 
         public Plugin()
         {
@@ -132,7 +134,7 @@ namespace PluginFileReader.Plugin
         /// <param name="request"></param>
         /// <param name="context"></param>
         /// <returns>Discovered schemas</returns>
-        public override Task<DiscoverSchemasResponse> DiscoverSchemas(DiscoverSchemasRequest request,
+        public override async Task<DiscoverSchemasResponse> DiscoverSchemas(DiscoverSchemasRequest request,
             ServerCallContext context)
         {
             Logger.SetLogPrefix("discover");
@@ -148,6 +150,8 @@ namespace PluginFileReader.Plugin
                 // get all schemas
                 try
                 {
+                    await DiscoverSemaphoreSlim.WaitAsync();
+                    
                     var files = _server.Settings.GetAllFilesByDirectory();
                     Logger.Info($"Schemas attempted: {files.Count}");
 
@@ -160,17 +164,23 @@ namespace PluginFileReader.Plugin
 
                     Logger.Info($"Schemas returned: {discoverSchemasResponse.Schemas.Count}");
 
-                    return Task.FromResult(discoverSchemasResponse);
+                    return discoverSchemasResponse;
                 }
                 catch (Exception e)
                 {
                     Logger.Error(e, e.Message, context);
-                    return Task.FromResult(new DiscoverSchemasResponse());
+                    return new DiscoverSchemasResponse();
+                }
+                finally
+                {
+                    DiscoverSemaphoreSlim.Release();
                 }
             }
 
             try
             {
+                await DiscoverSemaphoreSlim.WaitAsync();
+                
                 var refreshSchemas = request.ToRefresh;
 
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
@@ -201,12 +211,16 @@ namespace PluginFileReader.Plugin
 
                 // return all schemas 
                 Logger.Info($"Schemas returned: {discoverSchemasResponse.Schemas.Count}");
-                return Task.FromResult(discoverSchemasResponse);
+                return discoverSchemasResponse;
             }
             catch (Exception e)
             {
                 Logger.Error(e, e.Message, context);
-                return Task.FromResult(new DiscoverSchemasResponse());
+                return new DiscoverSchemasResponse();
+            }
+            finally
+            {
+                DiscoverSemaphoreSlim.Release();
             }
         }
 

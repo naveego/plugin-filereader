@@ -337,6 +337,64 @@ namespace PluginFileReaderTest.Plugin
         }
         
         [Fact]
+        public async Task DiscoverSchemasMultipleRequestsTest()
+        {
+            // setup
+            PrepareTestEnvironment();
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+            var client2 = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var request = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+                SampleSize = 10
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client2.Connect(connectRequest);
+            var responseAsync = client.DiscoverSchemasAsync(request);
+            var response2 = client2.DiscoverSchemasAsync(request);
+
+            // assert
+            var response = await responseAsync;
+            Assert.IsType<DiscoverSchemasResponse>(response);
+            Assert.Single(response.Schemas);
+
+            var schema = response.Schemas[0];
+            Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
+            Assert.Equal("ReadDirectory", schema.Name);
+            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            Assert.Equal(10, schema.Sample.Count);
+            Assert.Equal(6, schema.Properties.Count);
+            Assert.True(schema.PublisherMetaJson != "");
+
+            var property = schema.Properties[0];
+            Assert.Equal("id", property.Id);
+            Assert.Equal("id", property.Name);
+            Assert.Equal("", property.Description);
+            Assert.Equal(PropertyType.String, property.Type);
+            Assert.False(property.IsKey);
+            Assert.True(property.IsNullable);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
         public async Task DiscoverSchemasAllEmptyTest()
         {
             // setup
