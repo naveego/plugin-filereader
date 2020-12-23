@@ -1,8 +1,8 @@
-using PluginFileReader.API.CSV;
-using PluginFileReader.API.Excel;
 using PluginFileReader.API.Factory;
-using PluginFileReader.API.FixedWidthColumns;
-using PluginFileReader.Helper;
+using PluginFileReader.API.Factory.Implementations.AS400;
+using PluginFileReader.API.Factory.Implementations.Delimited;
+using PluginFileReader.API.Factory.Implementations.Excel;
+using PluginFileReader.API.Factory.Implementations.FixedWidthColumns;
 
 namespace PluginFileReader.API.Utility
 {
@@ -18,11 +18,13 @@ namespace PluginFileReader.API.Utility
             switch (mode)
             {
                 case Constants.DelimitedMode:
-                    return new CsvImportExportFactory();
+                    return new DelimitedImportExportFactory();
                 case Constants.FixedWidthMode:
                     return new FixedWidthColumnsFactory();
                 case Constants.ExcelMode:
                     return new ExcelImportExportFactory();
+                case Constants.AS400Mode:
+                    return new AS400ImportExportFactory();
                 default:
                     return null;
             }

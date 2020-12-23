@@ -164,6 +164,33 @@ namespace PluginFileReader.Helper
                 }
             }
         }
+        
+        /// <summary>
+        /// Reads the columns configuration files if defined on each RootPath and populates the columns property
+        /// </summary>
+        public void ReconcileAS400FormatsFiles()
+        {
+            if (RootPaths == null)
+            {
+                RootPaths = new List<RootPathObject>();
+            }
+            
+            var serializer = new JsonSerializer();
+            
+            // apply config files
+            foreach (var rootPath in RootPaths)
+            {
+                if (rootPath.Mode == Constants.AS400Mode)
+                {
+                    // apply local config file
+                    if (!string.IsNullOrWhiteSpace(rootPath.AS400Settings.AS400FormatsConfigurationFile))
+                    {
+                        using var file = File.OpenText(rootPath.AS400Settings.AS400FormatsConfigurationFile);
+                        rootPath.AS400Settings.Formats = (List<AS400Format>) serializer.Deserialize(file, typeof(List<AS400Format>));
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Checks if RootPaths are directories
@@ -295,6 +322,9 @@ namespace PluginFileReader.Helper
         // LEGACY EXCEL FILE MODE SETTINGS
         public string ExcelColumns { get; set; }
         public List<ExcelCell> ExcelCells { get; set; }
+        
+        // AS400 MODE SETTINGS
+        public AS400Settings AS400Settings { get; set; }
     }
 
     public class DelimitedSettings
@@ -348,10 +378,19 @@ namespace PluginFileReader.Helper
         }
     }
 
+    public class AS400Settings
+    {
+        public string AS400FormatsConfigurationFile { get; set; }
+        public int KeyValueWidth { get; set; }
+        public List<AS400Format> Formats { get; set; }
+    }
+
     public class Column
     {
         public string ColumnName { get; set; }
         public bool IsKey { get; set; }
+        public bool IsHeader { get; set; }
+        public bool IsGlobalHeader { get; set; }
         public int ColumnStart { get; set; }
         public int ColumnEnd { get; set; }
         public bool TrimWhitespace { get; set; }
@@ -367,5 +406,38 @@ namespace PluginFileReader.Helper
         {
             return $"{ColumnName}_{RowIndex}_{ColumnIndex}";
         }
+    }
+    
+    public class AS400Format
+    {
+        public AS400KeyValue KeyValue { get; set; } 
+        public bool SingleRecordPerLine { get; set; }
+        public bool IsGlobalHeader { get; set; }
+        // single line definition
+        public List<Column> Columns { get; set; }
+        
+        // if multiline definition 
+        public AS400MultiLineDefinition MultiLineDefinition { get; set; }
+        public List<string> HeaderRecordKeys { get; set; } 
+        public List<Column> MultiLineColumns { get; set; } 
+    }
+    
+    public class AS400KeyValue
+    {
+        // TODO evaluate if needed
+        // public int ColumnStart { get; set; }
+        // public int ColumnEnd { get; set; }
+        public string Value { get; set; } 
+        public string Name { get; set; } 
+    }
+    
+    public class AS400MultiLineDefinition
+    {
+        public int TagNameStart { get; set; }
+        public int TagNameEnd { get; set; }
+        public char TagNameDelimiter { get; set; }
+        public int ValueLengthStart { get; set; }
+        public int ValueLengthEnd { get; set; }
+        public int ValueStart { get; set; }
     }
 }

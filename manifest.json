@@ -49,7 +49,8 @@
             "Mode",
             "DelimitedSettings",
             "FixedWidthSettings",
-            "ExcelModeSettings"
+            "ExcelModeSettings",
+            "AS400Settings"
           ],
           "DelimitedSettings": {
             "ui:order": [
@@ -87,6 +88,68 @@
                   "ColumnIndex",
                   "RowIndex"
                 ]
+              }
+            }
+          },
+          "AS400Settings": {
+            "ui:order": [
+              "AS400FormatsConfigurationFile",
+              "KeyValueWidth",
+              "Formats"
+            ],
+            "Formats": {
+              "items": {
+                "ui:order": [
+                  "KeyValue",
+                  "IsGlobalHeader",
+                  "SingleRecordPerLine",
+                  "Columns",
+                  "MultiLineDefinition",
+                  "HeaderRecordKeys",
+                  "MultiLineColumns"
+                ],
+                "KeyValue": {
+                  "ui:order": [
+                    "Value",
+                    "Name"
+                  ]
+                },
+                "Columns": {
+                  "items": {
+                    "ui:order": [
+                      "ColumnName",
+                      "IsKey",
+                      "TrimWhitespace",
+                      "ColumnStart",
+                      "ColumnEnd",
+                      "IsGlobalHeader",
+                      "IsHeader"
+                    ]
+                  }
+                },
+                "MultiLineDefinition": {
+                  "ui:order": [
+                    "TagNameDelimiter",
+                    "TagNameStart",
+                    "TagNameEnd",
+                    "ValueLengthStart",
+                    "ValueLengthEnd",
+                    "ValueStart"
+                  ]
+                },
+                "MultiLineColumns": {
+                  "items": {
+                    "ui:order": [
+                      "ColumnName",
+                      "IsKey",
+                      "TrimWhitespace",
+                      "ColumnStart",
+                      "ColumnEnd",
+                      "IsGlobalHeader",
+                      "IsHeader"
+                    ]
+                  }
+                }
               }
             }
           }
@@ -162,7 +225,8 @@
                 "enum": [
                   "Delimited",
                   "Fixed Width Columns",
-                  "Excel"
+                  "Excel",
+                  "AS400"
                 ]
               }
             },
@@ -328,6 +392,245 @@
                                 "ColumnIndex",
                                 "RowIndex"
                               ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "Mode": {
+                        "enum": [
+                          "AS400"
+                        ]
+                      },
+                      "AS400Settings": {
+                        "type": "object",
+                        "title": "AS400 Settings",
+                        "properties": {
+                          "AS400FormatsConfigurationFile": {
+                            "type": "string",
+                            "title": "AS400 Formats Configuration File",
+                            "description": "Path to the columns configuration file for fixed width files (optional and recommended)",
+                            "default": ""
+                          },
+                          "KeyValueWidth": {
+                            "title": "Key Value Width",
+                            "description": "The number of characters the key value uses from the start of each line.",
+                            "type": "number",
+                            "default": 2
+                          },
+                          "Formats": {
+                            "readOnly": false,
+                            "type": "array",
+                            "title": "AS400 Formats",
+                            "description": "Formats that can be found in the AS400 files.",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "SingleRecordPerLine": {
+                                  "type": "boolean",
+                                  "title": "Single Record Per Line",
+                                  "description": "Is this format contained on a single line?",
+                                  "default": false,
+                                  "examples": [
+                                    true
+                                  ]
+                                },
+                                "IsGlobalHeader": {
+                                  "type": "boolean",
+                                  "title": "Is Global Header",
+                                  "description": "Is this format part of the global header information?",
+                                  "default": false,
+                                  "examples": [
+                                    true
+                                  ]
+                                },
+                                "Columns": {
+                                  "readOnly": false,
+                                  "type": "array",
+                                  "title": "Single Line Columns",
+                                  "description": "Columns for single line formats",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "ColumnName": {
+                                        "title": "Column Name",
+                                        "description": "The name of the column.",
+                                        "type": "string"
+                                      },
+                                      "ColumnStart": {
+                                        "title": "Column Start",
+                                        "description": "The index of the first character of the column (0 is the first index).",
+                                        "type": "number"
+                                      },
+                                      "ColumnEnd": {
+                                        "title": "Column End",
+                                        "description": "The index of the last character of the column.",
+                                        "type": "number"
+                                      },
+                                      "IsKey": {
+                                        "title": "Is Key",
+                                        "description": "Is this column the key property?",
+                                        "default": false,
+                                        "type": "boolean"
+                                      },
+                                      "TrimWhitespace": {
+                                        "title": "Trim Whitespace",
+                                        "description": "Trim all leading and trailing whitespace?",
+                                        "default": false,
+                                        "type": "boolean"
+                                      },
+                                      "IsGlobalHeader": {
+                                        "type": "boolean",
+                                        "title": "Is Global Header",
+                                        "description": "Is this column part of the global header information?",
+                                        "default": false,
+                                        "examples": [
+                                          true
+                                        ]
+                                      },
+                                      "IsHeader": {
+                                        "type": "boolean",
+                                        "title": "Is Header",
+                                        "description": "Is this column part of the header information?",
+                                        "default": false,
+                                        "examples": [
+                                          true
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "ColumnName",
+                                      "ColumnStart",
+                                      "ColumnEnd"
+                                    ]
+                                  }
+                                },
+                                "KeyValue": {
+                                  "type": "object",
+                                  "title": "AS400 Key Value",
+                                  "properties": {
+                                    "Value": {
+                                      "title": "Value",
+                                      "description": "The value of the key.",
+                                      "type": "string"
+                                    },
+                                    "Name": {
+                                      "title": "Name",
+                                      "description": "The name of the key.",
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "MultiLineDefinition": {
+                                  "type": "object",
+                                  "title": "AS400 Multi Line Definition",
+                                  "properties": {
+                                    "TagNameDelimiter": {
+                                      "title": "Tag Name Delimiter",
+                                      "description": "The delimiter of the tag name.",
+                                      "type": "string"
+                                    },
+                                    "TagNameStart": {
+                                      "title": "Tag Name Start",
+                                      "description": "The starting index of the tag name.",
+                                      "type": "number"
+                                    },
+                                    "TagNameEnd": {
+                                      "title": "Tag Name End",
+                                      "description": "The ending index of the tag name.",
+                                      "type": "number"
+                                    },
+                                    "ValueLengthStart": {
+                                      "title": "Value Length Start",
+                                      "description": "The starting index of the value length.",
+                                      "type": "number"
+                                    },
+                                    "ValueLengthEnd": {
+                                      "title": "Value Length End",
+                                      "description": "The ending index of the value length.",
+                                      "type": "number"
+                                    },
+                                    "ValueStart": {
+                                      "title": "ValueStart",
+                                      "description": "The starting indec of the value",
+                                      "type": "number"
+                                    }
+                                  }
+                                },
+                                "HeaderRecordKeys": {
+                                  "readOnly": false,
+                                  "type": "array",
+                                  "title": "Header Record Keys",
+                                  "description": "Keys that indicate header values",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "MultiLineColumns": {
+                                  "readOnly": false,
+                                  "type": "array",
+                                  "title": "Multi Line Columns",
+                                  "description": "Columns for multi line formats",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "ColumnName": {
+                                        "title": "Column Name",
+                                        "description": "The name of the column.",
+                                        "type": "string"
+                                      },
+                                      "ColumnStart": {
+                                        "title": "Column Start",
+                                        "description": "The index of the first character of the column (0 is the first index).",
+                                        "type": "number"
+                                      },
+                                      "ColumnEnd": {
+                                        "title": "Column End",
+                                        "description": "The index of the last character of the column.",
+                                        "type": "number"
+                                      },
+                                      "IsKey": {
+                                        "title": "Is Key",
+                                        "description": "Is this column the key property?",
+                                        "default": false,
+                                        "type": "boolean"
+                                      },
+                                      "TrimWhitespace": {
+                                        "title": "Trim Whitespace",
+                                        "description": "Trim all leading and trailing whitespace?",
+                                        "default": false,
+                                        "type": "boolean"
+                                      },
+                                      "IsGlobalHeader": {
+                                        "type": "boolean",
+                                        "title": "Is Global Header",
+                                        "description": "Is this column part of the global header information?",
+                                        "default": false,
+                                        "examples": [
+                                          true
+                                        ]
+                                      },
+                                      "IsHeader": {
+                                        "type": "boolean",
+                                        "title": "Is Header",
+                                        "description": "Is this column part of the header information?",
+                                        "default": false,
+                                        "examples": [
+                                          true
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "ColumnName",
+                                      "ColumnStart",
+                                      "ColumnEnd"
+                                    ]
+                                  }
+                                }
+                              }
                             }
                           }
                         }

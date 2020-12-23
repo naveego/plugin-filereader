@@ -12,12 +12,22 @@ namespace PluginFileReader.API.Discover
 {
     public static partial class Discover
     {
-        public static Schema GetSchemaForDirectory(IImportExportFactory factory, RootPathObject rootPath, List<string> paths,
+        public static IEnumerable<Schema> GetSchemasForDirectory(IImportExportFactory factory, RootPathObject rootPath, List<string> paths,
             int sampleSize = 5)
         {
             if (paths.Count == 0)
             {
-                return null;
+                return new List<Schema>();
+            }
+            
+            if (sampleSize == 0)
+            {
+                sampleSize = 5;
+            }
+            
+            if (factory.CustomDiscover)
+            {
+                return factory.MakeDiscoverer().DiscoverSchemas(factory, rootPath, paths, sampleSize);
             }
             
             var schemaName = Constants.SchemaName;
@@ -32,11 +42,6 @@ namespace PluginFileReader.API.Discover
             
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
-            if (sampleSize == 0)
-            {
-                sampleSize = 5;
-            }
-            
             Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths.Take(1).ToList(), sampleSize);
             
             var schema = new Schema
@@ -51,7 +56,10 @@ namespace PluginFileReader.API.Discover
             schema = GetSchemaForQuery(schema, sampleSize, rootPath?.FixedWidthSettings?.Columns);
             schema.PublisherMetaJson = JsonConvert.SerializeObject(publisherMetaJson);
 
-            return schema;
+            return new List<Schema>
+            {
+                schema
+            };
         }
     }
 }

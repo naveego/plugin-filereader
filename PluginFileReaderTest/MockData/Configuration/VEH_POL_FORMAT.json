@@ -1,0 +1,1345 @@
+[
+  {
+    "KeyValue": {
+      "Value": "10",
+      "Name": null
+    },
+    "SingleRecordPerLine": true,
+    "IsGlobalHeader": true,
+    "Columns": [
+      {
+        "ColumnName": "Policy Company",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 2,
+        "ColumnEnd": 3,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy Number",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 4,
+        "ColumnEnd": 19,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy Company Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 20,
+        "ColumnEnd": 59,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Transaction Date",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 60,
+        "ColumnEnd": 66,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Renewal Policy Number",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 67,
+        "ColumnEnd": 3,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent Number",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 83,
+        "ColumnEnd": 88,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 89,
+        "ColumnEnd": 128,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent Address Line 1",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 129,
+        "ColumnEnd": 168,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent Address Line 2",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 169,
+        "ColumnEnd": 208,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent City",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 209,
+        "ColumnEnd": 238,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent State",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 239,
+        "ColumnEnd": 240,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent Zip Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 241,
+        "ColumnEnd": 249,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent Commission",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 250,
+        "ColumnEnd": 252,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent Applies Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 253,
+        "ColumnEnd": 253,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Audit Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 254,
+        "ColumnEnd": 254,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "New York Free Trade Zone",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 255,
+        "ColumnEnd": 255,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "A Rate Company",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 256,
+        "ColumnEnd": 256,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Currency Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 257,
+        "ColumnEnd": 259,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Branch Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 260,
+        "ColumnEnd": 261,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy Effective Date",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 262,
+        "ColumnEnd": 269,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy Expiration Date",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 270,
+        "ColumnEnd": 277,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Product Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 278,
+        "ColumnEnd": 280,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy Aggregate",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 281,
+        "ColumnEnd": 288,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Excess Policy Indicator",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 289,
+        "ColumnEnd": 289,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Prime Carrier Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 290,
+        "ColumnEnd": 329,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Prime Carrier Limits",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 330,
+        "ColumnEnd": 337,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Form Type",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 338,
+        "ColumnEnd": 338,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy Transaction",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 339,
+        "ColumnEnd": 339,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Cancellation Date",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 340,
+        "ColumnEnd": 346,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Parent Company",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 347,
+        "ColumnEnd": 348,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "System Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 349,
+        "ColumnEnd": 349,
+        "TrimWhitespace": true
+      }
+    ],
+    "MultiLineDefinition": null,
+    "HeaderRecordKeys": null,
+    "MultiLineColumns": null
+  },
+  {
+    "KeyValue": {
+      "Value": "11",
+      "Name": null
+    },
+    "SingleRecordPerLine": true,
+    "IsGlobalHeader": true,
+    "Columns": [
+      {
+        "ColumnName": "Endorsement Number",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 2,
+        "ColumnEnd": 5,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Entity",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 6,
+        "ColumnEnd": 6,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 7,
+        "ColumnEnd": 46,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account Address Line 1",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 47,
+        "ColumnEnd": 86,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account Address Line 2",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 87,
+        "ColumnEnd": 126,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account City",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 127,
+        "ColumnEnd": 156,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account State",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 157,
+        "ColumnEnd": 158,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account Zip Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 159,
+        "ColumnEnd": 167,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "DBA Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 168,
+        "ColumnEnd": 212,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account Number",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 213,
+        "ColumnEnd": 221,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "New Renewal Dec",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 222,
+        "ColumnEnd": 222,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Business Description",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 223,
+        "ColumnEnd": 291,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy State",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 292,
+        "ColumnEnd": 293,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Total Policy Premium",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 294,
+        "ColumnEnd": 318,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Group Profile",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 319,
+        "ColumnEnd": 328,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "User Profile",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 329,
+        "ColumnEnd": 338,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Current Date",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 339,
+        "ColumnEnd": 345,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Bill Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 346,
+        "ColumnEnd": 347,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Reporting Period",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 348,
+        "ColumnEnd": 348,
+        "TrimWhitespace": true
+      }
+    ],
+    "MultiLineDefinition": null,
+    "HeaderRecordKeys": null,
+    "MultiLineColumns": null
+  },
+  {
+    "KeyValue": {
+      "Value": "12",
+      "Name": null
+    },
+    "SingleRecordPerLine": true,
+    "IsGlobalHeader": true,
+    "Columns": [
+      {
+        "ColumnName": "Language",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 2,
+        "ColumnEnd": 11,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Transaction Effective Date Edited",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 12,
+        "ColumnEnd": 19,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Transaction Effective Date Numeric",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 20,
+        "ColumnEnd": 26,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Authorized Representative Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 27,
+        "ColumnEnd": 66,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Auth Rep Address Line 1",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 67,
+        "ColumnEnd": 106,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Auth Rep Address Line 2",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 107,
+        "ColumnEnd": 146,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Auth Rep City",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 147,
+        "ColumnEnd": 171,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Auth Rep State",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 172,
+        "ColumnEnd": 173,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Auth Rep Zip Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 174,
+        "ColumnEnd": 182,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Surplus Lines Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 183,
+        "ColumnEnd": 222,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Surplus Lines Company",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 223,
+        "ColumnEnd": 262,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Surplus Lines Address Line 1",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 263,
+        "ColumnEnd": 302,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Surplus Lines Address Line 2",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 303,
+        "ColumnEnd": 342,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "WAIVCOL Coverage Codes Counter",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 343,
+        "ColumnEnd": 345,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "CGLB Line of Business Counter",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 346,
+        "ColumnEnd": 348,
+        "TrimWhitespace": true
+      }
+    ],
+    "MultiLineDefinition": null,
+    "HeaderRecordKeys": null,
+    "MultiLineColumns": null
+  },
+  {
+    "KeyValue": {
+      "Value": "13",
+      "Name": null
+    },
+    "SingleRecordPerLine": true,
+    "IsGlobalHeader": true,
+    "Columns": [
+      {
+        "ColumnName": "Surplus Lines City",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 2,
+        "ColumnEnd": 41,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Countersigning Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 42,
+        "ColumnEnd": 81,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Countersigning Company",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 82,
+        "ColumnEnd": 121,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Countersign Address Line 1",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 122,
+        "ColumnEnd": 161,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Countersign Address Line 2",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 162,
+        "ColumnEnd": 201,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Countersign City",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 202,
+        "ColumnEnd": 241,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account Executive Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 242,
+        "ColumnEnd": 281,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account Executive Title",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 282,
+        "ColumnEnd": 321,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Effective Time",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 322,
+        "ColumnEnd": 326,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "TUX Switch",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 327,
+        "ColumnEnd": 327,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Blanket Policy",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 328,
+        "ColumnEnd": 328,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "New Renewal Verbiage",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 329,
+        "ColumnEnd": 343,
+        "TrimWhitespace": true
+      }
+    ],
+    "MultiLineDefinition": null,
+    "HeaderRecordKeys": null,
+    "MultiLineColumns": null
+  },
+  {
+    "KeyValue": {
+      "Value": "14",
+      "Name": null
+    },
+    "SingleRecordPerLine": true,
+    "IsGlobalHeader": true,
+    "Columns": [
+      {
+        "ColumnName": "Division Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 2,
+        "ColumnEnd": 41,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Surplus Lines Applicable",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 42,
+        "ColumnEnd": 42,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Countersigning Agent Applicable 14",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 43,
+        "ColumnEnd": 43,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Miscellaneous Field 1",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 44,
+        "ColumnEnd": 53,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Miscellaneous Field 2",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 54,
+        "ColumnEnd": 63,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account Address Line 3",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 64,
+        "ColumnEnd": 103,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Account Address Line 4",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 104,
+        "ColumnEnd": 143,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent Address Line 3",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 144,
+        "ColumnEnd": 183,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Number of Copies Other",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 184,
+        "ColumnEnd": 185,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Number of Copies Mortgagor",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 186,
+        "ColumnEnd": 187,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Number of Copies Loss Payee",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 188,
+        "ColumnEnd": 189,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy Transaction Date",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 190,
+        "ColumnEnd": 197,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "User Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 198,
+        "ColumnEnd": 227,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Product Description",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 228,
+        "ColumnEnd": 267,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy Effective Date Long",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 268,
+        "ColumnEnd": 285,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy Expiration Date Long",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 286,
+        "ColumnEnd": 303,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Transaction Effective Date",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 304,
+        "ColumnEnd": 321,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Policy Transaction Date Long",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 322,
+        "ColumnEnd": 339,
+        "TrimWhitespace": true
+      }
+    ],
+    "MultiLineDefinition": null,
+    "HeaderRecordKeys": null,
+    "MultiLineColumns": null
+  },
+  {
+    "KeyValue": {
+      "Value": "15",
+      "Name": null
+    },
+    "SingleRecordPerLine": true,
+    "IsGlobalHeader": true,
+    "Columns": [
+      {
+        "ColumnName": "Currency Description",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 2,
+        "ColumnEnd": 21,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Current Date Long",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 22,
+        "ColumnEnd": 39,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Countersigning Agent Applicable 15",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 40,
+        "ColumnEnd": 41,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Cabinet Name",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 41,
+        "ColumnEnd": 50,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "GCE",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 51,
+        "ColumnEnd": 54,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Agent Code",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 55,
+        "ColumnEnd": 57,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Client Number",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 58,
+        "ColumnEnd": 67,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Submission Number",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 68,
+        "ColumnEnd": 77,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Status",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 78,
+        "ColumnEnd": 78,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Nbr of Submissions",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 79,
+        "ColumnEnd": 80,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Original Policy Tran Date",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 81,
+        "ColumnEnd": 87,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "Email Indicator",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": true,
+        "ColumnStart": 88,
+        "ColumnEnd": 88,
+        "TrimWhitespace": true
+      }
+    ],
+    "MultiLineDefinition": null,
+    "HeaderRecordKeys": null,
+    "MultiLineColumns": null
+  },
+  {
+    "KeyValue": {
+      "Value": "25",
+      "Name": "VEH_POL"
+    },
+    "SingleRecordPerLine": false,
+    "IsGlobalHeader": false,
+    "Columns": null,
+    "MultiLineDefinition": {
+      "TagNameStart": 2,
+      "TagNameEnd": 33,
+      "TagNameDelimiter": ".",
+      "ValueLengthStart": 34,
+      "ValueLengthEnd": 38,
+      "ValueStart": 39
+    },
+    "HeaderRecordKeys": [
+      "VEH",
+      "ID"
+    ],
+    "MultiLineColumns": [
+      {
+        "ColumnName": "VEH.NUM",
+        "IsKey": true,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "VEH.YR",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "VEH.MK",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "VEH.MD",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "VEH.CC",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "VEH.DRVR.DOB",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "VEH.VIN",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "VEH.TERR",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "VEH.TOWN",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "VEH.STATE",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "VEH.CLASS",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "ID.YEAR",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "ID.MAKE",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "ID.MODEL",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "ID.VIN",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "ID.STATE",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "ID.EFFECTIVE",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "ID.EXPIRE",
+        "IsKey": false,
+        "IsHeader": true,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "COVCODE",
+        "IsKey": true,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "PREM",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "LIMIT",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "AGG.LIMIT",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "DED",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "MEP",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "COIN",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "CLASS",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "TERR",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "SCHMOD",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "EFF.DT",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "EXP.DT",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      },
+      {
+        "ColumnName": "DESC",
+        "IsKey": false,
+        "IsHeader": false,
+        "IsGlobalHeader": false,
+        "ColumnStart": 0,
+        "ColumnEnd": 0,
+        "TrimWhitespace": true
+      }
+    ]
+  }
+]
