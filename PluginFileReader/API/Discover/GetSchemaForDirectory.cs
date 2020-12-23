@@ -48,7 +48,7 @@ namespace PluginFileReader.API.Discover
                 Properties = {},
             };
 
-            schema = GetSchemaForQuery(schema, sampleSize, rootPath.Columns);
+            schema = GetSchemaForQuery(schema, sampleSize, rootPath?.FixedWidthSettings?.Columns);
             schema.PublisherMetaJson = JsonConvert.SerializeObject(publisherMetaJson);
 
             return schema;

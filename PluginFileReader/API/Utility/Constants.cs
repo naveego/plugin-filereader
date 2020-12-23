@@ -29,6 +29,11 @@ namespace PluginFileReader.API.Utility
         public static string ReplicationMetaDataReplicatedShapeId = "NaveegoShapeId";
         public static string ReplicationMetaDataReplicatedShapeName = "NaveegoShapeName";
         public static string ReplicationMetaDataTimestamp = "Timestamp";
+
+        public const string DelimitedMode = "Delimited";
+        public const string FixedWidthMode = "Fixed Width Columns";
+        public const string ExcelMode = "Excel";
+        public const string AS400Mode = "AS400";
         
         public static List<ReplicationColumn> ReplicationMetaDataColumns = new List<ReplicationColumn>
         {

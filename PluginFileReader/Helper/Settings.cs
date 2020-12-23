@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using PluginFileReader.API.Utility;
 
 namespace PluginFileReader.Helper
 {
@@ -143,20 +144,23 @@ namespace PluginFileReader.Helper
             // apply config files
             foreach (var rootPath in RootPaths)
             {
-                // apply global config file
-                var indexName = string.IsNullOrWhiteSpace(rootPath.Name)
-                    ? new DirectoryInfo(rootPath.RootPath).Name
-                    : rootPath.Name;
-                if (globalConfigurationColumns.ContainsKey(indexName))
+                if (rootPath.Mode == Constants.FixedWidthMode)
                 {
-                    rootPath.Columns = globalConfigurationColumns[indexName];
-                }
+                    // apply global config file
+                    var indexName = string.IsNullOrWhiteSpace(rootPath.Name)
+                        ? new DirectoryInfo(rootPath.RootPath).Name
+                        : rootPath.Name;
+                    if (globalConfigurationColumns.ContainsKey(indexName))
+                    {
+                        rootPath.FixedWidthSettings.Columns = globalConfigurationColumns[indexName];
+                    }
 
-                // apply local config file
-                if (!string.IsNullOrWhiteSpace(rootPath.ColumnsConfigurationFile))
-                {
-                    using var file = File.OpenText(rootPath.ColumnsConfigurationFile);
-                    rootPath.Columns = (List<Column>) serializer.Deserialize(file, typeof(List<Column>));
+                    // apply local config file
+                    if (!string.IsNullOrWhiteSpace(rootPath.FixedWidthSettings.ColumnsConfigurationFile))
+                    {
+                        using var file = File.OpenText(rootPath.FixedWidthSettings.ColumnsConfigurationFile);
+                        rootPath.FixedWidthSettings.Columns = (List<Column>) serializer.Deserialize(file, typeof(List<Column>));
+                    }
                 }
             }
         }
@@ -186,6 +190,49 @@ namespace PluginFileReader.Helper
         {
             return GetAllFiles().Count != 0;
         }
+        
+        /// <summary>
+        /// Adds legacy config support
+        /// </summary>
+        public void ConvertLegacySettings()
+        {
+            if (RootPaths != null)
+            {
+                foreach (var rootPath in RootPaths)
+                {
+                    if (rootPath.Mode == Constants.DelimitedMode && rootPath.DelimitedSettings == null)
+                    {
+                        rootPath.DelimitedSettings = new DelimitedSettings
+                        {
+                            Delimiter = rootPath.Delimiter,
+                            HasHeader = rootPath.HasHeader
+                        };
+                        continue;
+                    }
+
+                    if (rootPath.Mode == Constants.FixedWidthMode && rootPath.FixedWidthSettings == null)
+                    {
+                        rootPath.FixedWidthSettings = new FixedWidthSettings
+                        {
+                            Columns = rootPath.Columns,
+                            ColumnsConfigurationFile = rootPath.ColumnsConfigurationFile
+                        };
+                        continue;    
+                    }
+
+                    if (rootPath.Mode == Constants.ExcelMode && rootPath.ExcelModeSettings == null)
+                    {
+                        rootPath.ExcelModeSettings = new ExcelModeSettings
+                        {
+                            ExcelCells = rootPath.ExcelCells,
+                            ExcelColumns = rootPath.ExcelColumns,
+                            HasHeader = rootPath.HasHeader
+                        };
+                        continue;
+                    }
+                }
+            }
+        }
 
         private bool ModeIsSetOnAllRootPaths()
         {
@@ -204,9 +251,9 @@ namespace PluginFileReader.Helper
         {
             foreach (var rootPath in RootPaths)
             {
-                if (rootPath.Mode == "Fixed Width Columns")
+                if (rootPath.Mode == Constants.FixedWidthMode)
                 {
-                    if (rootPath.Columns.Count == 0)
+                    if (rootPath.FixedWidthSettings.Columns.Count == 0)
                     {
                         throw new Exception(
                             $"{rootPath.RootPath} is set to Fixed Width Columns and has no Columns defined");
@@ -223,24 +270,38 @@ namespace PluginFileReader.Helper
         public string RootPath { get; set; }
         public string Filter { get; set; }
         public string Name { get; set; }
-        public string Mode { get; set; }
         public string CleanupAction { get; set; }
         public string ArchivePath { get; set; }
+        public string Mode { get; set; }
         public int SkipLines { get; set; }
 
-        // FLAT FILE MODE SETTINGS
+        // DELIMITED MODE SETTINGS
+        public DelimitedSettings DelimitedSettings {get; set; }
+        
+        // LEGACY DELIMITED MODE SETTINGS
         public bool HasHeader { get; set; }
         public string Delimiter { get; set; }
+        
+        // FIXED WIDTH MODE SETTINGS
+        public FixedWidthSettings FixedWidthSettings { get; set; }
 
-        // FIXED COLUMN WIDTH MODE SETTINGS
+        // LEGACY COLUMN WIDTH MODE SETTINGS
         public string ColumnsConfigurationFile { get; set; }
         public List<Column> Columns { get; set; }
 
         // EXCEL FILE MODE SETTINGS
+        public ExcelModeSettings ExcelModeSettings { get; set; }
+        
+        // LEGACY EXCEL FILE MODE SETTINGS
         public string ExcelColumns { get; set; }
         public List<ExcelCell> ExcelCells { get; set; }
+    }
 
-
+    public class DelimitedSettings
+    {
+        public bool HasHeader { get; set; }
+        public string Delimiter { get; set; }
+        
         public char GetDelimiter()
         {
             switch (Delimiter)
@@ -251,7 +312,20 @@ namespace PluginFileReader.Helper
                     return char.Parse(Delimiter);
             }
         }
+    }
 
+    public class FixedWidthSettings
+    {
+        public string ColumnsConfigurationFile { get; set; }
+        public List<Column> Columns { get; set; }
+    }
+
+    public class ExcelModeSettings
+    {
+        public bool HasHeader { get; set; }
+        public string ExcelColumns { get; set; }
+        public List<ExcelCell> ExcelCells { get; set; }
+        
         public List<int> GetAllExcelColumnIndexes()
         {
             if (string.IsNullOrWhiteSpace(ExcelColumns))
@@ -265,7 +339,7 @@ namespace PluginFileReader.Helper
                 .SelectMany(x => Enumerable.Range(x.First, x.Last - x.First + 1))
                 .OrderBy(z => z).ToList();
         }
-
+        
         public List<ExcelCell> GetOrderedExcelCells()
         {
             return ExcelCells != null

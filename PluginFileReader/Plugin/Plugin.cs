@@ -72,6 +72,7 @@ namespace PluginFileReader.Plugin
             try
             {
                 _server.Settings = JsonConvert.DeserializeObject<Settings>(request.SettingsJson);
+                _server.Settings.ConvertLegacySettings();
                 _server.Settings.ReconcileColumnsConfigurationFiles();
                 _server.Settings.Validate();
             }

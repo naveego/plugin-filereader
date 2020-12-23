@@ -17,11 +17,11 @@ namespace PluginFileReader.API.Utility
         {
             switch (mode)
             {
-                case "Delimited":
+                case Constants.DelimitedMode:
                     return new CsvImportExportFactory();
-                case "Fixed Width Columns":
+                case Constants.FixedWidthMode:
                     return new FixedWidthColumnsFactory();
-                case "Excel":
+                case Constants.ExcelMode:
                     return new ExcelImportExportFactory();
                 default:
                     return null;

@@ -37,7 +37,7 @@ namespace PluginFileReader.API.CSV
             SQLDatabaseConnection = sqlDatabaseConnection;
             TableName = tableName;
             SchemaName = schemaName;
-            Delimiter = rootPath.GetDelimiter();
+            Delimiter = rootPath.DelimitedSettings.GetDelimiter();
         }
         
         public CsvImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, ConfigureReplicationFormData replicationFormData)
@@ -158,7 +158,7 @@ namespace PluginFileReader.API.CSV
                     foreach (string field in CsvReader.Fields)
                     {
                         columnCount++;
-                        if (rootPath.HasHeader)
+                        if (rootPath.DelimitedSettings.HasHeader)
                         {
                             if (headerColumns.Contains(field))
                             {
@@ -248,7 +248,7 @@ namespace PluginFileReader.API.CSV
                     CsvReader.SkipLines = rootPath.SkipLines;
 
                     //Skip the header line.
-                    if (rootPath.HasHeader)
+                    if (rootPath.DelimitedSettings.HasHeader)
                         CsvReader.SkipLines += 1;
 
                     var trans = SQLDatabaseConnection.BeginTransaction();

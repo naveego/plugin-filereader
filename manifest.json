@@ -33,16 +33,61 @@
   },
   "configSchema": {
     "ui": {
-      "ui:order": ["GlobalColumnsConfigurationFile","RootPaths"],
+      "ui:order": [
+        "GlobalColumnsConfigurationFile",
+        "RootPaths"
+      ],
       "RootPaths": {
         "items": {
-          "ui:order": ["RootPath", "Filter", "Name", "CleanupAction", "ArchivePath", "Mode", "SkipLines", "Delimiter", "HasHeader", "ExcelColumns", "ExcelCells", "ColumnsConfigurationFile", "Columns"],
-          "Columns": {
-            "items": {
-              "ui:order": ["ColumnName", "IsKey", "TrimWhitespace", "ColumnStart", "ColumnEnd"]
-            },
+          "ui:order": [
+            "RootPath",
+            "Filter",
+            "Name",
+            "CleanupAction",
+            "ArchivePath",
+            "SkipLines",
+            "Mode",
+            "DelimitedSettings",
+            "FixedWidthSettings",
+            "ExcelModeSettings"
+          ],
+          "DelimitedSettings": {
+            "ui:order": [
+              "Delimiter",
+              "HasHeader"
+            ]
+          },
+          "FixedWidthSettings": {
+            "ui:order": [
+              "ColumnsConfigurationFile",
+              "Columns"
+            ],
+            "Columns": {
+              "items": {
+                "ui:order": [
+                  "ColumnName",
+                  "IsKey",
+                  "TrimWhitespace",
+                  "ColumnStart",
+                  "ColumnEnd"
+                ]
+              }
+            }
+          },
+          "ExcelModeSettings": {
+            "ui:order": [
+              "HasHeader",
+              "ExcelColumns",
+              "ExcelCells"
+            ],
             "ExcelCells": {
-              "ui:order": ["ColumnName", "ColumnIndex", "RowIndex"]
+              "items": {
+                "ui:order": [
+                  "ColumnName",
+                  "ColumnIndex",
+                  "RowIndex"
+                ]
+              }
             }
           }
         }
@@ -61,7 +106,7 @@
           "title": "Root Paths",
           "description": "The folder(s) containing the files.",
           "type": "array",
-          "minItems": 0,
+          "minItems": 1,
           "items": {
             "type": "object",
             "properties": {
@@ -85,37 +130,23 @@
                 "title": "Cleanup Action",
                 "description": "Action taken to clean up after reading.",
                 "default": "Nothing",
-                "examples": ["string"],
-                "enum": ["Nothing", "Delete", "Archive"]
+                "examples": [
+                  "string"
+                ],
+                "enum": [
+                  "Nothing",
+                  "Delete",
+                  "Archive"
+                ]
               },
               "ArchivePath": {
                 "type": "string",
                 "title": "Archive Folder",
                 "description": "The folder to move files to after processing, if cleanup action is \"archive\".",
                 "default": "",
-                "examples": ["string"]
-              },
-              "Mode": {
-                "type": "string",
-                "title": "Mode",
-                "description": "Mode to use when reading target files.",
-                "default": "Delimited",
-                "enum": ["Delimited", "Fixed Width Columns", "Excel"]
-              },
-              "Delimiter": {
-                "type": "string",
-                "title": "Delimiter",
-                "description": "The delimiter for delimited files.",
-                "default": ",",
-                "examples": [",", "|"],
-                "pattern": ""
-              },
-              "HasHeader": {
-                "type": "boolean",
-                "title": "Has Header",
-                "description": "Does the file have a header row?",
-                "default": false,
-                "examples": [true]
+                "examples": [
+                  "string"
+                ]
               },
               "SkipLines": {
                 "title": "Skip Lines",
@@ -123,90 +154,195 @@
                 "default": 0,
                 "type": "number"
               },
-              "ExcelColumns": {
+              "Mode": {
                 "type": "string",
-                "title": "Excel Columns",
-                "description": "The columns to read from an Excel file (ex. 0, 2-5, 7, 10, 12-15).",
-                "default": "",
-                "pattern": ""
-              },
-              "ExcelCells": {
-                "readOnly": false,
-                "type": "array",
-                "title": "Excel Cells",
-                "description": "Cells to include on all records.",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "ColumnName": {
-                      "title": "Column Name",
-                      "description": "The name of the column.",
-                      "type": "string"
-                    },
-                    "ColumnIndex": {
-                      "title": "Column Index",
-                      "description": "The column index of the cell.",
-                      "type": "number"
-                    },
-                    "RowIndex": {
-                      "title": "Row Index",
-                      "description": "The row index of the cell.",
-                      "type": "number"
-                    }
-                  },
-                  "required": ["ColumnName", "ColumnIndex", "RowIndex"]
-                }
-              },
-              "ColumnsConfigurationFile": {
-                "type": "string",
-                "title": "Columns Configuration File",
-                "description": "Path to the columns configuration file for fixed width files (optional)"
-              },
-              "Columns": {
-                "readOnly": false,
-                "type": "array",
-                "title": "Columns",
-                "description": "Columns for fixed column width files",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "ColumnName": {
-                      "title": "Column Name",
-                      "description": "The name of the column.",
-                      "type": "string"
-                    },
-                    "ColumnStart": {
-                      "title": "Column Start",
-                      "description": "The index of the first character of the column (0 is the first index).",
-                      "type": "number"
-                    },
-                    "ColumnEnd": {
-                      "title": "Column End",
-                      "description": "The index of the last character of the column.",
-                      "type": "number"
-                    },
-                    "IsKey": {
-                      "title": "Is Key",
-                      "description": "Is this column the key property?",
-                      "default": false,
-                      "type": "boolean"
-                    },
-                    "TrimWhitespace": {
-                      "title": "Trim Whitespace",
-                      "description": "Trim all leading and trailing whitespace?",
-                      "default": false,
-                      "type": "boolean"
-                    }
-                  },
-                  "required": ["ColumnName", "ColumnStart", "ColumnEnd"]
-                }
+                "title": "Mode",
+                "description": "Mode to use when reading target files.",
+                "default": "Delimited",
+                "enum": [
+                  "Delimited",
+                  "Fixed Width Columns",
+                  "Excel"
+                ]
               }
             },
-            "required": ["RootPath", "Filter", "Mode"]
+            "required": [
+              "RootPath",
+              "Filter",
+              "Mode"
+            ],
+            "dependencies": {
+              "Mode": {
+                "oneOf": [
+                  {
+                    "properties": {
+                      "Mode": {
+                        "enum": [
+                          "Delimited"
+                        ]
+                      },
+                      "DelimitedSettings": {
+                        "type": "object",
+                        "title": "Delimited Settings",
+                        "properties": {
+                          "Delimiter": {
+                            "type": "string",
+                            "title": "Delimiter",
+                            "description": "The delimiter for delimited files.",
+                            "default": ",",
+                            "examples": [
+                              ",",
+                              "|"
+                            ],
+                            "pattern": ""
+                          },
+                          "HasHeader": {
+                            "type": "boolean",
+                            "title": "Has Header",
+                            "description": "Does the file have a header row?",
+                            "default": false,
+                            "examples": [
+                              true
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "Mode": {
+                        "enum": [
+                          "Fixed Width Columns"
+                        ]
+                      },
+                      "FixedWidthSettings": {
+                        "type": "object",
+                        "title": "Fixed Width Columns Settings",
+                        "properties": {
+                          "ColumnsConfigurationFile": {
+                            "type": "string",
+                            "title": "Columns Configuration File",
+                            "description": "Path to the columns configuration file for fixed width files (optional)"
+                          },
+                          "Columns": {
+                            "readOnly": false,
+                            "type": "array",
+                            "title": "Columns",
+                            "description": "Columns for fixed column width files",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "ColumnName": {
+                                  "title": "Column Name",
+                                  "description": "The name of the column.",
+                                  "type": "string"
+                                },
+                                "ColumnStart": {
+                                  "title": "Column Start",
+                                  "description": "The index of the first character of the column (0 is the first index).",
+                                  "type": "number"
+                                },
+                                "ColumnEnd": {
+                                  "title": "Column End",
+                                  "description": "The index of the last character of the column.",
+                                  "type": "number"
+                                },
+                                "IsKey": {
+                                  "title": "Is Key",
+                                  "description": "Is this column the key property?",
+                                  "default": false,
+                                  "type": "boolean"
+                                },
+                                "TrimWhitespace": {
+                                  "title": "Trim Whitespace",
+                                  "description": "Trim all leading and trailing whitespace?",
+                                  "default": false,
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "ColumnName",
+                                "ColumnStart",
+                                "ColumnEnd"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "Mode": {
+                        "enum": [
+                          "Excel"
+                        ]
+                      },
+                      "ExcelModeSettings": {
+                        "type": "object",
+                        "title": "Excel Settings",
+                        "properties": {
+                          "HasHeader": {
+                            "type": "boolean",
+                            "title": "Has Header",
+                            "description": "Does the file have a header row?",
+                            "default": false,
+                            "examples": [
+                              true
+                            ]
+                          },
+                          "ExcelColumns": {
+                            "type": "string",
+                            "title": "Excel Columns",
+                            "description": "The columns to read from an Excel file (ex. 0, 2-5, 7, 10, 12-15).",
+                            "default": "",
+                            "pattern": ""
+                          },
+                          "ExcelCells": {
+                            "readOnly": false,
+                            "type": "array",
+                            "title": "Excel Cells",
+                            "description": "Cells to include on all records.",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "ColumnName": {
+                                  "title": "Column Name",
+                                  "description": "The name of the column.",
+                                  "type": "string"
+                                },
+                                "ColumnIndex": {
+                                  "title": "Column Index",
+                                  "description": "The column index of the cell.",
+                                  "type": "number"
+                                },
+                                "RowIndex": {
+                                  "title": "Row Index",
+                                  "description": "The row index of the cell.",
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "ColumnName",
+                                "ColumnIndex",
+                                "RowIndex"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
           }
         }
       },
-      "required": []
+      "required": [
+        "RootPaths"
+      ]
     }
   }
 }
