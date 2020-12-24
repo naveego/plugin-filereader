@@ -27,7 +27,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             var schemas = new List<Schema>();
             
             // foreach (var format in AS400.Format25) // POC
-            foreach (var format in rootPath.AS400Settings.Formats)
+            foreach (var format in rootPath.ModeSettings.AS400Settings.Formats)
             {
                 if (format.IsGlobalHeader)
                 {

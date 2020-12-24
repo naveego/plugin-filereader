@@ -152,14 +152,14 @@ namespace PluginFileReader.Helper
                         : rootPath.Name;
                     if (globalConfigurationColumns.ContainsKey(indexName))
                     {
-                        rootPath.FixedWidthSettings.Columns = globalConfigurationColumns[indexName];
+                        rootPath.ModeSettings.FixedWidthSettings.Columns = globalConfigurationColumns[indexName];
                     }
 
                     // apply local config file
-                    if (!string.IsNullOrWhiteSpace(rootPath.FixedWidthSettings.ColumnsConfigurationFile))
+                    if (!string.IsNullOrWhiteSpace(rootPath.ModeSettings.FixedWidthSettings.ColumnsConfigurationFile))
                     {
-                        using var file = File.OpenText(rootPath.FixedWidthSettings.ColumnsConfigurationFile);
-                        rootPath.FixedWidthSettings.Columns = (List<Column>) serializer.Deserialize(file, typeof(List<Column>));
+                        using var file = File.OpenText(rootPath.ModeSettings.FixedWidthSettings.ColumnsConfigurationFile);
+                        rootPath.ModeSettings.FixedWidthSettings.Columns = (List<Column>) serializer.Deserialize(file, typeof(List<Column>));
                     }
                 }
             }
@@ -183,10 +183,10 @@ namespace PluginFileReader.Helper
                 if (rootPath.Mode == Constants.AS400Mode)
                 {
                     // apply local config file
-                    if (!string.IsNullOrWhiteSpace(rootPath.AS400Settings.AS400FormatsConfigurationFile))
+                    if (!string.IsNullOrWhiteSpace(rootPath.ModeSettings.AS400Settings.AS400FormatsConfigurationFile))
                     {
-                        using var file = File.OpenText(rootPath.AS400Settings.AS400FormatsConfigurationFile);
-                        rootPath.AS400Settings.Formats = (List<AS400Format>) serializer.Deserialize(file, typeof(List<AS400Format>));
+                        using var file = File.OpenText(rootPath.ModeSettings.AS400Settings.AS400FormatsConfigurationFile);
+                        rootPath.ModeSettings.AS400Settings.Formats = (List<AS400Format>) serializer.Deserialize(file, typeof(List<AS400Format>));
                     }
                 }
             }
@@ -227,9 +227,9 @@ namespace PluginFileReader.Helper
             {
                 foreach (var rootPath in RootPaths)
                 {
-                    if (rootPath.Mode == Constants.DelimitedMode && rootPath.DelimitedSettings == null)
+                    if (rootPath.Mode == Constants.DelimitedMode && rootPath.ModeSettings.DelimitedSettings == null)
                     {
-                        rootPath.DelimitedSettings = new DelimitedSettings
+                        rootPath.ModeSettings.DelimitedSettings = new DelimitedSettings
                         {
                             Delimiter = rootPath.Delimiter,
                             HasHeader = rootPath.HasHeader
@@ -237,9 +237,9 @@ namespace PluginFileReader.Helper
                         continue;
                     }
 
-                    if (rootPath.Mode == Constants.FixedWidthMode && rootPath.FixedWidthSettings == null)
+                    if (rootPath.Mode == Constants.FixedWidthMode && rootPath.ModeSettings.FixedWidthSettings == null)
                     {
-                        rootPath.FixedWidthSettings = new FixedWidthSettings
+                        rootPath.ModeSettings.FixedWidthSettings = new FixedWidthSettings
                         {
                             Columns = rootPath.Columns,
                             ColumnsConfigurationFile = rootPath.ColumnsConfigurationFile
@@ -247,9 +247,9 @@ namespace PluginFileReader.Helper
                         continue;    
                     }
 
-                    if (rootPath.Mode == Constants.ExcelMode && rootPath.ExcelModeSettings == null)
+                    if (rootPath.Mode == Constants.ExcelMode && rootPath.ModeSettings.ExcelModeSettings == null)
                     {
-                        rootPath.ExcelModeSettings = new ExcelModeSettings
+                        rootPath.ModeSettings.ExcelModeSettings = new ExcelModeSettings
                         {
                             ExcelCells = rootPath.ExcelCells,
                             ExcelColumns = rootPath.ExcelColumns,
@@ -280,7 +280,7 @@ namespace PluginFileReader.Helper
             {
                 if (rootPath.Mode == Constants.FixedWidthMode)
                 {
-                    if (rootPath.FixedWidthSettings.Columns.Count == 0)
+                    if (rootPath.ModeSettings.FixedWidthSettings.Columns.Count == 0)
                     {
                         throw new Exception(
                             $"{rootPath.RootPath} is set to Fixed Width Columns and has no Columns defined");
@@ -301,27 +301,33 @@ namespace PluginFileReader.Helper
         public string ArchivePath { get; set; }
         public string Mode { get; set; }
         public int SkipLines { get; set; }
-
-        // DELIMITED MODE SETTINGS
-        public DelimitedSettings DelimitedSettings {get; set; }
+        
+        // MODE SETTINGS
+        public ModeSettings ModeSettings { get; set; }
         
         // LEGACY DELIMITED MODE SETTINGS
         public bool HasHeader { get; set; }
         public string Delimiter { get; set; }
         
-        // FIXED WIDTH MODE SETTINGS
-        public FixedWidthSettings FixedWidthSettings { get; set; }
-
         // LEGACY COLUMN WIDTH MODE SETTINGS
         public string ColumnsConfigurationFile { get; set; }
         public List<Column> Columns { get; set; }
-
-        // EXCEL FILE MODE SETTINGS
-        public ExcelModeSettings ExcelModeSettings { get; set; }
         
         // LEGACY EXCEL FILE MODE SETTINGS
         public string ExcelColumns { get; set; }
         public List<ExcelCell> ExcelCells { get; set; }
+    }
+
+    public class ModeSettings
+    {
+        // DELIMITED MODE SETTINGS
+        public DelimitedSettings DelimitedSettings {get; set; }
+        
+        // FIXED WIDTH MODE SETTINGS
+        public FixedWidthSettings FixedWidthSettings { get; set; }
+        
+        // EXCEL FILE MODE SETTINGS
+        public ExcelModeSettings ExcelModeSettings { get; set; }
         
         // AS400 MODE SETTINGS
         public AS400Settings AS400Settings { get; set; }

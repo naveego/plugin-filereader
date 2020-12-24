@@ -37,7 +37,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             var columnsMap = new Dictionary<string, List<Column>>();
 
             // foreach (var format in AS400.Format25) // POC
-            foreach (var format in rootPath.AS400Settings.Formats)
+            foreach (var format in rootPath.ModeSettings.AS400Settings.Formats)
             {
                 if (format.IsGlobalHeader)
                 {
@@ -50,7 +50,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                 {
                     var columns = new List<Column>(format.Columns);
                     // foreach (var globalFormat in AS400.Format25.FindAll(f => f.IsGlobalHeader)) // POC
-                    foreach (var globalFormat in rootPath.AS400Settings.Formats.FindAll(f => f.IsGlobalHeader))
+                    foreach (var globalFormat in rootPath.ModeSettings.AS400Settings.Formats.FindAll(f => f.IsGlobalHeader))
                     {
                         columns.AddRange(globalFormat.Columns);
                     }
@@ -63,7 +63,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                 {
                     var columns = new List<Column>(format.MultiLineColumns);
                     // foreach (var globalFormat in AS400.Format25.FindAll(f => f.IsGlobalHeader)) // POC
-                    foreach (var globalFormat in rootPath.AS400Settings.Formats.FindAll(f => f.IsGlobalHeader)) 
+                    foreach (var globalFormat in rootPath.ModeSettings.AS400Settings.Formats.FindAll(f => f.IsGlobalHeader)) 
                     {
                         columns.AddRange(globalFormat.Columns);
                     }
@@ -89,9 +89,9 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                 while ((line = file.ReadLine()) != null && recordsInserted < limit)
                 {
                     // var keyValue = line.Substring(0, 2; // POC
-                    var keyValue = line.Substring(0, rootPath.AS400Settings.KeyValueWidth);
+                    var keyValue = line.Substring(0, rootPath.ModeSettings.AS400Settings.KeyValueWidth);
                     // var format = AS400.Format25.FirstOrDefault(f => f.KeyValue.Value == keyValue); // POC
-                    var format = rootPath.AS400Settings.Formats.FirstOrDefault(f => f.KeyValue.Value == keyValue);
+                    var format = rootPath.ModeSettings.AS400Settings.Formats.FirstOrDefault(f => f.KeyValue.Value == keyValue);
 
                     if (format == null)
                     {

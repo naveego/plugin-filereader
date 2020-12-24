@@ -36,7 +36,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             SQLDatabaseConnection = sqlDatabaseConnection;
             TableName = tableName;
             SchemaName = schemaName;
-            Delimiter = rootPath.DelimitedSettings.GetDelimiter();
+            Delimiter = rootPath.ModeSettings.DelimitedSettings.GetDelimiter();
         }
         
         public DelimitedImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, ConfigureReplicationFormData replicationFormData)
@@ -157,7 +157,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                     foreach (string field in DelimitedReader.Fields)
                     {
                         columnCount++;
-                        if (rootPath.DelimitedSettings.HasHeader)
+                        if (rootPath.ModeSettings.DelimitedSettings.HasHeader)
                         {
                             if (headerColumns.Contains(field))
                             {
@@ -247,7 +247,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                     DelimitedReader.SkipLines = rootPath.SkipLines;
 
                     //Skip the header line.
-                    if (rootPath.DelimitedSettings.HasHeader)
+                    if (rootPath.ModeSettings.DelimitedSettings.HasHeader)
                         DelimitedReader.SkipLines += 1;
 
                     var trans = SQLDatabaseConnection.BeginTransaction();

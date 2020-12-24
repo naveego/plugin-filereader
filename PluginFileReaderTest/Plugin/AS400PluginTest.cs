@@ -98,10 +98,13 @@ namespace PluginFileReaderTest.Plugin
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
                             Columns = null,
-                            AS400Settings = new AS400Settings
+                            ModeSettings = new ModeSettings
                             {
-                                KeyValueWidth = 2,
-                                AS400FormatsConfigurationFile = FormatConfigFilePath
+                                AS400Settings = new AS400Settings
+                                {
+                                    KeyValueWidth = 2,
+                                    AS400FormatsConfigurationFile = FormatConfigFilePath
+                                }
                             }
                         },
                         new RootPathObject
@@ -114,10 +117,13 @@ namespace PluginFileReaderTest.Plugin
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
                             Columns = null,
-                            AS400Settings = new AS400Settings
+                            ModeSettings = new ModeSettings
                             {
-                                KeyValueWidth = 2,
-                                AS400FormatsConfigurationFile = FormatConfigFilePath
+                                AS400Settings = new AS400Settings
+                                {
+                                    KeyValueWidth = 2,
+                                    AS400FormatsConfigurationFile = FormatConfigFilePath
+                                }
                             }
                         }
                     }
@@ -133,10 +139,13 @@ namespace PluginFileReaderTest.Plugin
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
                             Columns = null,
-                            AS400Settings = new AS400Settings
+                            ModeSettings = new ModeSettings
                             {
-                                KeyValueWidth = 2,
-                                AS400FormatsConfigurationFile = FormatConfigFilePath
+                                AS400Settings = new AS400Settings
+                                {
+                                    KeyValueWidth = 2,
+                                    AS400FormatsConfigurationFile = FormatConfigFilePath
+                                }
                             }
                         }
                     }

@@ -45,7 +45,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
             var rowsSkipped = 0;
             List<string> headerColumns = new List<string>();
             List<int> columnIndexes;
-            List<ExcelCell> orderedExcelCells = rootPath.ExcelModeSettings.GetOrderedExcelCells();
+            List<ExcelCell> orderedExcelCells = rootPath.ModeSettings.ExcelModeSettings.GetOrderedExcelCells();
             Dictionary<string, object> excelCellsValues = new Dictionary<string, object>();
 
             using (var stream = File.OpenRead(filePathAndName))
@@ -86,7 +86,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                     }
                     
                     // get desired column indexes
-                    columnIndexes = rootPath.ExcelModeSettings.GetAllExcelColumnIndexes();
+                    columnIndexes = rootPath.ModeSettings.ExcelModeSettings.GetAllExcelColumnIndexes();
 
                     if (columnIndexes.Count == 0)
                     {
@@ -96,7 +96,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                     // get column names
                     foreach (var i in columnIndexes)
                     {
-                        if (rootPath.ExcelModeSettings.HasHeader)
+                        if (rootPath.ModeSettings.ExcelModeSettings.HasHeader)
                         {
                             var field = reader.GetValue(i)?.ToString();
 

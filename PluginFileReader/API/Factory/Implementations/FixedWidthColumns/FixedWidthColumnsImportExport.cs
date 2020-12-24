@@ -39,7 +39,7 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
             var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (");
             var primaryKeySb = new StringBuilder("PRIMARY KEY (");
             var hasPrimaryKey = false;
-            foreach (var column in rootPath.FixedWidthSettings.Columns)
+            foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
             {
                 querySb.Append(
                     $"[{column.ColumnName}] VARCHAR({int.MaxValue}){(column.IsKey ? " NOT NULL UNIQUE" : "")},");
@@ -82,7 +82,7 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
 
             // prepare insert cmd with parameters
             querySb = new StringBuilder($"INSERT INTO [{_schemaName}].[{_tableName}] (");
-            foreach (var column in rootPath.FixedWidthSettings.Columns)
+            foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
             {
                 querySb.Append($"[{column.ColumnName}],");
             }
@@ -90,9 +90,9 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
             querySb.Length--;
             querySb.Append(") VALUES (");
 
-            foreach (var column in rootPath.FixedWidthSettings.Columns)
+            foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
             {
-                var paramName = $"@param{rootPath.FixedWidthSettings.Columns.IndexOf(column)}";
+                var paramName = $"@param{rootPath.ModeSettings.FixedWidthSettings.Columns.IndexOf(column)}";
                 querySb.Append($"{paramName},");
                 cmd.Parameters.Add(paramName);
             }
@@ -122,10 +122,10 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
                 // read all lines from file
                 while ((line = file.ReadLine()) != null && rowsRead < limit)
                 {
-                    foreach (var column in rootPath.FixedWidthSettings.Columns)
+                    foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
                     {
                         var rawValue = line.Substring(column.ColumnStart, column.ColumnEnd - column.ColumnStart + 1);
-                        cmd.Parameters[$"@param{rootPath.FixedWidthSettings.Columns.IndexOf(column)}"].Value = column.TrimWhitespace ? rawValue.Trim() : rawValue;
+                        cmd.Parameters[$"@param{rootPath.ModeSettings.FixedWidthSettings.Columns.IndexOf(column)}"].Value = column.TrimWhitespace ? rawValue.Trim() : rawValue;
                     }
 
                     cmd.ExecuteNonQuery();
