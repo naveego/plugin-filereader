@@ -77,7 +77,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             }
 
             // read file into db
-            var file = new StreamReader(filePathAndName);
+            var file = Utility.Utility.GetStreamReader(filePathAndName, rootPath);
             string line;
             var recordsInserted = 0;
 

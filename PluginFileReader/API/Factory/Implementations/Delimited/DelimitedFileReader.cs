@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using PluginFileReader.Helper;
 
 namespace PluginFileReader.API.Factory.Implementations.Delimited
 {
@@ -101,12 +102,12 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         /// specified file path.
         /// </summary>
         /// <param name="path">The name of the CSV file to read from</param>
-        /// <param name="encoding">The encoding of the CSV file</param>
-        public DelimitedFileReader(string path, Encoding encoding)
+        /// <param name="rootPath">The root path object/param>
+        public DelimitedFileReader(string path, RootPathObject rootPath)
         {
             InitCsvReader();
             // _reader = new StreamReader(path, encoding);
-            _reader = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+            _reader = Utility.Utility.GetStreamReader(path, rootPath);
         }
 
         public void RestrictToColumns(params int[] columnIndexes)

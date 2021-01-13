@@ -146,7 +146,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             var rowCount = 0;
             List<string> headerColumns = new List<string>();
 
-            using (DelimitedReader = new DelimitedFileReader(filePathAndName, Encoding.UTF8))
+            using (DelimitedReader = new DelimitedFileReader(filePathAndName, rootPath))
             {
                 DelimitedReader.Delimiter = Delimiter;
                 DelimitedReader.OnEmptyLine = BlankLine.SkipEntireLine;
@@ -240,7 +240,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 Logger.Debug($"Reading delimited file {filePathAndName}");
                 
                 //Read CSV once insert statement has been created.
-                using (DelimitedReader = new DelimitedFileReader(filePathAndName, Encoding.UTF8))
+                using (DelimitedReader = new DelimitedFileReader(filePathAndName, rootPath))
                 {
                     DelimitedReader.Delimiter = Delimiter;
                     DelimitedReader.OnEmptyLine = BlankLine.SkipEntireLine;
