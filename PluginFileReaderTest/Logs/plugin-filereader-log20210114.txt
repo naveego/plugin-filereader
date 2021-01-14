@@ -1,0 +1,128 @@
+2021-01-14 16:17:08.692 -05:00 [INF]  Connecting...
+2021-01-14 16:17:08.764 -05:00 [INF]  Connected.
+2021-01-14 16:17:08.786 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-14 16:17:43.887 -05:00 [DBG] <discover> Downloaded file readme.txt
+2021-01-14 16:26:59.516 -05:00 [INF]  Connecting...
+2021-01-14 16:26:59.580 -05:00 [INF]  Connected.
+2021-01-14 16:26:59.607 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-14 16:27:03.483 -05:00 [DBG] <discover> Downloaded file readme.txt
+2021-01-14 16:28:06.889 -05:00 [INF]  Connecting...
+2021-01-14 16:28:06.950 -05:00 [INF]  Connected.
+2021-01-14 16:28:06.974 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-14 16:28:10.690 -05:00 [DBG] <discover> Downloaded file readme.txt
+2021-01-14 16:29:33.809 -05:00 [INF]  Connecting...
+2021-01-14 16:29:33.866 -05:00 [INF]  Connected.
+2021-01-14 16:29:33.891 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-14 16:29:37.573 -05:00 [DBG] <discover> Downloaded file readme.txt
+2021-01-14 16:31:55.700 -05:00 [INF]  Connecting...
+2021-01-14 16:31:55.765 -05:00 [INF]  Connected.
+2021-01-14 16:31:55.788 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-14 16:31:58.906 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-14 16:31:59.004 -05:00 [INF] <discover> Purging table: [dbo].[/]
+2021-01-14 16:31:59.088 -05:00 [INF] <discover> Preparing to load file: ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:31:59.089 -05:00 [INF] <discover> Begin loading file: ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:31:59.093 -05:00 [DBG] <discover> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-14 16:31:59.093 -05:00 [DBG] <discover> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[/] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-14 16:31:59.149 -05:00 [DBG] <discover> Insert Row SQL: INSERT INTO dbo.[/] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-14 16:31:59.150 -05:00 [DBG] <discover> Reading delimited file ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:31:59.161 -05:00 [INF] <discover> Loaded file ../../../Temp/MOCK_DATA.csv with 5 rows
+2021-01-14 16:31:59.170 -05:00 [DBG] <discover> {
+  "Id": "[dbo].[/]",
+  "Name": "/",
+  "Description": "",
+  "Properties": [],
+  "Count": null,
+  "Sample": [],
+  "Query": "SELECT * FROM [dbo].[/]",
+  "PublisherMetaJson": "",
+  "Errors": [],
+  "DataFlowDirection": 0
+}
+2021-01-14 16:32:50.354 -05:00 [INF]  Connecting...
+2021-01-14 16:32:50.424 -05:00 [INF]  Connected.
+2021-01-14 16:32:53.089 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-14 16:32:56.251 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-14 16:32:56.303 -05:00 [INF] <discover> Purging table: [dbo].[/]
+2021-01-14 16:32:56.381 -05:00 [INF] <discover> Preparing to load file: ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:32:56.381 -05:00 [INF] <discover> Begin loading file: ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:32:56.385 -05:00 [DBG] <discover> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-14 16:32:56.386 -05:00 [DBG] <discover> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[/] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-14 16:32:56.447 -05:00 [DBG] <discover> Insert Row SQL: INSERT INTO dbo.[/] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-14 16:32:56.447 -05:00 [DBG] <discover> Reading delimited file ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:32:56.455 -05:00 [INF] <discover> Loaded file ../../../Temp/MOCK_DATA.csv with 5 rows
+2021-01-14 16:32:56.463 -05:00 [DBG] <discover> {
+  "Id": "[dbo].[/]",
+  "Name": "/",
+  "Description": "",
+  "Properties": [],
+  "Count": null,
+  "Sample": [],
+  "Query": "SELECT * FROM [dbo].[/]",
+  "PublisherMetaJson": "",
+  "Errors": [],
+  "DataFlowDirection": 0
+}
+2021-01-14 16:33:02.093 -05:00 [INF] <discover> Schemas returned: 1
+2021-01-14 16:46:25.605 -05:00 [INF]  Connecting...
+2021-01-14 16:46:25.668 -05:00 [INF]  Connected.
+2021-01-14 16:46:25.693 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-14 16:46:29.831 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-14 16:46:29.878 -05:00 [INF] <discover> Purging table: [dbo].[/]
+2021-01-14 16:46:29.974 -05:00 [INF] <discover> Preparing to load file: ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:46:29.975 -05:00 [INF] <discover> Begin loading file: ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:46:29.980 -05:00 [DBG] <discover> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-14 16:46:29.981 -05:00 [DBG] <discover> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[/] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-14 16:46:30.039 -05:00 [DBG] <discover> Insert Row SQL: INSERT INTO dbo.[/] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-14 16:46:30.039 -05:00 [DBG] <discover> Reading delimited file ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:46:30.054 -05:00 [INF] <discover> Loaded file ../../../Temp/MOCK_DATA.csv with 5 rows
+2021-01-14 16:46:30.066 -05:00 [DBG] <discover> {
+  "Id": "[dbo].[/]",
+  "Name": "/",
+  "Description": "",
+  "Properties": [],
+  "Count": null,
+  "Sample": [],
+  "Query": "SELECT * FROM [dbo].[/]",
+  "PublisherMetaJson": "",
+  "Errors": [],
+  "DataFlowDirection": 0
+}
+2021-01-14 16:46:30.092 -05:00 [INF] <discover> Schemas returned: 1
+2021-01-14 16:46:41.019 -05:00 [INF] <test> Publishing records for schema: /
+2021-01-14 16:46:44.952 -05:00 [INF] <test> Purging table: [dbo].[/]
+2021-01-14 16:46:44.971 -05:00 [INF] <test> Preparing to load file: ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:46:44.971 -05:00 [INF] <test> Begin loading file: ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:46:44.972 -05:00 [DBG] <test> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-14 16:46:44.972 -05:00 [DBG] <test> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[/] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-14 16:46:44.974 -05:00 [DBG] <test> Insert Row SQL: INSERT INTO dbo.[/] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-14 16:46:44.974 -05:00 [DBG] <test> Reading delimited file ../../../Temp/MOCK_DATA.csv
+2021-01-14 16:46:45.156 -05:00 [INF] <test> Loaded file ../../../Temp/MOCK_DATA.csv with 1000 rows
+2021-01-14 16:46:45.212 -05:00 [INF] <test> Published 10 records

@@ -35,8 +35,14 @@
     "ui": {
       "ui:order": [
         "GlobalColumnsConfigurationFile",
+        "FtpHostname",
+        "FtpUsername",
+        "FtpPassword",
         "RootPaths"
       ],
+      "FtpPassword": {
+        "ui:widget": "password"
+      },
       "RootPaths": {
         "items": {
           "ui:order": [
@@ -46,6 +52,7 @@
             "CleanupAction",
             "ArchivePath",
             "SkipLines",
+            "FileReadMode",
             "Mode",
             "ModeSettings"
           ],
@@ -164,6 +171,24 @@
           "description": "Global configuration file for columns in fixed width root paths. Overridden by specific columns configuration files.",
           "default": ""
         },
+        "FtpHostname": {
+          "type": "string",
+          "title": "SFTP Hostname",
+          "description": "Hostname for any root paths using SFTP.",
+          "default": ""
+        },
+        "FtpUsername": {
+          "type": "string",
+          "title": "SFTP Username",
+          "description": "Username for any root paths using SFTP.",
+          "default": ""
+        },
+        "FtpPassword": {
+          "type": "string",
+          "title": "SFTP Password",
+          "description": "Password for any root paths using SFTP.",
+          "default": ""
+        },
         "RootPaths": {
           "title": "Root Paths",
           "description": "The folder(s) containing the files.",
@@ -215,6 +240,16 @@
                 "description": "The number of lines to skip at the top of the file.",
                 "default": 0,
                 "type": "number"
+              },
+              "FileReadMode": {
+                "type": "string",
+                "title": "File Read Mode",
+                "description": "Mode to access target files.",
+                "default": "Local",
+                "enum": [
+                  "Local",
+                  "SFTP"
+                ]
               },
               "Mode": {
                 "type": "string",

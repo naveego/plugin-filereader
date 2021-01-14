@@ -75,18 +75,22 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false)
+            string filter = null, bool multiRoot = false, bool sftp = false)
         {
             return new Settings
             {
+                FtpHostname = "test.rebex.net",
+                FtpUsername = "demo",
+                FtpPassword = "password",
                 RootPaths = multiRoot
                     ? new List<RootPathObject>
                     {
                         new RootPathObject
                         {
-                            RootPath = ReadPath,
+                            RootPath = sftp ? "/" : ReadPath,
                             Filter = filter ?? DefaultFilter,
                             Mode = DelimitedMode,
+                            FileReadMode = sftp ? "SFTP" : "Local",
                             Delimiter = delimiter,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
@@ -94,9 +98,10 @@ namespace PluginFileReaderTest.Plugin
                         },
                         new RootPathObject
                         {
-                            RootPath = ReadDifferentPath,
+                            RootPath = sftp ? "/" : ReadDifferentPath,
                             Filter = filter ?? DefaultFilter,
                             Mode = DelimitedMode,
+                            FileReadMode = sftp ? "SFTP" : "Local",
                             Delimiter = delimiter,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
@@ -107,10 +112,11 @@ namespace PluginFileReaderTest.Plugin
                     {
                         new RootPathObject
                         {
-                            RootPath = ReadPath,
+                            RootPath = sftp ? "/" : ReadPath,
                             Filter = filter ?? DefaultFilter,
                             Delimiter = delimiter,
                             Mode = DelimitedMode,
+                            FileReadMode = sftp ? "SFTP" : "Local",
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath
@@ -120,12 +126,12 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false, bool empty = false)
+            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false)
         {
             if (empty)
             {
                 var emptySettings = new Settings();
-                
+
                 return new ConnectRequest
                 {
                     SettingsJson = JsonConvert.SerializeObject(emptySettings),
@@ -133,8 +139,8 @@ namespace PluginFileReaderTest.Plugin
                     OauthStateJson = ""
                 };
             }
-            
-            var settings = GetSettings(cleanupAction, delimiter, filter, multiRoot);
+
+            var settings = GetSettings(cleanupAction, delimiter, filter, multiRoot, sftp);
 
             return new ConnectRequest
             {
@@ -178,7 +184,6 @@ namespace PluginFileReaderTest.Plugin
                     }
                 }
             };
-            
         }
 
         [Fact]
@@ -250,7 +255,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ConnectEmptyTest()
         {
@@ -335,7 +340,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasMultipleRequestsTest()
         {
@@ -393,7 +398,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasAllEmptyTest()
         {
@@ -540,7 +545,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasAllDelimiterTabTest()
         {
@@ -578,7 +583,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasAllDuplicateColumnTest()
         {
@@ -611,7 +616,7 @@ namespace PluginFileReaderTest.Plugin
             // assert
             Assert.IsType<DiscoverSchemasResponse>(response);
             Assert.Single(response.Schemas);
-            
+
             var property = response.Schemas[0].Properties[0];
             Assert.Equal("id", property.Id);
             Assert.Equal("id", property.Name);
@@ -619,7 +624,7 @@ namespace PluginFileReaderTest.Plugin
             var propertyDupe = response.Schemas[0].Properties[3];
             Assert.Equal("id_DUPLICATE_4", propertyDupe.Id);
             Assert.Equal("id_DUPLICATE_4", propertyDupe.Name);
-            
+
             // cleanup
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
@@ -670,7 +675,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task NoDiscoverSchemasRefreshTest()
         {
@@ -715,7 +720,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasRefreshQueryBadSyntaxTest()
         {
@@ -1060,6 +1065,79 @@ on a.id = b.id"),
         }
 
         [Fact]
+        public async Task ReadStreamSftpTest()
+        {
+            // setup
+            PrepareTestEnvironment();
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings(null, ",", "*.csv", false, false, true);
+
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+
+            var settings = GetSettings();
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                RootPath = settings.RootPaths.First()
+            });
+
+            // act
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var discoverResponse = client.DiscoverSchemas(discoverAllRequest);
+            
+            var request = new ReadRequest()
+            {
+                Schema = discoverResponse.Schemas[0],
+                Limit = 10,
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+            
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(10, records.Count);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
         public async Task ReadStreamCleanUpArchiveFullTest()
         {
             // setup
@@ -1280,7 +1358,7 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task PrepareWriteReplicationTest()
         {
@@ -1335,7 +1413,7 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReplicationWriteTest()
         {
@@ -1388,11 +1466,14 @@ on a.id = b.id"),
                         CorrelationId = "test",
                         RecordId = "record1",
                         DataJson = "{\"Id\":1,\"Name\":\"Test Company\"}",
-                        Versions = { new RecordVersion
+                        Versions =
                         {
-                            RecordId = "version1",
-                            DataJson = "{\"Id\":1,\"Name\":\"Test Company\"}",
-                        }}
+                            new RecordVersion
+                            {
+                                RecordId = "version1",
+                                DataJson = "{\"Id\":1,\"Name\":\"Test Company\"}",
+                            }
+                        }
                     }
                 }
             };
@@ -1432,7 +1513,7 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ConfigureWriteTest()
         {
@@ -1492,7 +1573,7 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task PrepareWriteWritebackTest()
         {
@@ -1510,7 +1591,7 @@ on a.id = b.id"),
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
+
             var configRequest = new ConfigureWriteRequest
             {
                 Form = new ConfigurationFormRequest
@@ -1544,7 +1625,7 @@ on a.id = b.id"),
             // act
             client.Connect(connectRequest);
             var configResponse = client.ConfigureWrite(configRequest);
-            
+
             var request = new PrepareWriteRequest()
             {
                 Schema = configResponse.Schema,
@@ -1558,7 +1639,7 @@ on a.id = b.id"),
                     ShapeDataVersion = 2
                 }
             };
-            
+
             var response = client.PrepareWrite(request);
 
             // assert
@@ -1568,7 +1649,7 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task WritebackTest()
         {
@@ -1586,7 +1667,7 @@ on a.id = b.id"),
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
+
             var configRequest = new ConfigureWriteRequest
             {
                 Form = new ConfigurationFormRequest
@@ -1619,9 +1700,9 @@ on a.id = b.id"),
 
             // act
             client.Connect(connectRequest);
-            
+
             var configResponse = client.ConfigureWrite(configRequest);
-            
+
             var prepareWriteRequest = new PrepareWriteRequest()
             {
                 Schema = configResponse.Schema,
@@ -1635,9 +1716,9 @@ on a.id = b.id"),
                     ShapeDataVersion = 2
                 }
             };
-            
+
             client.PrepareWrite(prepareWriteRequest);
-            
+
             var records = new List<Record>()
             {
                 {
@@ -1647,11 +1728,14 @@ on a.id = b.id"),
                         CorrelationId = "test",
                         RecordId = "record1",
                         DataJson = "{\"Id\":1}",
-                        Versions = { new RecordVersion
+                        Versions =
                         {
-                            RecordId = "version1",
-                            DataJson = "{\"Id\":1}",
-                        }}
+                            new RecordVersion
+                            {
+                                RecordId = "version1",
+                                DataJson = "{\"Id\":1}",
+                            }
+                        }
                     }
                 }
             };

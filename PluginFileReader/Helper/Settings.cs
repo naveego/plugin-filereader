@@ -2,14 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using PluginFileReader.API.Utility;
+using Renci.SshNet;
 
 namespace PluginFileReader.Helper
 {
     public class Settings
     {
         public string GlobalColumnsConfigurationFile { get; set; }
+        public string FtpHostname { get; set; }
+        public string FtpUsername { get; set; }
+        public string FtpPassword { get; set; }
         public List<RootPathObject> RootPaths { get; set; }
 
         /// <summary>
@@ -38,21 +43,6 @@ namespace PluginFileReader.Helper
         }
 
         /// <summary>
-        /// Gets all files from location defined by RootPath and Filters and returns in a flat list
-        /// </summary>
-        /// <returns></returns>
-        private List<string> GetAllFiles()
-        {
-            var files = new List<string>();
-            foreach (var rootPath in RootPaths)
-            {
-                files.AddRange(Directory.GetFiles(rootPath.RootPath, rootPath.Filter));
-            }
-
-            return files;
-        }
-
-        /// <summary>
         /// Gets all files from location defined by RootPath and Filters and returns in a dictionary by directory
         /// </summary>
         /// <returns></returns>
@@ -61,19 +51,56 @@ namespace PluginFileReader.Helper
             var filesByDirectory = new Dictionary<string, List<string>>();
             foreach (var rootPath in RootPaths)
             {
-                if (filesByDirectory.TryGetValue(rootPath.RootPath, out var existingFiles))
+                var directoryPath = rootPath.RootPath;
+
+                if (rootPath.FileReadMode != "Local")
                 {
-                    existingFiles.AddRange(Directory.GetFiles(rootPath.RootPath, rootPath.Filter));
+                    directoryPath = Path.Join(Utility.TempDirectory, rootPath.RootPath);
+                    LoadFtpFilesIntoTempDirectory(directoryPath, rootPath);
+                }
+
+                if (filesByDirectory.TryGetValue(directoryPath, out var existingFiles))
+                {
+                    existingFiles.AddRange(Directory.GetFiles(directoryPath, rootPath.Filter));
                 }
                 else
                 {
                     var files = new List<string>();
-                    files.AddRange(Directory.GetFiles(rootPath.RootPath, rootPath.Filter));
+                    files.AddRange(Directory.GetFiles(directoryPath, rootPath.Filter));
                     filesByDirectory.Add(rootPath.RootPath, files);
                 }
             }
 
             return filesByDirectory;
+        }
+
+        private void LoadFtpFilesIntoTempDirectory(string tempDirectory, RootPathObject rootPath)
+        {
+            switch (rootPath.FileReadMode)
+            {
+                case "SFTP":
+                    using (var sftp = new SftpClient(FtpHostname, FtpUsername, FtpPassword))
+                    {
+                        sftp.Connect();
+                
+                        Regex mask = new Regex(rootPath.Filter.Replace(".", "[.]").Replace("*", ".*").Replace("?", "."));
+
+                        var allFiles = sftp.ListDirectory(rootPath.RootPath);
+                        var downloadFiles = allFiles.Where(f=> f.IsDirectory == false && mask.IsMatch(f.Name));
+
+                        foreach (var file in downloadFiles)
+                        {
+                            using (var targetFile = File.Create(Path.Combine(tempDirectory, file.Name)))
+                            {
+                                sftp.DownloadFile(file.FullName, targetFile);
+                                Logger.Debug($"Downloaded file {file.Name}");
+                            }
+                        }
+
+                        sftp.Disconnect();
+                    }
+                    break;
+            }
         }
 
         /// <summary>
@@ -158,13 +185,15 @@ namespace PluginFileReader.Helper
                     // apply local config file
                     if (!string.IsNullOrWhiteSpace(rootPath.ModeSettings.FixedWidthSettings.ColumnsConfigurationFile))
                     {
-                        using var file = File.OpenText(rootPath.ModeSettings.FixedWidthSettings.ColumnsConfigurationFile);
-                        rootPath.ModeSettings.FixedWidthSettings.Columns = (List<Column>) serializer.Deserialize(file, typeof(List<Column>));
+                        using var file =
+                            File.OpenText(rootPath.ModeSettings.FixedWidthSettings.ColumnsConfigurationFile);
+                        rootPath.ModeSettings.FixedWidthSettings.Columns =
+                            (List<Column>) serializer.Deserialize(file, typeof(List<Column>));
                     }
                 }
             }
         }
-        
+
         /// <summary>
         /// Reads the columns configuration files if defined on each RootPath and populates the columns property
         /// </summary>
@@ -174,9 +203,9 @@ namespace PluginFileReader.Helper
             {
                 RootPaths = new List<RootPathObject>();
             }
-            
+
             var serializer = new JsonSerializer();
-            
+
             // apply config files
             foreach (var rootPath in RootPaths)
             {
@@ -185,8 +214,10 @@ namespace PluginFileReader.Helper
                     // apply local config file
                     if (!string.IsNullOrWhiteSpace(rootPath.ModeSettings.AS400Settings.AS400FormatsConfigurationFile))
                     {
-                        using var file = File.OpenText(rootPath.ModeSettings.AS400Settings.AS400FormatsConfigurationFile);
-                        rootPath.ModeSettings.AS400Settings.Formats = (List<AS400Format>) serializer.Deserialize(file, typeof(List<AS400Format>));
+                        using var file =
+                            File.OpenText(rootPath.ModeSettings.AS400Settings.AS400FormatsConfigurationFile);
+                        rootPath.ModeSettings.AS400Settings.Formats =
+                            (List<AS400Format>) serializer.Deserialize(file, typeof(List<AS400Format>));
                     }
                 }
             }
@@ -210,15 +241,6 @@ namespace PluginFileReader.Helper
         }
 
         /// <summary>
-        /// Checks if files exist for the root path under the filters
-        /// </summary>
-        /// <returns></returns>
-        public bool FilesExistAtRootPathsAndFilters()
-        {
-            return GetAllFiles().Count != 0;
-        }
-        
-        /// <summary>
         /// Adds legacy config support
         /// </summary>
         public void ConvertLegacySettings()
@@ -227,6 +249,16 @@ namespace PluginFileReader.Helper
             {
                 foreach (var rootPath in RootPaths)
                 {
+                    if (string.IsNullOrWhiteSpace(rootPath.FileReadMode))
+                    {
+                        rootPath.FileReadMode = "Local";
+                    }
+
+                    if (rootPath.ModeSettings == null)
+                    {
+                        rootPath.ModeSettings = new ModeSettings();
+                    }
+                    
                     if (rootPath.Mode == Constants.DelimitedMode && rootPath.ModeSettings.DelimitedSettings == null)
                     {
                         rootPath.ModeSettings.DelimitedSettings = new DelimitedSettings
@@ -244,7 +276,7 @@ namespace PluginFileReader.Helper
                             Columns = rootPath.Columns,
                             ColumnsConfigurationFile = rootPath.ColumnsConfigurationFile
                         };
-                        continue;    
+                        continue;
                     }
 
                     if (rootPath.Mode == Constants.ExcelMode && rootPath.ModeSettings.ExcelModeSettings == null)
@@ -299,20 +331,21 @@ namespace PluginFileReader.Helper
         public string Name { get; set; }
         public string CleanupAction { get; set; }
         public string ArchivePath { get; set; }
+        public string FileReadMode { get; set; }
         public string Mode { get; set; }
         public int SkipLines { get; set; }
-        
+
         // MODE SETTINGS
         public ModeSettings ModeSettings { get; set; }
-        
+
         // LEGACY DELIMITED MODE SETTINGS
         public bool HasHeader { get; set; }
         public string Delimiter { get; set; }
-        
+
         // LEGACY COLUMN WIDTH MODE SETTINGS
         public string ColumnsConfigurationFile { get; set; }
         public List<Column> Columns { get; set; }
-        
+
         // LEGACY EXCEL FILE MODE SETTINGS
         public string ExcelColumns { get; set; }
         public List<ExcelCell> ExcelCells { get; set; }
@@ -321,14 +354,14 @@ namespace PluginFileReader.Helper
     public class ModeSettings
     {
         // DELIMITED MODE SETTINGS
-        public DelimitedSettings DelimitedSettings {get; set; }
-        
+        public DelimitedSettings DelimitedSettings { get; set; }
+
         // FIXED WIDTH MODE SETTINGS
         public FixedWidthSettings FixedWidthSettings { get; set; }
-        
+
         // EXCEL FILE MODE SETTINGS
         public ExcelModeSettings ExcelModeSettings { get; set; }
-        
+
         // AS400 MODE SETTINGS
         public AS400Settings AS400Settings { get; set; }
     }
@@ -337,7 +370,7 @@ namespace PluginFileReader.Helper
     {
         public bool HasHeader { get; set; }
         public string Delimiter { get; set; }
-        
+
         public char GetDelimiter()
         {
             switch (Delimiter)
@@ -361,7 +394,7 @@ namespace PluginFileReader.Helper
         public bool HasHeader { get; set; }
         public string ExcelColumns { get; set; }
         public List<ExcelCell> ExcelCells { get; set; }
-        
+
         public List<int> GetAllExcelColumnIndexes()
         {
             if (string.IsNullOrWhiteSpace(ExcelColumns))
@@ -375,7 +408,7 @@ namespace PluginFileReader.Helper
                 .SelectMany(x => Enumerable.Range(x.First, x.Last - x.First + 1))
                 .OrderBy(z => z).ToList();
         }
-        
+
         public List<ExcelCell> GetOrderedExcelCells()
         {
             return ExcelCells != null
@@ -413,30 +446,32 @@ namespace PluginFileReader.Helper
             return $"{ColumnName}_{RowIndex}_{ColumnIndex}";
         }
     }
-    
+
     public class AS400Format
     {
-        public AS400KeyValue KeyValue { get; set; } 
+        public AS400KeyValue KeyValue { get; set; }
         public bool SingleRecordPerLine { get; set; }
+
         public bool IsGlobalHeader { get; set; }
+
         // single line definition
         public List<Column> Columns { get; set; }
-        
+
         // if multiline definition 
         public AS400MultiLineDefinition MultiLineDefinition { get; set; }
-        public List<string> HeaderRecordKeys { get; set; } 
-        public List<Column> MultiLineColumns { get; set; } 
+        public List<string> HeaderRecordKeys { get; set; }
+        public List<Column> MultiLineColumns { get; set; }
     }
-    
+
     public class AS400KeyValue
     {
         // TODO evaluate if needed
         // public int ColumnStart { get; set; }
         // public int ColumnEnd { get; set; }
-        public string Value { get; set; } 
-        public string Name { get; set; } 
+        public string Value { get; set; }
+        public string Name { get; set; }
     }
-    
+
     public class AS400MultiLineDefinition
     {
         public int TagNameStart { get; set; }

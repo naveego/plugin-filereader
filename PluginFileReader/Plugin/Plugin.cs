@@ -46,6 +46,9 @@ namespace PluginFileReader.Plugin
             Directory.CreateDirectory(request.PermanentDirectory);
             Directory.CreateDirectory(request.LogDirectory);
             
+            // configure stream reader factory
+            Utility.TempDirectory = request.TemporaryDirectory;
+            
             // configure logger
             Logger.SetLogLevel(request.LogLevel);
             Logger.Init(request.LogDirectory);
