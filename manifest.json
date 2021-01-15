@@ -36,6 +36,7 @@
       "ui:order": [
         "GlobalColumnsConfigurationFile",
         "FtpHostname",
+        "FtpPort",
         "FtpUsername",
         "FtpPassword",
         "RootPaths"
@@ -173,20 +174,26 @@
         },
         "FtpHostname": {
           "type": "string",
-          "title": "SFTP Hostname",
-          "description": "Hostname for any root paths using SFTP.",
+          "title": "FTP Hostname",
+          "description": "Hostname for any root paths using FTP/SFTP.",
+          "default": ""
+        },
+        "FtpPort": {
+          "type": "number",
+          "title": "FTP Port",
+          "description": "Port for any root paths using FTP/SFTP.",
           "default": ""
         },
         "FtpUsername": {
           "type": "string",
-          "title": "SFTP Username",
-          "description": "Username for any root paths using SFTP.",
+          "title": "FTP Username",
+          "description": "Username for any root paths using FTP/SFTP.",
           "default": ""
         },
         "FtpPassword": {
           "type": "string",
-          "title": "SFTP Password",
-          "description": "Password for any root paths using SFTP.",
+          "title": "FTP Password",
+          "description": "Password for any root paths using FTP/SFTP.",
           "default": ""
         },
         "RootPaths": {
@@ -248,6 +255,7 @@
                 "default": "Local",
                 "enum": [
                   "Local",
+                  "FTP",
                   "SFTP"
                 ]
               },

@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
+using FluentFTP;
 using Newtonsoft.Json;
 using PluginFileReader.API.Utility;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 
 namespace PluginFileReader.Helper
 {
@@ -13,6 +16,7 @@ namespace PluginFileReader.Helper
     {
         public string GlobalColumnsConfigurationFile { get; set; }
         public string FtpHostname { get; set; }
+        public int FtpPort { get; set; }
         public string FtpUsername { get; set; }
         public string FtpPassword { get; set; }
         public List<RootPathObject> RootPaths { get; set; }
@@ -78,26 +82,48 @@ namespace PluginFileReader.Helper
         {
             switch (rootPath.FileReadMode)
             {
-                case "SFTP":
-                    using (var sftp = new SftpClient(FtpHostname, FtpUsername, FtpPassword))
+                case "FTP":
+                    using (var client = new FtpClient(FtpHostname))
                     {
-                        sftp.Connect();
+                        client.Credentials = new NetworkCredential(FtpUsername, FtpPassword);
+                        client.Port = FtpPort;
+                        
+                        client.Connect();
+                        
+                        Regex mask = new Regex(rootPath.Filter.Replace(".", "[.]").Replace("*", ".*").Replace("?", "."));
+
+                        foreach (FtpListItem item in client.GetListing(rootPath.RootPath)) {
+	
+                            // if this is a file
+                            if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name)){
+                                client.DownloadFile(Path.Combine(tempDirectory, item.Name), item.FullName);
+                                Logger.Debug($"Downloaded file {item.Name}");
+                            }
+                        }
+                        
+                        client.Disconnect();
+                    }
+                    break;
+                case "SFTP":
+                    using (var client = new SftpClient(FtpHostname, FtpPort, FtpUsername, FtpPassword))
+                    {
+                        client.Connect();
                 
                         Regex mask = new Regex(rootPath.Filter.Replace(".", "[.]").Replace("*", ".*").Replace("?", "."));
 
-                        var allFiles = sftp.ListDirectory(rootPath.RootPath);
+                        var allFiles = client.ListDirectory(rootPath.RootPath);
                         var downloadFiles = allFiles.Where(f=> f.IsDirectory == false && mask.IsMatch(f.Name));
 
                         foreach (var file in downloadFiles)
                         {
                             using (var targetFile = File.Create(Path.Combine(tempDirectory, file.Name)))
                             {
-                                sftp.DownloadFile(file.FullName, targetFile);
+                                client.DownloadFile(file.FullName, targetFile);
                                 Logger.Debug($"Downloaded file {file.Name}");
                             }
                         }
 
-                        sftp.Disconnect();
+                        client.Disconnect();
                     }
                     break;
             }
@@ -231,7 +257,7 @@ namespace PluginFileReader.Helper
         {
             foreach (var rootPath in RootPaths)
             {
-                if (!Directory.Exists(rootPath.RootPath))
+                if (rootPath.FileReadMode == "Local" && !Directory.Exists(rootPath.RootPath))
                 {
                     throw new Exception($"{rootPath.RootPath} is not a directory");
                 }

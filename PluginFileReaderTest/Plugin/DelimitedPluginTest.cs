@@ -79,18 +79,19 @@ namespace PluginFileReaderTest.Plugin
         {
             return new Settings
             {
-                FtpHostname = "test.rebex.net",
-                FtpUsername = "demo",
-                FtpPassword = "password",
+                FtpHostname = "150.136.152.223",
+                FtpPort = 21,
+                FtpUsername = "ftp_user",
+                FtpPassword = "Kc7WnC3MLzIR",
                 RootPaths = multiRoot
                     ? new List<RootPathObject>
                     {
                         new RootPathObject
                         {
-                            RootPath = sftp ? "/" : ReadPath,
+                            RootPath = sftp ? "/CSV" : ReadPath,
                             Filter = filter ?? DefaultFilter,
                             Mode = DelimitedMode,
-                            FileReadMode = sftp ? "SFTP" : "Local",
+                            FileReadMode = sftp ? "FTP" : "Local",
                             Delimiter = delimiter,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
@@ -98,10 +99,10 @@ namespace PluginFileReaderTest.Plugin
                         },
                         new RootPathObject
                         {
-                            RootPath = sftp ? "/" : ReadDifferentPath,
+                            RootPath = sftp ? "/CSV" : ReadDifferentPath,
                             Filter = filter ?? DefaultFilter,
                             Mode = DelimitedMode,
-                            FileReadMode = sftp ? "SFTP" : "Local",
+                            FileReadMode = sftp ? "FTP" : "Local",
                             Delimiter = delimiter,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
@@ -112,11 +113,11 @@ namespace PluginFileReaderTest.Plugin
                     {
                         new RootPathObject
                         {
-                            RootPath = sftp ? "/" : ReadPath,
+                            RootPath = sftp ? "/CSV" : ReadPath,
                             Filter = filter ?? DefaultFilter,
                             Delimiter = delimiter,
                             Mode = DelimitedMode,
-                            FileReadMode = sftp ? "SFTP" : "Local",
+                            FileReadMode = sftp ? "FTP" : "Local",
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath
@@ -1096,13 +1097,6 @@ on a.id = b.id"),
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
-
-            var settings = GetSettings();
-            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
-            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
-            {
-                RootPath = settings.RootPaths.First()
-            });
 
             // act
             client.Configure(configureRequest);
