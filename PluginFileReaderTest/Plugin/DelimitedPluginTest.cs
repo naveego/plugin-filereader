@@ -79,10 +79,10 @@ namespace PluginFileReaderTest.Plugin
         {
             return new Settings
             {
-                FtpHostname = "150.136.152.223",
+                FtpHostname = "",
                 FtpPort = 21,
-                FtpUsername = "ftp_user",
-                FtpPassword = "ck7jNlQBG9Xq",
+                FtpUsername = "",
+                FtpPassword = "",
                 RootPaths = multiRoot
                     ? new List<RootPathObject>
                     {
