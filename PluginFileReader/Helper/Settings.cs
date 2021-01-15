@@ -100,7 +100,7 @@ namespace PluginFileReader.Helper
                                 Logger.Debug($"Downloaded file {item.Name}");
                             }
                         }
-                        
+
                         client.Disconnect();
                     }
                     break;
@@ -260,6 +260,49 @@ namespace PluginFileReader.Helper
                 if (rootPath.FileReadMode == "Local" && !Directory.Exists(rootPath.RootPath))
                 {
                     throw new Exception($"{rootPath.RootPath} is not a directory");
+                }
+
+                if (rootPath.FileReadMode == "FTP")
+                {
+                    using (var client = new FtpClient(FtpHostname))
+                    {
+                        client.Credentials = new NetworkCredential(FtpUsername, FtpPassword);
+                        client.Port = FtpPort;
+                        
+                        client.Connect();
+
+                        try
+                        {
+                            if(!client.DirectoryExists(rootPath.RootPath))
+                            {
+                                throw new Exception($"{rootPath.RootPath} is not a directory on remote FTP");
+                            }
+                        }
+                        finally
+                        {
+                            client.Disconnect();
+                        }
+                    }
+                }
+
+                if (rootPath.FileReadMode == "SFTP")
+                {
+                    using (var client = new SftpClient(FtpHostname, FtpPort, FtpUsername, FtpPassword))
+                    {
+                        client.Connect();
+                        
+                        try
+                        {
+                            if(!client.Exists(rootPath.RootPath))
+                            {
+                                throw new Exception($"{rootPath.RootPath} is not a directory on remote SFTP");
+                            }
+                        }
+                        finally
+                        {
+                            client.Disconnect();
+                        }
+                    }
                 }
             }
 

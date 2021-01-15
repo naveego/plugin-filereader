@@ -95,3 +95,76 @@ Renci.SshNet.Common.SshOperationTimeoutException: Socket read operation has time
 2021-01-15 11:10:38.038 -05:00 [DBG] <test> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
 2021-01-15 11:10:38.352 -05:00 [INF] <test> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 1000 rows
 2021-01-15 11:10:38.460 -05:00 [INF] <test> Published 10 records
+2021-01-15 11:23:59.651 -05:00 [INF]  Connecting...
+2021-01-15 11:23:59.707 -05:00 [INF]  Connected.
+2021-01-15 11:23:59.720 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-15 11:24:00.269 -05:00 [ERR] <discover> Could not find a part of the path '/home/wyatt/repos/naveego/plugin-filereader/PluginFileReaderTest/Temp/BAD'.
+System.IO.DirectoryNotFoundException: Could not find a part of the path '/home/wyatt/repos/naveego/plugin-filereader/PluginFileReaderTest/Temp/BAD'.
+   at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerator`1..ctor(String directory, Boolean isNormalized, EnumerationOptions options)
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions options)
+   at PluginFileReader.Helper.Settings.GetAllFilesByDirectory() in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Helper/Settings.cs:line 72
+   at PluginFileReader.Plugin.Plugin.DiscoverSchemas(DiscoverSchemasRequest request, ServerCallContext context) in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Plugin/Plugin.cs:line 160
+2021-01-15 11:24:32.204 -05:00 [INF]  Connecting...
+2021-01-15 11:24:32.256 -05:00 [INF]  Connected.
+2021-01-15 11:24:32.303 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-15 11:43:48.283 -05:00 [INF]  Connecting...
+2021-01-15 11:43:48.825 -05:00 [ERR]  /BAD is not a directory on remote FTP
+System.Exception: /BAD is not a directory on remote FTP
+   at PluginFileReader.Helper.Settings.RootPathsAreDirectories() in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Helper/Settings.cs:line 278
+   at PluginFileReader.Helper.Settings.Validate() in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Helper/Settings.cs:line 32
+   at PluginFileReader.Plugin.Plugin.Connect(ConnectRequest request, ServerCallContext context) in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Plugin/Plugin.cs:line 81
+2021-01-15 11:54:54.066 -05:00 [INF]  Connecting...
+2021-01-15 11:54:54.582 -05:00 [INF]  Connected.
+2021-01-15 11:54:54.596 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-15 11:54:55.387 -05:00 [DBG] <discover> Downloaded file MOCK_DATA.csv
+2021-01-15 11:54:55.432 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-15 11:54:55.507 -05:00 [INF] <discover> Purging table: [dbo].[CSV]
+2021-01-15 11:54:55.666 -05:00 [INF] <discover> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-15 11:54:55.666 -05:00 [INF] <discover> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-15 11:54:55.675 -05:00 [DBG] <discover> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-15 11:54:55.675 -05:00 [DBG] <discover> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-15 11:54:55.753 -05:00 [DBG] <discover> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-15 11:54:55.753 -05:00 [DBG] <discover> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-15 11:54:55.774 -05:00 [INF] <discover> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 5 rows
+2021-01-15 11:54:55.793 -05:00 [DBG] <discover> {
+  "Id": "[dbo].[CSV]",
+  "Name": "CSV",
+  "Description": "",
+  "Properties": [],
+  "Count": null,
+  "Sample": [],
+  "Query": "SELECT * FROM [dbo].[CSV]",
+  "PublisherMetaJson": "",
+  "Errors": [],
+  "DataFlowDirection": 0
+}
+2021-01-15 11:54:55.811 -05:00 [INF] <discover> Schemas returned: 1
+2021-01-15 11:54:55.827 -05:00 [INF] <test> Publishing records for schema: CSV
+2021-01-15 11:54:56.566 -05:00 [DBG] <test> Downloaded file MOCK_DATA.csv
+2021-01-15 11:54:56.643 -05:00 [INF] <test> Purging table: [dbo].[CSV]
+2021-01-15 11:54:56.662 -05:00 [INF] <test> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-15 11:54:56.662 -05:00 [INF] <test> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-15 11:54:56.663 -05:00 [DBG] <test> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-15 11:54:56.663 -05:00 [DBG] <test> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-15 11:54:56.664 -05:00 [DBG] <test> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-15 11:54:56.664 -05:00 [DBG] <test> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-15 11:54:56.831 -05:00 [INF] <test> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 1000 rows
+2021-01-15 11:54:56.880 -05:00 [INF] <test> Published 10 records
