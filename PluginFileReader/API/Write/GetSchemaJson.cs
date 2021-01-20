@@ -24,6 +24,19 @@ namespace PluginFileReader.API.Write
                         {"title", "Target File Name"},
                         {"description", "Name of target file"},
                     }},
+                    {"FileWriteMode", new Dictionary<string, object>
+                    {
+                        {"type", "string"},
+                        {"title", "File Write Mode"},
+                        {"description", "Mode to write target files."},
+                        {"default", "Local"},
+                        {"enum", new List<string>
+                        {
+                            "Local",
+                            "FTP",
+                            "SFTP"
+                        }}
+                    }},
                     {"IncludeHeader", new Dictionary<string, object>
                     {
                         {"type", "boolean"},

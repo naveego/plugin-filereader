@@ -7,13 +7,51 @@ namespace PluginFileReader.API.Utility
 {
     public static partial class Utility 
     {
-        public static void ArchiveFileAtPath(string path, string archivePath)
+        public static void ArchiveFileAtPath(string path, RootPathObject rootPath, Settings settings)
         {
             try
             {
-                var archiveFilePath = GetUniqueFilePath($"{Path.Join(archivePath, Path.GetFileName(path))}");
-                File.Copy(path, archiveFilePath, false);
-                DeleteFileAtPath(path);
+                switch (rootPath.FileReadMode)
+                {
+                    case Constants.FileModeLocal:
+                        var archiveFilePath = GetUniqueFilePath($"{Path.Join(rootPath.ArchivePath, Path.GetFileName(path))}");
+                        File.Copy(path, archiveFilePath, false);
+                        DeleteFileAtPath(path, rootPath, settings, false);
+                        break;
+                    case Constants.FileModeFtp:
+                        using (var client = GetFtpClient(settings))
+                        {
+                            try
+                            {
+                                var remoteFilePath = Path.Join("/", path.Replace(TempDirectory, ""));
+                                client.MoveFile(remoteFilePath, rootPath.ArchivePath);
+                                DeleteFileAtPath(path, rootPath, settings, true);
+                            }
+                            finally
+                            {
+                                client.Disconnect();
+                            }
+                        }
+
+                        break;
+                    case Constants.FileModeSftp:
+                        using (var client = GetSftpClient(settings))
+                        {
+                            try
+                            {
+                                var localFileStream = GetFileStream(path);
+                                client.UploadFile(localFileStream, rootPath.ArchivePath);
+                                DeleteFileAtPath(path, rootPath, settings, true);
+                            }
+                            finally
+                            {
+                                client.Disconnect();
+                            }
+                        }
+
+                        break;
+                }
+
             }
             catch (Exception e)
             {

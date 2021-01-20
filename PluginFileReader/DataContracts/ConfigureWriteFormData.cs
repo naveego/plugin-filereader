@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using PluginFileReader.API.Utility;
 
 namespace PluginFileReader.DataContracts
 {
@@ -7,6 +8,7 @@ namespace PluginFileReader.DataContracts
     {
         public string TargetFileDirectory { get; set; }
         public string TargetFileName { get; set; }
+        public string FileWriteMode { get; set; }
         public bool IncludeHeader { get; set; }
         public bool QuoteWrap { get; set; }
         public string Delimiter { get; set; }
@@ -30,9 +32,28 @@ namespace PluginFileReader.DataContracts
             return Path.GetFileNameWithoutExtension(TargetFileName);
         }
 
+        public string GetTargetDirectory()
+        {
+            switch (FileWriteMode)
+            {
+                case Constants.FileModeFtp:
+                case Constants.FileModeSftp:
+                    return Path.Join(Utility.TempDirectory, TargetFileDirectory);
+                default:
+                    return Path.Join(TargetFileDirectory);
+            }
+        }
+
         public string GetTargetFilePath()
         {
-            return Path.Join(TargetFileDirectory, TargetFileName);
+            switch (FileWriteMode)
+            {
+                case Constants.FileModeFtp:
+                case Constants.FileModeSftp:
+                    return Path.Join(Utility.TempDirectory, TargetFileDirectory, TargetFileName);
+                default:
+                    return Path.Join(TargetFileDirectory, TargetFileName);
+            }
         }
 
         public ConfigureReplicationFormData GetReplicationFormData()
@@ -49,6 +70,14 @@ namespace PluginFileReader.DataContracts
                 VersionRecordFileDirectory = "",
                 VersionRecordFileName = ""
             };
+        }
+
+        public void ConvertLegacyConfiguration()
+        {
+            if (string.IsNullOrWhiteSpace(FileWriteMode))
+            {
+                FileWriteMode = Constants.FileModeLocal;
+            }
         }
     }
 

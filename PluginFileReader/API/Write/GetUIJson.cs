@@ -13,6 +13,7 @@ namespace PluginFileReader.API.Write
                 {
                     "TargetFileDirectory",
                     "TargetFileName",
+                    "FileWriteMode",
                     "IncludeHeader",
                     "QuoteWrap",
                     "Delimiter",

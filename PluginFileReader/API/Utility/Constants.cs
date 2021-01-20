@@ -30,10 +30,21 @@ namespace PluginFileReader.API.Utility
         public static string ReplicationMetaDataReplicatedShapeName = "NaveegoShapeName";
         public static string ReplicationMetaDataTimestamp = "Timestamp";
 
-        public const string DelimitedMode = "Delimited";
-        public const string FixedWidthMode = "Fixed Width Columns";
-        public const string ExcelMode = "Excel";
-        public const string AS400Mode = "AS400";
+        // Mode options
+        public const string ModeDelimited = "Delimited";
+        public const string ModeFixedWidth = "Fixed Width Columns";
+        public const string ModeExcel = "Excel";
+        public const string ModeAS400 = "AS400";
+
+        // File Mode options
+        public const string FileModeLocal = "Local";
+        public const string FileModeFtp = "FTP";
+        public const string FileModeSftp = "SFTP";
+
+        // Cleanup Action options
+        public const string CleanupActionNone = "None";
+        public const string CleanupActionArchive = "Archive";
+        public const string CleanupActionDelete = "Delete";
         
         public static List<ReplicationColumn> ReplicationMetaDataColumns = new List<ReplicationColumn>
         {

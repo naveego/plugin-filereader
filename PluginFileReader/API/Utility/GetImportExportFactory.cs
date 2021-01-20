@@ -17,13 +17,13 @@ namespace PluginFileReader.API.Utility
         {
             switch (mode)
             {
-                case Constants.DelimitedMode:
+                case Constants.ModeDelimited:
                     return new DelimitedImportExportFactory();
-                case Constants.FixedWidthMode:
+                case Constants.ModeFixedWidth:
                     return new FixedWidthColumnsFactory();
-                case Constants.ExcelMode:
+                case Constants.ModeExcel:
                     return new ExcelImportExportFactory();
-                case Constants.AS400Mode:
+                case Constants.ModeAS400:
                     return new AS400ImportExportFactory();
                 default:
                     return null;

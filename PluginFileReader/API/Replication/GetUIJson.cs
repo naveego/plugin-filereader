@@ -15,6 +15,7 @@ namespace PluginFileReader.API.Replication
                     "GoldenRecordFileName",
                     "VersionRecordFileDirectory",
                     "VersionRecordFileName",
+                    "FileWriteMode",
                     "IncludeHeader",
                     "QuoteWrap",
                     "Delimiter",

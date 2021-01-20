@@ -22,7 +22,7 @@ namespace PluginFileReader.Plugin
         private readonly ServerStatus _server;
 
         private TaskCompletionSource<bool> _tcs;
-        
+
         private static readonly SemaphoreSlim DiscoverSemaphoreSlim = new SemaphoreSlim(1, 1);
 
         public Plugin()
@@ -40,15 +40,15 @@ namespace PluginFileReader.Plugin
         {
             Logger.Debug("Got configure request");
             Logger.Debug(JsonConvert.SerializeObject(request, Formatting.Indented));
-            
+
             // ensure all directories are created
             Directory.CreateDirectory(request.TemporaryDirectory);
             Directory.CreateDirectory(request.PermanentDirectory);
             Directory.CreateDirectory(request.LogDirectory);
-            
+
             // configure stream reader factory
             Utility.TempDirectory = request.TemporaryDirectory;
-            
+
             // configure logger
             Logger.SetLogLevel(request.LogLevel);
             Logger.Init(request.LogDirectory);
@@ -156,12 +156,13 @@ namespace PluginFileReader.Plugin
                 try
                 {
                     await DiscoverSemaphoreSlim.WaitAsync();
-                    
+
                     var files = _server.Settings.GetAllFilesByDirectory();
                     Logger.Info($"Schemas attempted: {files.Count}");
 
                     var schemas = _server.Settings.RootPaths.Select(p =>
-                            Discover.GetSchemasForDirectory(Utility.GetImportExportFactory(p.Mode), p, files[p.RootPath],
+                            Discover.GetSchemasForDirectory(Utility.GetImportExportFactory(p.Mode), p,
+                                files[p.RootPath],
                                 sampleSize))
                         .ToList();
 
@@ -185,7 +186,7 @@ namespace PluginFileReader.Plugin
             try
             {
                 await DiscoverSemaphoreSlim.WaitAsync();
-                
+
                 var refreshSchemas = request.ToRefresh;
 
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
@@ -198,14 +199,15 @@ namespace PluginFileReader.Plugin
                     sampleSize = 5;
                 }
 
-                foreach (var rootPath in _server.Settings.RootPaths) {
+                foreach (var rootPath in _server.Settings.RootPaths)
+                {
                     var schemaName = Constants.SchemaName;
                     var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
                         ? new DirectoryInfo(rootPath.RootPath).Name
                         : rootPath.Name;
 
                     Utility.LoadDirectoryFilesIntoDb(
-                        Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath, 
+                        Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
                         tableName, schemaName, files[rootPath.RootPath].Take(1).ToList(), sampleSize);
                 }
 
@@ -258,7 +260,8 @@ namespace PluginFileReader.Plugin
                     // schema is not query based so we can stream each file as it is loaded
                     var schemaMetaJson =
                         JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
-                    var rootPath = _server.Settings.RootPaths.First(r => r.RootPath == schemaMetaJson.RootPath.RootPath);
+                    var rootPath =
+                        _server.Settings.RootPaths.First(r => r.RootPath == schemaMetaJson.RootPath.RootPath);
                     var files = filesByDirectory[rootPath.RootPath];
                     var schemaName = Constants.SchemaName;
                     var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
@@ -345,22 +348,32 @@ namespace PluginFileReader.Plugin
                     var files = filesByDirectory[rootPath.RootPath];
                     switch (rootPath.CleanupAction)
                     {
-                        case "Delete":
+                        case Constants.CleanupActionDelete:
                             foreach (var file in files)
                             {
                                 Logger.Info($"Deleting file {file}");
-                                Utility.DeleteFileAtPath(file);
+                                Utility.DeleteFileAtPath(file, rootPath, _server.Settings, true);
                             }
 
                             break;
-                        case "Archive":
+                        case Constants.CleanupActionArchive:
                             foreach (var file in files)
                             {
                                 Logger.Info($"Archiving file {file} to {rootPath.ArchivePath}");
-                                Utility.ArchiveFileAtPath(file, rootPath.ArchivePath);
+                                Utility.ArchiveFileAtPath(file, rootPath, _server.Settings);
                             }
 
                             break;
+                    }
+
+                    // clean up local files pulled from remote
+                    if (rootPath.FileReadMode != Constants.FileModeLocal)
+                    {
+                        foreach (var file in files)
+                        {
+                            Logger.Info($"Source file is not local, deleting local file {file}");
+                            Utility.DeleteFileAtPath(file, rootPath, _server.Settings, false);
+                        }
                     }
                 }
             }
@@ -411,6 +424,8 @@ namespace PluginFileReader.Plugin
                 // get form data
                 var formData = JsonConvert.DeserializeObject<ConfigureWriteFormData>(request.Form.DataJson);
 
+                var errors = formData.ValidateWriteFormData(_server.Settings);
+
                 // base schema to return
                 var schema = Write.GetSchemaFromForm(formData);
 
@@ -419,7 +434,7 @@ namespace PluginFileReader.Plugin
                     Form = new ConfigurationFormResponse
                     {
                         DataJson = request.Form.DataJson,
-                        Errors = { },
+                        Errors = {errors},
                         SchemaJson = schemaJson,
                         UiJson = uiJson,
                         StateJson = request.Form.StateJson
@@ -462,14 +477,13 @@ namespace PluginFileReader.Plugin
 
             try
             {
-                var errors = new List<string>();
                 if (!string.IsNullOrWhiteSpace(request.Form.DataJson))
                 {
                     // check for config errors
                     var replicationFormData =
                         JsonConvert.DeserializeObject<ConfigureReplicationFormData>(request.Form.DataJson);
 
-                    errors = replicationFormData.ValidateReplicationFormData();
+                    var errors = replicationFormData.ValidateReplicationFormData(_server.Settings);
 
                     return Task.FromResult(new ConfigureReplicationResponse
                     {
@@ -544,17 +558,18 @@ namespace PluginFileReader.Plugin
                 try
                 {
                     // setup import export helpers
-                    var factory = Utility.GetImportExportFactory("Delimited");
+                    var factory = Utility.GetImportExportFactory(Constants.ModeDelimited);
                     var replicationSettings =
                         JsonConvert.DeserializeObject<ConfigureReplicationFormData>(request.Replication.SettingsJson);
+                    replicationSettings.ConvertLegacyConfiguration();
                     _server.WriteSettings.GoldenImportExport = factory.MakeImportExportFile(conn, replicationSettings,
                         replicationSettings.GetGoldenTableName(), Constants.SchemaName);
                     _server.WriteSettings.VersionImportExport = factory.MakeImportExportFile(conn, replicationSettings,
                         replicationSettings.GetVersionTableName(), Constants.SchemaName);
 
                     // prepare write locations
-                    Directory.CreateDirectory(replicationSettings.GoldenRecordFileDirectory);
-                    Directory.CreateDirectory(replicationSettings.VersionRecordFileDirectory);
+                    Directory.CreateDirectory(replicationSettings.GetGoldenDirectory());
+                    Directory.CreateDirectory(replicationSettings.GetVersionDirectory());
                 }
                 catch (Exception e)
                 {
@@ -581,14 +596,15 @@ namespace PluginFileReader.Plugin
                 try
                 {
                     // setup import export helper
-                    var factory = Utility.GetImportExportFactory("Delimited");
+                    var factory = Utility.GetImportExportFactory(Constants.ModeDelimited);
                     var writeFormData =
                         JsonConvert.DeserializeObject<ConfigureWriteFormData>(request.Schema.PublisherMetaJson);
+                    writeFormData.ConvertLegacyConfiguration();
                     _server.WriteSettings.TargetImportExport = factory.MakeImportExportFile(conn, writeFormData,
                         writeFormData.GetTargetTableName(), Constants.SchemaName);
 
                     // prepare write location
-                    Directory.CreateDirectory(writeFormData.TargetFileDirectory);
+                    Directory.CreateDirectory(writeFormData.GetTargetDirectory());
 
                     // reconcile job
                     Logger.Info($"Starting to reconcile Replication Job {request.DataVersions.JobId}");
@@ -646,7 +662,7 @@ namespace PluginFileReader.Plugin
                         while (_server.Connected)
                         {
                             Replication.WriteToDisk(_server.WriteSettings.GoldenImportExport,
-                                _server.WriteSettings.VersionImportExport, config);
+                                _server.WriteSettings.VersionImportExport, config, _server.Settings);
                             Thread.Sleep(1000);
                         }
                     });
@@ -676,7 +692,7 @@ namespace PluginFileReader.Plugin
                     {
                         while (_server.Connected)
                         {
-                            Write.WriteToDisk(_server.WriteSettings.TargetImportExport, writeConfig);
+                            Write.WriteToDisk(_server.WriteSettings.TargetImportExport, writeConfig, _server.Settings);
                             Thread.Sleep(1000);
                         }
                     });

@@ -36,6 +36,19 @@ namespace PluginFileReader.API.Replication
                         {"title", "Version Record File Name"},
                         {"description", "Name of Version Record file."},
                     }},
+                    {"FileWriteMode", new Dictionary<string, object>
+                    {
+                        {"type", "string"},
+                        {"title", "File Write Mode"},
+                        {"description", "Mode to write target files."},
+                        {"default", "Local"},
+                        {"enum", new List<string>
+                        {
+                            "Local",
+                            "FTP",
+                            "SFTP"
+                        }}
+                    }},
                     {"IncludeHeader", new Dictionary<string, object>
                     {
                         {"type", "boolean"},

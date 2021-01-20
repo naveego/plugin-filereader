@@ -10,6 +10,7 @@ namespace PluginFileReader.DataContracts
         public string GoldenRecordFileName { get; set; }
         public string VersionRecordFileDirectory { get; set; }
         public string VersionRecordFileName { get; set; }
+        public string FileWriteMode { get; set; }
         public bool IncludeHeader { get; set; }
         public bool QuoteWrap { get; set; }
         public string Delimiter { get; set; }
@@ -38,7 +39,26 @@ namespace PluginFileReader.DataContracts
 
         public string GetGoldenFilePath()
         {
-            return Path.Join(GoldenRecordFileDirectory, GoldenRecordFileName);
+            switch (FileWriteMode)
+            {
+                case Constants.FileModeFtp:
+                case Constants.FileModeSftp:
+                    return Path.Join(Utility.TempDirectory, GoldenRecordFileDirectory, GoldenRecordFileName);
+                default:
+                    return Path.Join(GoldenRecordFileDirectory, GoldenRecordFileName);
+            }
+        }
+        
+        public string GetGoldenDirectory()
+        {
+            switch (FileWriteMode)
+            {
+                case Constants.FileModeFtp:
+                case Constants.FileModeSftp:
+                    return Path.Join(Utility.TempDirectory, GoldenRecordFileDirectory);
+                default:
+                    return Path.Join(GoldenRecordFileDirectory);
+            }
         }
 
         public string GetVersionTableName()
@@ -52,7 +72,34 @@ namespace PluginFileReader.DataContracts
 
         public string GetVersionFilePath()
         {
-            return Path.Join(VersionRecordFileDirectory, VersionRecordFileName);
+            switch (FileWriteMode)
+            {
+                case Constants.FileModeFtp:
+                case Constants.FileModeSftp:
+                    return Path.Join(Utility.TempDirectory, VersionRecordFileDirectory, VersionRecordFileName);
+                default:
+                    return Path.Join(VersionRecordFileDirectory, VersionRecordFileName);
+            }
+        }
+        
+        public string GetVersionDirectory()
+        {
+            switch (FileWriteMode)
+            {
+                case Constants.FileModeFtp:
+                case Constants.FileModeSftp:
+                    return Path.Join(Utility.TempDirectory, VersionRecordFileDirectory);
+                default:
+                    return Path.Join(VersionRecordFileDirectory);
+            }
+        }
+        
+        public void ConvertLegacyConfiguration()
+        {
+            if (string.IsNullOrWhiteSpace(FileWriteMode))
+            {
+                FileWriteMode = Constants.FileModeLocal;
+            }
         }
     }
 }

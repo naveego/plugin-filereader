@@ -43,6 +43,12 @@ namespace PluginFileReader.Helper
                 {
                     throw new Exception("A RootPath set to Fixed Width Columns has no columns defined");
                 }
+
+                if (!RemoteHasRequiredPermissions())
+                {
+                    throw new Exception(
+                        "A Remote RootPath does not have the required permissions to perform actions configured");
+                }
             }
         }
 
@@ -57,10 +63,9 @@ namespace PluginFileReader.Helper
             {
                 var directoryPath = rootPath.RootPath;
 
-                if (rootPath.FileReadMode != "Local")
+                if (rootPath.FileReadMode != Constants.FileModeLocal)
                 {
-                    directoryPath = Path.Join(Utility.TempDirectory, rootPath.RootPath);
-                    LoadFtpFilesIntoTempDirectory(directoryPath, rootPath);
+                    LoadRemoteFilesIntoTempDirectory(rootPath);
                 }
 
                 if (filesByDirectory.TryGetValue(directoryPath, out var existingFiles))
@@ -78,41 +83,49 @@ namespace PluginFileReader.Helper
             return filesByDirectory;
         }
 
-        private void LoadFtpFilesIntoTempDirectory(string tempDirectory, RootPathObject rootPath)
+        private void LoadRemoteFilesIntoTempDirectory(RootPathObject rootPath)
         {
+            var tempDirectory = Path.Join(Utility.TempDirectory, rootPath.RootPath);
+
             switch (rootPath.FileReadMode)
             {
-                case "FTP":
-                    using (var client = new FtpClient(FtpHostname))
+                case Constants.FileModeFtp:
+                    using (var client = Utility.GetFtpClient(this))
                     {
-                        client.Credentials = new NetworkCredential(FtpUsername, FtpPassword);
-                        client.Port = FtpPort;
-                        
-                        client.Connect();
-                        
-                        Regex mask = new Regex(rootPath.Filter.Replace(".", "[.]").Replace("*", ".*").Replace("?", "."));
+                        var mask = new Regex(rootPath.Filter
+                            .Replace(".", "[.]")
+                            .Replace("*", ".*")
+                            .Replace("?", "."));
 
-                        foreach (FtpListItem item in client.GetListing(rootPath.RootPath)) {
-	
+                        foreach (var item in client.GetListing(rootPath.RootPath))
+                        {
                             // if this is a file
-                            if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name)){
-                                client.DownloadFile(Path.Combine(tempDirectory, item.Name), item.FullName);
+                            if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
+                            {
+                                var status = client.DownloadFile(Path.Combine(tempDirectory, item.Name), item.FullName);
+                                if (status == FtpStatus.Failed)
+                                {
+                                    throw new Exception($"Could not download target file {item.FullName}");
+                                }
+
                                 Logger.Debug($"Downloaded file {item.Name}");
                             }
                         }
 
                         client.Disconnect();
                     }
+
                     break;
-                case "SFTP":
-                    using (var client = new SftpClient(FtpHostname, FtpPort, FtpUsername, FtpPassword))
+                case Constants.FileModeSftp:
+                    using (var client = Utility.GetSftpClient(this))
                     {
-                        client.Connect();
-                
-                        Regex mask = new Regex(rootPath.Filter.Replace(".", "[.]").Replace("*", ".*").Replace("?", "."));
+                        var mask = new Regex(rootPath.Filter
+                            .Replace(".", "[.]")
+                            .Replace("*", ".*")
+                            .Replace("?", "."));
 
                         var allFiles = client.ListDirectory(rootPath.RootPath);
-                        var downloadFiles = allFiles.Where(f=> f.IsDirectory == false && mask.IsMatch(f.Name));
+                        var downloadFiles = allFiles.Where(f => f.IsDirectory == false && mask.IsMatch(f.Name));
 
                         foreach (var file in downloadFiles)
                         {
@@ -125,6 +138,7 @@ namespace PluginFileReader.Helper
 
                         client.Disconnect();
                     }
+
                     break;
             }
         }
@@ -197,7 +211,7 @@ namespace PluginFileReader.Helper
             // apply config files
             foreach (var rootPath in RootPaths)
             {
-                if (rootPath.Mode == Constants.FixedWidthMode)
+                if (rootPath.Mode == Constants.ModeFixedWidth)
                 {
                     // apply global config file
                     var indexName = string.IsNullOrWhiteSpace(rootPath.Name)
@@ -235,7 +249,7 @@ namespace PluginFileReader.Helper
             // apply config files
             foreach (var rootPath in RootPaths)
             {
-                if (rootPath.Mode == Constants.AS400Mode)
+                if (rootPath.Mode == Constants.ModeAS400)
                 {
                     // apply local config file
                     if (!string.IsNullOrWhiteSpace(rootPath.ModeSettings.AS400Settings.AS400FormatsConfigurationFile))
@@ -250,66 +264,6 @@ namespace PluginFileReader.Helper
         }
 
         /// <summary>
-        /// Checks if RootPaths are directories
-        /// </summary>
-        /// <returns></returns>
-        private bool RootPathsAreDirectories()
-        {
-            foreach (var rootPath in RootPaths)
-            {
-                if (rootPath.FileReadMode == "Local" && !Directory.Exists(rootPath.RootPath))
-                {
-                    throw new Exception($"{rootPath.RootPath} is not a directory");
-                }
-
-                if (rootPath.FileReadMode == "FTP")
-                {
-                    using (var client = new FtpClient(FtpHostname))
-                    {
-                        client.Credentials = new NetworkCredential(FtpUsername, FtpPassword);
-                        client.Port = FtpPort;
-                        
-                        client.Connect();
-
-                        try
-                        {
-                            if(!client.DirectoryExists(rootPath.RootPath))
-                            {
-                                throw new Exception($"{rootPath.RootPath} is not a directory on remote FTP");
-                            }
-                        }
-                        finally
-                        {
-                            client.Disconnect();
-                        }
-                    }
-                }
-
-                if (rootPath.FileReadMode == "SFTP")
-                {
-                    using (var client = new SftpClient(FtpHostname, FtpPort, FtpUsername, FtpPassword))
-                    {
-                        client.Connect();
-                        
-                        try
-                        {
-                            if(!client.Exists(rootPath.RootPath))
-                            {
-                                throw new Exception($"{rootPath.RootPath} is not a directory on remote SFTP");
-                            }
-                        }
-                        finally
-                        {
-                            client.Disconnect();
-                        }
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// Adds legacy config support
         /// </summary>
         public void ConvertLegacySettings()
@@ -320,15 +274,15 @@ namespace PluginFileReader.Helper
                 {
                     if (string.IsNullOrWhiteSpace(rootPath.FileReadMode))
                     {
-                        rootPath.FileReadMode = "Local";
+                        rootPath.FileReadMode = Constants.FileModeLocal;
                     }
 
                     if (rootPath.ModeSettings == null)
                     {
                         rootPath.ModeSettings = new ModeSettings();
                     }
-                    
-                    if (rootPath.Mode == Constants.DelimitedMode && rootPath.ModeSettings.DelimitedSettings == null)
+
+                    if (rootPath.Mode == Constants.ModeDelimited && rootPath.ModeSettings.DelimitedSettings == null)
                     {
                         rootPath.ModeSettings.DelimitedSettings = new DelimitedSettings
                         {
@@ -338,7 +292,7 @@ namespace PluginFileReader.Helper
                         continue;
                     }
 
-                    if (rootPath.Mode == Constants.FixedWidthMode && rootPath.ModeSettings.FixedWidthSettings == null)
+                    if (rootPath.Mode == Constants.ModeFixedWidth && rootPath.ModeSettings.FixedWidthSettings == null)
                     {
                         rootPath.ModeSettings.FixedWidthSettings = new FixedWidthSettings
                         {
@@ -348,7 +302,7 @@ namespace PluginFileReader.Helper
                         continue;
                     }
 
-                    if (rootPath.Mode == Constants.ExcelMode && rootPath.ModeSettings.ExcelModeSettings == null)
+                    if (rootPath.Mode == Constants.ModeExcel && rootPath.ModeSettings.ExcelModeSettings == null)
                     {
                         rootPath.ModeSettings.ExcelModeSettings = new ExcelModeSettings
                         {
@@ -360,6 +314,75 @@ namespace PluginFileReader.Helper
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks if RootPaths are directories
+        /// </summary>
+        /// <returns></returns>
+        private bool RootPathsAreDirectories()
+        {
+            foreach (var rootPath in RootPaths)
+            {
+                if (rootPath.FileReadMode == Constants.FileModeLocal && !Directory.Exists(rootPath.RootPath))
+                {
+                    throw new Exception($"{rootPath.RootPath} is not a directory");
+                }
+
+                if (rootPath.FileReadMode == Constants.FileModeFtp)
+                {
+                    using (var client = Utility.GetFtpClient(this))
+                    {
+                        try
+                        {
+                            if (!client.DirectoryExists(rootPath.RootPath))
+                            {
+                                throw new Exception($"{rootPath.RootPath} is not a directory on remote FTP");
+                            }
+
+                            if (rootPath.CleanupAction == Constants.CleanupActionArchive)
+                            {
+                                if (!client.DirectoryExists(rootPath.ArchivePath))
+                                {
+                                    throw new Exception($"{rootPath.ArchivePath} is not a directory on remote FTP");
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            client.Disconnect();
+                        }
+                    }
+                }
+
+                if (rootPath.FileReadMode == Constants.FileModeSftp)
+                {
+                    using (var client = Utility.GetSftpClient(this))
+                    {
+                        try
+                        {
+                            if (!client.Exists(rootPath.RootPath))
+                            {
+                                throw new Exception($"{rootPath.RootPath} is not a directory on remote SFTP");
+                            }
+                            
+                            if (rootPath.CleanupAction == Constants.CleanupActionArchive)
+                            {
+                                if (!client.Exists(rootPath.ArchivePath))
+                                {
+                                    throw new Exception($"{rootPath.ArchivePath} is not a directory on remote FTP");
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            client.Disconnect();
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         private bool ModeIsSetOnAllRootPaths()
@@ -379,12 +402,81 @@ namespace PluginFileReader.Helper
         {
             foreach (var rootPath in RootPaths)
             {
-                if (rootPath.Mode == Constants.FixedWidthMode)
+                if (rootPath.Mode == Constants.ModeFixedWidth)
                 {
                     if (rootPath.ModeSettings.FixedWidthSettings.Columns.Count == 0)
                     {
                         throw new Exception(
                             $"{rootPath.RootPath} is set to Fixed Width Columns and has no Columns defined");
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private bool RemoteHasRequiredPermissions()
+        {
+            foreach (var rootPath in RootPaths)
+            {
+                // check read permissions by attempting to download all target files
+                LoadRemoteFilesIntoTempDirectory(rootPath);
+
+                // check write permissions to configured archive directories by writing a test file and deleting it
+                if (rootPath.CleanupAction == Constants.CleanupActionArchive)
+                {
+                    var testFileName = "test.txt";
+                    var remoteTestFileName = Path.Join(rootPath.ArchivePath, testFileName);
+                    var localTestFileName = Path.Join(Utility.TempDirectory, testFileName);
+                    
+                    var testFile = new StreamWriter(localTestFileName);
+                    testFile.WriteLine("test");
+                    testFile.Close();
+                    
+                    switch (rootPath.FileReadMode)
+                    {
+                        case Constants.FileModeFtp:
+                            using (var client = Utility.GetFtpClient(this))
+                            {
+                                try
+                                {
+                                    var status = client.UploadFile(localTestFileName, Path.Combine(rootPath.ArchivePath, remoteTestFileName));
+                                    if (status == FtpStatus.Failed)
+                                    {
+                                        throw new Exception($"Could not write to archive directory {rootPath.ArchivePath}");
+                                    }
+                                    
+                                    Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);
+                                }
+                                finally
+                                {
+                                    client.Disconnect();
+                                }
+                            }
+
+                            break;
+                        case Constants.FileModeSftp:
+                            using (var client = Utility.GetSftpClient(this))
+                            {
+                                try
+                                {
+                                    var fileStream = Utility.GetFileStream(localTestFileName);
+                                    client.UploadFile(fileStream, remoteTestFileName);
+                                    Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);
+                                }
+                                catch
+                                {
+                                    throw new Exception($"Could not write to archive directory {rootPath.ArchivePath}");
+                                }
+                                finally
+                                {
+                                    client.Disconnect();
+                                }
+                            }
+
+                            break;
+                        default:
+                            continue;
                     }
                 }
             }

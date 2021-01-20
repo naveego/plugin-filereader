@@ -107,7 +107,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         {
             InitCsvReader();
             // _reader = new StreamReader(path, encoding);
-            _reader = Utility.Utility.GetStreamReader(path, rootPath);
+            _reader = Utility.Utility.GetStreamReader(path);
         }
 
         public void RestrictToColumns(params int[] columnIndexes)
