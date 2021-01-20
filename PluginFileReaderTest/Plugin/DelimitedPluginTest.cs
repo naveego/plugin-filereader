@@ -95,7 +95,7 @@ namespace PluginFileReaderTest.Plugin
                             Delimiter = delimiter,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = ArchivePath
+                            ArchivePath = sftp ? "/CSV/Archive" : ArchivePath
                         },
                         new RootPathObject
                         {
@@ -106,7 +106,7 @@ namespace PluginFileReaderTest.Plugin
                             Delimiter = delimiter,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = ArchivePath
+                            ArchivePath = sftp ? "/CSV/Archive" :ArchivePath
                         }
                     }
                     : new List<RootPathObject>
@@ -120,7 +120,7 @@ namespace PluginFileReaderTest.Plugin
                             FileReadMode = sftp ? "FTP" : "Local",
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = ArchivePath
+                            ArchivePath = sftp ? "/CSV/Archive" :ArchivePath
                         }
                     }
             };
@@ -1082,7 +1082,7 @@ on a.id = b.id"),
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings(null, ",", "*.csv", false, false, true);
+            var connectRequest = GetConnectSettings(Constants.CleanupActionArchive, ",", "*.csv", false, false, true);
 
             var configureRequest = new ConfigureRequest
             {

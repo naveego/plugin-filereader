@@ -30,6 +30,8 @@ namespace PluginFileReader.API.Utility
 
                 if (deleteRemote)
                 {
+                    var remoteFilePath = Path.Join("/", path.Replace(TempDirectory, ""));
+                    
                     switch (mode)
                     {
                         case Constants.FileModeFtp:
@@ -37,7 +39,6 @@ namespace PluginFileReader.API.Utility
                             {
                                 try
                                 {
-                                    var remoteFilePath = Path.Join("/", path.Replace(TempDirectory, ""));
                                     client.DeleteFile(remoteFilePath);
                                 }
                                 finally
@@ -52,7 +53,7 @@ namespace PluginFileReader.API.Utility
                             {
                                 try
                                 {
-                                    var remoteFilePath = Path.Join("/", path.Replace(TempDirectory, ""));
+                                    
                                     client.DeleteFile(remoteFilePath);
                                 }
                                 finally

@@ -65,6 +65,7 @@ namespace PluginFileReader.Helper
 
                 if (rootPath.FileReadMode != Constants.FileModeLocal)
                 {
+                    directoryPath = Path.Join(Utility.TempDirectory, rootPath.RootPath);
                     LoadRemoteFilesIntoTempDirectory(rootPath);
                 }
 
@@ -427,8 +428,10 @@ namespace PluginFileReader.Helper
                 {
                     var testFileName = "test.txt";
                     var remoteTestFileName = Path.Join(rootPath.ArchivePath, testFileName);
-                    var localTestFileName = Path.Join(Utility.TempDirectory, testFileName);
-                    
+                    var localTestDirectory = Path.Join(Utility.TempDirectory, rootPath.ArchivePath);
+                    var localTestFileName = Path.Join(Utility.TempDirectory, rootPath.ArchivePath, testFileName);
+
+                    Directory.CreateDirectory(localTestDirectory);
                     var testFile = new StreamWriter(localTestFileName);
                     testFile.WriteLine("test");
                     testFile.Close();
@@ -440,7 +443,7 @@ namespace PluginFileReader.Helper
                             {
                                 try
                                 {
-                                    var status = client.UploadFile(localTestFileName, Path.Combine(rootPath.ArchivePath, remoteTestFileName));
+                                    var status = client.UploadFile(localTestFileName, remoteTestFileName);
                                     if (status == FtpStatus.Failed)
                                     {
                                         throw new Exception($"Could not write to archive directory {rootPath.ArchivePath}");

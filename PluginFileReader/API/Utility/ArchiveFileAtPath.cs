@@ -11,10 +11,11 @@ namespace PluginFileReader.API.Utility
         {
             try
             {
+                var archiveFileName = Path.Join(rootPath.ArchivePath, Path.GetFileName(path));
                 switch (rootPath.FileReadMode)
                 {
                     case Constants.FileModeLocal:
-                        var archiveFilePath = GetUniqueFilePath($"{Path.Join(rootPath.ArchivePath, Path.GetFileName(path))}");
+                        var archiveFilePath = GetUniqueFilePath(archiveFileName);
                         File.Copy(path, archiveFilePath, false);
                         DeleteFileAtPath(path, rootPath, settings, false);
                         break;
@@ -23,8 +24,7 @@ namespace PluginFileReader.API.Utility
                         {
                             try
                             {
-                                var remoteFilePath = Path.Join("/", path.Replace(TempDirectory, ""));
-                                client.MoveFile(remoteFilePath, rootPath.ArchivePath);
+                                client.UploadFile(path, archiveFileName);
                                 DeleteFileAtPath(path, rootPath, settings, true);
                             }
                             finally
@@ -40,7 +40,7 @@ namespace PluginFileReader.API.Utility
                             try
                             {
                                 var localFileStream = GetFileStream(path);
-                                client.UploadFile(localFileStream, rootPath.ArchivePath);
+                                client.UploadFile(localFileStream, archiveFileName);
                                 DeleteFileAtPath(path, rootPath, settings, true);
                             }
                             finally

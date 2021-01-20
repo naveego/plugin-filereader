@@ -1,0 +1,310 @@
+2021-01-20 09:38:15.960 -05:00 [INF]  Connecting...
+2021-01-20 09:38:17.386 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 09:38:17.425 -05:00 [INF]  Connected.
+2021-01-20 09:38:17.461 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-20 09:38:18.284 -05:00 [DBG] <discover> Downloaded file MOCK_DATA.csv
+2021-01-20 09:38:18.324 -05:00 [ERR] <discover> Could not find a part of the path '/CSV'.
+System.IO.DirectoryNotFoundException: Could not find a part of the path '/CSV'.
+   at System.IO.Enumeration.FileSystemEnumerator`1.CreateDirectoryHandle(String path, Boolean ignoreNotFound)
+   at System.IO.Enumeration.FileSystemEnumerator`1.Init()
+   at System.IO.Enumeration.FileSystemEnumerator`1..ctor(String directory, Boolean isNormalized, EnumerationOptions options)
+   at System.IO.Enumeration.FileSystemEnumerable`1..ctor(String directory, FindTransform transform, EnumerationOptions options, Boolean isNormalized)
+   at System.IO.Enumeration.FileSystemEnumerableFactory.UserFiles(String directory, String expression, EnumerationOptions options)
+   at System.IO.Directory.InternalEnumeratePaths(String path, String searchPattern, SearchTarget searchTarget, EnumerationOptions options)
+   at PluginFileReader.Helper.Settings.GetAllFilesByDirectory() in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Helper/Settings.cs:line 77
+   at PluginFileReader.Plugin.Plugin.DiscoverSchemas(DiscoverSchemasRequest request, ServerCallContext context) in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Plugin/Plugin.cs:line 160
+2021-01-20 09:40:06.263 -05:00 [INF]  Connecting...
+2021-01-20 09:40:13.504 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 09:43:01.565 -05:00 [INF]  Connecting...
+2021-01-20 09:43:06.051 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 09:44:58.365 -05:00 [INF]  Connecting...
+2021-01-20 09:44:59.929 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 09:48:34.233 -05:00 [INF]  Connecting...
+2021-01-20 09:48:35.795 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 09:50:04.712 -05:00 [INF]  Connecting...
+2021-01-20 09:50:06.339 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 09:51:16.375 -05:00 [INF]  Connecting...
+2021-01-20 09:51:17.928 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 09:57:09.545 -05:00 [INF]  Connected.
+2021-01-20 09:57:12.397 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-20 09:57:13.218 -05:00 [DBG] <discover> Downloaded file MOCK_DATA.csv
+2021-01-20 09:58:38.668 -05:00 [INF]  Connecting...
+2021-01-20 09:58:40.253 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 09:58:41.292 -05:00 [INF]  Connected.
+2021-01-20 10:20:14.306 -05:00 [INF]  Connecting...
+2021-01-20 10:20:15.822 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 10:20:16.867 -05:00 [INF]  Connected.
+2021-01-20 10:20:16.909 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-20 10:20:17.680 -05:00 [DBG] <discover> Downloaded file MOCK_DATA.csv
+2021-01-20 10:20:17.727 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-20 10:20:17.800 -05:00 [INF] <discover> Purging table: [dbo].[CSV]
+2021-01-20 10:20:17.957 -05:00 [INF] <discover> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:20:17.957 -05:00 [INF] <discover> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:20:17.966 -05:00 [DBG] <discover> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-20 10:20:17.966 -05:00 [DBG] <discover> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-20 10:20:18.044 -05:00 [DBG] <discover> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-20 10:20:18.044 -05:00 [DBG] <discover> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:20:18.063 -05:00 [INF] <discover> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 5 rows
+2021-01-20 10:20:18.076 -05:00 [DBG] <discover> {
+  "Id": "[dbo].[CSV]",
+  "Name": "CSV",
+  "Description": "",
+  "Properties": [],
+  "Count": null,
+  "Sample": [],
+  "Query": "SELECT * FROM [dbo].[CSV]",
+  "PublisherMetaJson": "",
+  "Errors": [],
+  "DataFlowDirection": 0
+}
+2021-01-20 10:20:18.098 -05:00 [INF] <discover> Schemas returned: 1
+2021-01-20 10:20:18.115 -05:00 [INF] <test> Publishing records for schema: CSV
+2021-01-20 10:20:18.890 -05:00 [DBG] <test> Downloaded file MOCK_DATA.csv
+2021-01-20 10:20:18.955 -05:00 [INF] <test> Purging table: [dbo].[CSV]
+2021-01-20 10:20:18.979 -05:00 [INF] <test> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:20:18.979 -05:00 [INF] <test> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:20:18.979 -05:00 [DBG] <test> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-20 10:20:18.979 -05:00 [DBG] <test> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-20 10:20:18.981 -05:00 [DBG] <test> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-20 10:20:18.981 -05:00 [DBG] <test> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:20:19.130 -05:00 [INF] <test> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 1000 rows
+2021-01-20 10:20:19.167 -05:00 [INF] <test> Published 10 records
+2021-01-20 10:20:19.167 -05:00 [INF] <test> Archiving file ../../../Temp/CSV/MOCK_DATA.csv to /CSV/Archive
+2021-01-20 10:20:19.626 -05:00 [ERR] <test> Unable to archive file ../../../Temp/CSV/MOCK_DATA.csv
+FluentFTP.FtpCommandException: Rename failed.
+   at FluentFTP.FtpClient.Rename(String path, String dest)
+   at FluentFTP.FtpClient.MoveFile(String path, String dest, FtpRemoteExists existsMode)
+   at PluginFileReader.API.Utility.Utility.ArchiveFileAtPath(String path, RootPathObject rootPath, Settings settings) in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/API/Utility/ArchiveFileAtPath.cs:line 28
+2021-01-20 10:20:19.627 -05:00 [ERR] <test> Rename failed.
+FluentFTP.FtpCommandException: Rename failed.
+   at FluentFTP.FtpClient.Rename(String path, String dest)
+   at FluentFTP.FtpClient.MoveFile(String path, String dest, FtpRemoteExists existsMode)
+   at PluginFileReader.API.Utility.Utility.ArchiveFileAtPath(String path, RootPathObject rootPath, Settings settings) in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/API/Utility/ArchiveFileAtPath.cs:line 28
+2021-01-20 10:20:19.627 -05:00 [INF] <test> Source file is not local, deleting local file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:24:34.984 -05:00 [INF]  Connecting...
+2021-01-20 10:24:36.543 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 10:24:37.546 -05:00 [INF]  Connected.
+2021-01-20 10:24:42.988 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-20 10:24:43.759 -05:00 [DBG] <discover> Downloaded file MOCK_DATA.csv
+2021-01-20 10:24:43.799 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-20 10:24:50.366 -05:00 [INF] <discover> Purging table: [dbo].[CSV]
+2021-01-20 10:24:50.453 -05:00 [INF] <discover> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:24:50.454 -05:00 [INF] <discover> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:24:50.460 -05:00 [DBG] <discover> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-20 10:24:50.460 -05:00 [DBG] <discover> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-20 10:24:50.518 -05:00 [DBG] <discover> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-20 10:24:50.518 -05:00 [DBG] <discover> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:24:50.526 -05:00 [INF] <discover> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 5 rows
+2021-01-20 10:24:50.536 -05:00 [DBG] <discover> {
+  "Id": "[dbo].[CSV]",
+  "Name": "CSV",
+  "Description": "",
+  "Properties": [],
+  "Count": null,
+  "Sample": [],
+  "Query": "SELECT * FROM [dbo].[CSV]",
+  "PublisherMetaJson": "",
+  "Errors": [],
+  "DataFlowDirection": 0
+}
+2021-01-20 10:24:50.578 -05:00 [INF] <discover> Schemas returned: 1
+2021-01-20 10:24:50.594 -05:00 [INF] <test> Publishing records for schema: CSV
+2021-01-20 10:24:51.352 -05:00 [DBG] <test> Downloaded file MOCK_DATA.csv
+2021-01-20 10:24:51.397 -05:00 [INF] <test> Purging table: [dbo].[CSV]
+2021-01-20 10:24:51.418 -05:00 [INF] <test> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:24:51.418 -05:00 [INF] <test> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:24:51.418 -05:00 [DBG] <test> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-20 10:24:51.418 -05:00 [DBG] <test> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-20 10:24:51.426 -05:00 [DBG] <test> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-20 10:24:51.426 -05:00 [DBG] <test> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:24:51.603 -05:00 [INF] <test> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 1000 rows
+2021-01-20 10:24:51.645 -05:00 [INF] <test> Published 10 records
+2021-01-20 10:24:51.645 -05:00 [INF] <test> Archiving file ../../../Temp/CSV/MOCK_DATA.csv to /CSV/Archive
+2021-01-20 10:28:08.227 -05:00 [INF]  Connecting...
+2021-01-20 10:28:09.783 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 10:28:10.795 -05:00 [INF]  Connected.
+2021-01-20 10:28:10.857 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-20 10:28:11.630 -05:00 [DBG] <discover> Downloaded file MOCK_DATA.csv
+2021-01-20 10:28:11.673 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-20 10:28:11.747 -05:00 [INF] <discover> Purging table: [dbo].[CSV]
+2021-01-20 10:28:11.822 -05:00 [INF] <discover> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:28:11.823 -05:00 [INF] <discover> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:28:11.827 -05:00 [DBG] <discover> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-20 10:28:11.827 -05:00 [DBG] <discover> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-20 10:28:11.874 -05:00 [DBG] <discover> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-20 10:28:11.874 -05:00 [DBG] <discover> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:28:11.885 -05:00 [INF] <discover> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 5 rows
+2021-01-20 10:28:11.896 -05:00 [DBG] <discover> {
+  "Id": "[dbo].[CSV]",
+  "Name": "CSV",
+  "Description": "",
+  "Properties": [],
+  "Count": null,
+  "Sample": [],
+  "Query": "SELECT * FROM [dbo].[CSV]",
+  "PublisherMetaJson": "",
+  "Errors": [],
+  "DataFlowDirection": 0
+}
+2021-01-20 10:28:11.929 -05:00 [INF] <discover> Schemas returned: 1
+2021-01-20 10:28:11.947 -05:00 [INF] <test> Publishing records for schema: CSV
+2021-01-20 10:28:12.732 -05:00 [DBG] <test> Downloaded file MOCK_DATA.csv
+2021-01-20 10:28:12.778 -05:00 [INF] <test> Purging table: [dbo].[CSV]
+2021-01-20 10:28:12.803 -05:00 [INF] <test> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:28:12.804 -05:00 [INF] <test> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:28:12.804 -05:00 [DBG] <test> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-20 10:28:12.804 -05:00 [DBG] <test> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-20 10:28:12.808 -05:00 [DBG] <test> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-20 10:28:12.808 -05:00 [DBG] <test> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:28:13.019 -05:00 [INF] <test> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 1000 rows
+2021-01-20 10:28:13.077 -05:00 [INF] <test> Published 10 records
+2021-01-20 10:28:13.077 -05:00 [INF] <test> Archiving file ../../../Temp/CSV/MOCK_DATA.csv to /CSV/Archive
+2021-01-20 10:35:34.777 -05:00 [INF]  Connecting...
+2021-01-20 10:35:36.348 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 10:35:37.371 -05:00 [INF]  Connected.
+2021-01-20 10:35:37.438 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-20 10:35:38.230 -05:00 [DBG] <discover> Downloaded file MOCK_DATA.csv
+2021-01-20 10:35:38.272 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-20 10:35:38.369 -05:00 [INF] <discover> Purging table: [dbo].[CSV]
+2021-01-20 10:35:38.453 -05:00 [INF] <discover> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:35:38.453 -05:00 [INF] <discover> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:35:38.457 -05:00 [DBG] <discover> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-20 10:35:38.457 -05:00 [DBG] <discover> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-20 10:35:38.510 -05:00 [DBG] <discover> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-20 10:35:38.511 -05:00 [DBG] <discover> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:35:38.521 -05:00 [INF] <discover> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 5 rows
+2021-01-20 10:35:38.534 -05:00 [DBG] <discover> {
+  "Id": "[dbo].[CSV]",
+  "Name": "CSV",
+  "Description": "",
+  "Properties": [],
+  "Count": null,
+  "Sample": [],
+  "Query": "SELECT * FROM [dbo].[CSV]",
+  "PublisherMetaJson": "",
+  "Errors": [],
+  "DataFlowDirection": 0
+}
+2021-01-20 10:35:38.571 -05:00 [INF] <discover> Schemas returned: 1
+2021-01-20 10:35:38.591 -05:00 [INF] <test> Publishing records for schema: CSV
+2021-01-20 10:35:39.368 -05:00 [DBG] <test> Downloaded file MOCK_DATA.csv
+2021-01-20 10:35:39.413 -05:00 [INF] <test> Purging table: [dbo].[CSV]
+2021-01-20 10:35:39.436 -05:00 [INF] <test> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:35:39.436 -05:00 [INF] <test> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:35:39.436 -05:00 [DBG] <test> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-20 10:35:39.436 -05:00 [DBG] <test> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-20 10:35:39.440 -05:00 [DBG] <test> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-20 10:35:39.440 -05:00 [DBG] <test> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:35:39.632 -05:00 [INF] <test> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 1000 rows
+2021-01-20 10:35:39.687 -05:00 [INF] <test> Published 10 records
+2021-01-20 10:35:39.687 -05:00 [INF] <test> Archiving file ../../../Temp/CSV/MOCK_DATA.csv to /CSV/Archive
+2021-01-20 10:41:35.120 -05:00 [INF]  Connecting...
+2021-01-20 10:41:36.725 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-20 10:41:37.745 -05:00 [INF]  Connected.
+2021-01-20 10:41:37.812 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-20 10:41:38.591 -05:00 [DBG] <discover> Downloaded file MOCK_DATA.csv
+2021-01-20 10:41:38.645 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-20 10:41:38.732 -05:00 [INF] <discover> Purging table: [dbo].[CSV]
+2021-01-20 10:41:38.806 -05:00 [INF] <discover> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:41:38.806 -05:00 [INF] <discover> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:41:38.810 -05:00 [DBG] <discover> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-20 10:41:38.811 -05:00 [DBG] <discover> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-20 10:41:38.861 -05:00 [DBG] <discover> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-20 10:41:38.862 -05:00 [DBG] <discover> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:41:38.874 -05:00 [INF] <discover> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 5 rows
+2021-01-20 10:41:38.885 -05:00 [DBG] <discover> {
+  "Id": "[dbo].[CSV]",
+  "Name": "CSV",
+  "Description": "",
+  "Properties": [],
+  "Count": null,
+  "Sample": [],
+  "Query": "SELECT * FROM [dbo].[CSV]",
+  "PublisherMetaJson": "",
+  "Errors": [],
+  "DataFlowDirection": 0
+}
+2021-01-20 10:41:38.921 -05:00 [INF] <discover> Schemas returned: 1
+2021-01-20 10:41:38.936 -05:00 [INF] <test> Publishing records for schema: CSV
+2021-01-20 10:41:39.780 -05:00 [DBG] <test> Downloaded file MOCK_DATA.csv
+2021-01-20 10:41:39.826 -05:00 [INF] <test> Purging table: [dbo].[CSV]
+2021-01-20 10:41:39.832 -05:00 [INF] <test> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:41:39.832 -05:00 [INF] <test> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:41:39.832 -05:00 [DBG] <test> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-20 10:41:39.832 -05:00 [DBG] <test> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-20 10:41:39.834 -05:00 [DBG] <test> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-20 10:41:39.834 -05:00 [DBG] <test> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-20 10:41:40.029 -05:00 [INF] <test> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 1000 rows
+2021-01-20 10:41:40.078 -05:00 [INF] <test> Published 10 records
+2021-01-20 10:41:40.078 -05:00 [INF] <test> Archiving file ../../../Temp/CSV/MOCK_DATA.csv to /CSV/Archive
+2021-01-20 10:43:28.182 -05:00 [INF] <test> Source file is not local, deleting local file ../../../Temp/CSV/MOCK_DATA.csv
