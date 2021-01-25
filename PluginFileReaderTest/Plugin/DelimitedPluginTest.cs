@@ -106,7 +106,7 @@ namespace PluginFileReaderTest.Plugin
                             Delimiter = delimiter,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = sftp ? "/CSV/Archive" :ArchivePath
+                            ArchivePath = sftp ? "/CSV/Archive" : ArchivePath
                         }
                     }
                     : new List<RootPathObject>
@@ -120,7 +120,7 @@ namespace PluginFileReaderTest.Plugin
                             FileReadMode = sftp ? "FTP" : "Local",
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = sftp ? "/CSV/Archive" :ArchivePath
+                            ArchivePath = sftp ? "/CSV/Archive" : ArchivePath
                         }
                     }
             };
@@ -1066,7 +1066,7 @@ on a.id = b.id"),
         }
 
         [Fact]
-        public async Task ReadStreamSftpTest()
+        public async Task ReadStreamFtpTest()
         {
             // setup
             PrepareTestEnvironment();
@@ -1082,7 +1082,7 @@ on a.id = b.id"),
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings(Constants.CleanupActionArchive, ",", "*.csv", false, false, true);
+            var connectRequest = GetConnectSettings(Constants.CleanupActionNone, ",", "*.csv", false, false, true);
 
             var configureRequest = new ConfigureRequest
             {
@@ -1102,7 +1102,7 @@ on a.id = b.id"),
             client.Configure(configureRequest);
             client.Connect(connectRequest);
             var discoverResponse = client.DiscoverSchemas(discoverAllRequest);
-            
+
             var request = new ReadRequest()
             {
                 Schema = discoverResponse.Schemas[0],
@@ -1113,7 +1113,7 @@ on a.id = b.id"),
                 },
                 JobId = "test",
             };
-            
+
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
             var records = new List<Record>();
@@ -1507,6 +1507,117 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
+        
+        [Fact]
+        public async Task ReplicationWriteFtpTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var prepareWriteRequest = new PrepareWriteRequest()
+            {
+                Schema = GetReplicationSchema(),
+                CommitSlaSeconds = 1,
+                Replication = new ReplicationWriteRequest
+                {
+                    SettingsJson = JsonConvert.SerializeObject(new ConfigureReplicationFormData
+                    {
+                        FileWriteMode = Constants.FileModeFtp,
+                        GoldenRecordFileDirectory = "/Repl",
+                        GoldenRecordFileName = GoldenReplicationFile,
+                        VersionRecordFileDirectory = "/Repl",
+                        VersionRecordFileName = VersionReplicationFile,
+                        Delimiter = ",",
+                        IncludeHeader = true
+                    })
+                },
+                DataVersions = new DataVersions
+                {
+                    JobId = "jobUnitTest",
+                    ShapeId = "shapeUnitTest",
+                    JobDataVersion = 1,
+                    ShapeDataVersion = 2
+                }
+            };
+
+            var records = new List<Record>()
+            {
+                {
+                    new Record
+                    {
+                        Action = Record.Types.Action.Upsert,
+                        CorrelationId = "test",
+                        RecordId = "record1",
+                        DataJson = "{\"Id\":1,\"Name\":\"Test Company\"}",
+                        Versions =
+                        {
+                            new RecordVersion
+                            {
+                                RecordId = "version1",
+                                DataJson = "{\"Id\":1,\"Name\":\"Test Company\"}",
+                            }
+                        }
+                    }
+                }
+            };
+
+            var recordAcks = new List<RecordAck>();
+
+            // act
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            client.PrepareWrite(prepareWriteRequest);
+
+            using (var call = client.WriteStream())
+            {
+                var responseReaderTask = Task.Run(async () =>
+                {
+                    while (await call.ResponseStream.MoveNext())
+                    {
+                        var ack = call.ResponseStream.Current;
+                        recordAcks.Add(ack);
+                    }
+                });
+
+                foreach (Record record in records)
+                {
+                    await call.RequestStream.WriteAsync(record);
+                }
+
+                await call.RequestStream.CompleteAsync();
+                await responseReaderTask;
+            }
+
+            // assert
+            Assert.Single(recordAcks);
+            Assert.Equal("", recordAcks[0].Error);
+            Assert.Equal("test", recordAcks[0].CorrelationId);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
 
         [Fact]
         public async Task ConfigureWriteTest()
@@ -1562,6 +1673,192 @@ on a.id = b.id"),
 
             // assert
             Assert.IsType<ConfigureWriteResponse>(response);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ConfigureWriteFtpTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var request = new ConfigureWriteRequest
+            {
+                Form = new ConfigurationFormRequest
+                {
+                    DataJson = JsonConvert.SerializeObject(new ConfigureWriteFormData
+                    {
+                        FileWriteMode = Constants.FileModeFtp,
+                        TargetFileName = "output.csv",
+                        TargetFileDirectory = "/Output",
+                        Delimiter = ",",
+                        CustomHeader = "custom header",
+                        NullValue = "null",
+                        IncludeHeader = true,
+                        QuoteWrap = false,
+                        Columns = new List<WriteColumn>
+                        {
+                            new WriteColumn
+                            {
+                                Name = "C1",
+                                DefaultValue = ""
+                            },
+                            new WriteColumn
+                            {
+                                Name = "C2",
+                                DefaultValue = "default"
+                            },
+                        }
+                    })
+                }
+            };
+
+            // act
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var response = client.ConfigureWrite(request);
+
+            // assert
+            Assert.IsType<ConfigureWriteResponse>(response);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
+        public async Task ConfigureReplicationTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+            
+
+
+            var request = new ConfigureReplicationRequest
+            {
+                Form = new ConfigurationFormRequest
+                {
+                    DataJson = JsonConvert.SerializeObject(
+                        new ConfigureReplicationFormData
+                        {
+                            GoldenRecordFileDirectory = ReplicationPath,
+                            GoldenRecordFileName = GoldenReplicationFile,
+                            VersionRecordFileDirectory = ReplicationPath,
+                            VersionRecordFileName = VersionReplicationFile,
+                            Delimiter = ",",
+                            CustomHeader = "custom header",
+                            NullValue = "null",
+                            IncludeHeader = true,
+                            QuoteWrap = false,
+                        }
+                    )
+                }
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var response = client.ConfigureReplication(request);
+
+            // assert
+            Assert.IsType<ConfigureReplicationResponse>(response);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ConfigureReplicationFtpTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var request = new ConfigureReplicationRequest
+            {
+                Form = new ConfigurationFormRequest
+                {
+                    DataJson = JsonConvert.SerializeObject(
+                        new ConfigureReplicationFormData
+                        {
+                            FileWriteMode = Constants.FileModeFtp,
+                            GoldenRecordFileDirectory = "/Repl",
+                            GoldenRecordFileName = GoldenReplicationFile,
+                            VersionRecordFileDirectory = "/Repl",
+                            VersionRecordFileName = VersionReplicationFile,
+                            Delimiter = ",",
+                            CustomHeader = "custom header",
+                            NullValue = "null",
+                            IncludeHeader = true,
+                            QuoteWrap = false,
+                        }
+                    )
+                }
+            };
+
+            // act
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var response = client.ConfigureReplication(request);
+
+            // assert
+            Assert.IsType<ConfigureReplicationResponse>(response);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -1693,6 +1990,139 @@ on a.id = b.id"),
             };
 
             // act
+            client.Connect(connectRequest);
+
+            var configResponse = client.ConfigureWrite(configRequest);
+
+            var prepareWriteRequest = new PrepareWriteRequest()
+            {
+                Schema = configResponse.Schema,
+                CommitSlaSeconds = 1,
+                Replication = null,
+                DataVersions = new DataVersions
+                {
+                    JobId = "jobUnitTest_write",
+                    ShapeId = "shapeUnitTest",
+                    JobDataVersion = 1,
+                    ShapeDataVersion = 2
+                }
+            };
+
+            client.PrepareWrite(prepareWriteRequest);
+
+            var records = new List<Record>()
+            {
+                {
+                    new Record
+                    {
+                        Action = Record.Types.Action.Upsert,
+                        CorrelationId = "test",
+                        RecordId = "record1",
+                        DataJson = "{\"Id\":1}",
+                        Versions =
+                        {
+                            new RecordVersion
+                            {
+                                RecordId = "version1",
+                                DataJson = "{\"Id\":1}",
+                            }
+                        }
+                    }
+                }
+            };
+
+            var recordAcks = new List<RecordAck>();
+
+            using (var call = client.WriteStream())
+            {
+                var responseReaderTask = Task.Run(async () =>
+                {
+                    while (await call.ResponseStream.MoveNext())
+                    {
+                        var ack = call.ResponseStream.Current;
+                        recordAcks.Add(ack);
+                    }
+                });
+
+                foreach (Record record in records)
+                {
+                    await call.RequestStream.WriteAsync(record);
+                }
+
+                await call.RequestStream.CompleteAsync();
+                await responseReaderTask;
+            }
+
+            // assert
+            Assert.Single(recordAcks);
+            Assert.Equal("", recordAcks[0].Error);
+            Assert.Equal("test", recordAcks[0].CorrelationId);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task WritebackFtpTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var configRequest = new ConfigureWriteRequest
+            {
+                Form = new ConfigurationFormRequest
+                {
+                    DataJson = JsonConvert.SerializeObject(new ConfigureWriteFormData
+                    {
+                        FileWriteMode = Constants.FileModeFtp,
+                        TargetFileName = TargetWriteFile,
+                        TargetFileDirectory = "/Output",
+                        Delimiter = ",",
+                        CustomHeader = "custom header",
+                        NullValue = "null",
+                        IncludeHeader = true,
+                        QuoteWrap = false,
+                        Columns = new List<WriteColumn>
+                        {
+                            new WriteColumn
+                            {
+                                Name = "Id",
+                                DefaultValue = ""
+                            },
+                            new WriteColumn
+                            {
+                                Name = "Name",
+                                DefaultValue = "default"
+                            },
+                        }
+                    })
+                }
+            };
+
+            // act
+            client.Configure(configureRequest);
             client.Connect(connectRequest);
 
             var configResponse = client.ConfigureWrite(configRequest);

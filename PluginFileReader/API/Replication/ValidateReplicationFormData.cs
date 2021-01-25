@@ -34,7 +34,7 @@ namespace PluginFileReader.API.Replication
             {
                 errors.Add("Version Record file name is empty.");
             }
-            
+
             if (string.IsNullOrWhiteSpace(data.FileWriteMode))
             {
                 errors.Add("File Write Mode is empty.");
@@ -52,107 +52,124 @@ namespace PluginFileReader.API.Replication
 
             if (data.FileWriteMode != Constants.FileModeLocal)
             {
-                var testFileName = "test.txt";
-                    var remoteGoldenTestFileName = Path.Join(data.GetGoldenDirectory(), testFileName);
-                    var remoteVersionTestFileName = Path.Join(data.GetVersionDirectory(), testFileName);
-                    var localTestFileName = Path.Join(Utility.Utility.TempDirectory, testFileName);
-                    
-                    var testFile = new StreamWriter(Path.Combine(localTestFileName, testFileName));
-                    testFile.WriteLine("test");
-                    testFile.Close();
-                    
-                    switch (data.FileWriteMode)
-                    {
-                        case Constants.FileModeFtp:
-                            using (var client = Utility.Utility.GetFtpClient(settings))
+                var goldenTestFileName = "golden_test.txt";
+                var remoteGoldenDirectory = data.GetRemoteGoldenDirectory();
+                var remoteGoldenTestFileName = Path.Join(remoteGoldenDirectory, goldenTestFileName);
+                var localGoldenTestDirectory = data.GetLocalGoldenDirectory();
+                var localGoldenTestFileName = Path.Join(localGoldenTestDirectory, goldenTestFileName);
+                
+                Directory.CreateDirectory(localGoldenTestDirectory);
+                var goldenTestFile = new StreamWriter(localGoldenTestFileName);
+                goldenTestFile.WriteLine("test");
+                goldenTestFile.Close();
+
+                var versionTestFileName = "version_test.txt";
+                var remoteVersionDirectory = data.GetRemoteVersionDirectory();
+                var remoteVersionTestFileName = Path.Join(remoteVersionDirectory, versionTestFileName);
+                var localVersionTestDirectory = data.GetLocalVersionDirectory();
+                var localVersionTestFileName = Path.Join(localVersionTestDirectory, versionTestFileName);
+                
+                Directory.CreateDirectory(localVersionTestDirectory);
+                var testFile = new StreamWriter(localVersionTestFileName);
+                testFile.WriteLine("test");
+                testFile.Close();
+                
+                switch (data.FileWriteMode)
+                {
+                    case Constants.FileModeFtp:
+                        using (var client = Utility.Utility.GetFtpClient(settings))
+                        {
+                            try
+                            {
+                                if (!client.DirectoryExists(remoteGoldenDirectory))
+                                {
+                                    errors.Add($"{remoteGoldenDirectory} is not a directory on remote FTP");
+                                }
+                                else
+                                {
+                                    var status = client.UploadFile(localGoldenTestFileName, remoteGoldenTestFileName);
+                                    if (status == FtpStatus.Failed)
+                                    {
+                                        errors.Add($"Could not write to golden directory {remoteGoldenDirectory}");
+                                    }
+                                }
+                                
+                                Utility.Utility.DeleteFileAtPath(localGoldenTestFileName, data, settings, true);
+
+                                if (!client.DirectoryExists(remoteVersionDirectory))
+                                {
+                                    errors.Add($"{remoteVersionDirectory} is not a directory on remote FTP");
+                                }
+                                else
+                                {
+                                    var status = client.UploadFile(localVersionTestFileName, remoteVersionTestFileName);
+                                    if (status == FtpStatus.Failed)
+                                    {
+                                        errors.Add(
+                                            $"Could not write to version directory {remoteVersionDirectory}");
+                                    }
+                                }
+
+                                Utility.Utility.DeleteFileAtPath(localVersionTestFileName, data, settings, true);
+                            }
+                            finally
+                            {
+                                client.Disconnect();
+                            }
+                        }
+
+                        break;
+                    case Constants.FileModeSftp:
+                        using (var client = Utility.Utility.GetSftpClient(settings))
+                        {
+                            try
                             {
                                 try
                                 {
-                                    if (!client.DirectoryExists(data.GetGoldenDirectory()))
+                                    if (!client.Exists(remoteGoldenDirectory))
                                     {
-                                        errors.Add($"{data.GetGoldenDirectory()} is not a directory on remote FTP");
+                                        errors.Add($"{remoteGoldenDirectory} is not a directory on remote FTP");
                                     }
                                     else
                                     {
-                                        var status = client.UploadFile(localTestFileName, remoteGoldenTestFileName);
-                                        if (status == FtpStatus.Failed)
-                                        {
-                                            errors.Add($"Could not write to golden directory {data.GetGoldenDirectory()}");
-                                        }
+                                        var fileStream = Utility.Utility.GetFileStream(localGoldenTestFileName);
+                                        client.UploadFile(fileStream, remoteGoldenTestFileName);
+                                        Utility.Utility.DeleteFileAtPath(localGoldenTestFileName, data, settings, true);
                                     }
-
-                                    if (!client.DirectoryExists(data.GetVersionDirectory()))
-                                    {
-                                        errors.Add($"{data.GetVersionDirectory()} is not a directory on remote FTP");
-                                    }
-                                    else
-                                    {
-                                        var status = client.UploadFile(localTestFileName, remoteVersionTestFileName);
-                                        if (status == FtpStatus.Failed)
-                                        {
-                                            errors.Add($"Could not write to version directory {data.GetVersionDirectory()}");
-                                        }
-                                    }
-                                    
-                                    Utility.Utility.DeleteFileAtPath(localTestFileName, data, settings, true);
                                 }
-                                finally
+                                catch
                                 {
-                                    client.Disconnect();
+                                    errors.Add($"Could not write to golden directory {remoteGoldenDirectory}");
                                 }
-                            }
 
-                            break;
-                        case Constants.FileModeSftp:
-                            using (var client = Utility.Utility.GetSftpClient(settings))
-                            {
                                 try
                                 {
-                                    try
+                                    if (!client.Exists(remoteVersionDirectory))
                                     {
-                                        if (!client.Exists(data.GetGoldenDirectory()))
-                                        {
-                                            errors.Add($"{data.GetGoldenDirectory()} is not a directory on remote FTP");
-                                        }
-                                        else
-                                        {
-                                            var fileStream = Utility.Utility.GetFileStream(localTestFileName);
-                                            client.UploadFile(fileStream, remoteGoldenTestFileName);
-                                            Utility.Utility.DeleteFileAtPath(localTestFileName, data, settings, true);
-                                        }
+                                        errors.Add($"{remoteVersionDirectory} is not a directory on remote FTP");
                                     }
-                                    catch
+                                    else
                                     {
-                                        errors.Add($"Could not write to golden directory {data.GetGoldenDirectory()}");
-                                    }
-                                    try
-                                    {
-                                        if (!client.Exists(data.GetVersionDirectory()))
-                                        {
-                                            errors.Add($"{data.GetVersionDirectory()} is not a directory on remote FTP");
-                                        }
-                                        else
-                                        {
-                                            var fileStream = Utility.Utility.GetFileStream(localTestFileName);
-                                            client.UploadFile(fileStream, remoteVersionTestFileName);
-                                            Utility.Utility.DeleteFileAtPath(localTestFileName, data, settings, true);
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        errors.Add($"Could not write to version directory {data.GetVersionDirectory()}");
+                                        var fileStream = Utility.Utility.GetFileStream(localVersionTestFileName);
+                                        client.UploadFile(fileStream, remoteVersionTestFileName);
+                                        Utility.Utility.DeleteFileAtPath(localVersionTestFileName, data, settings, true);
                                     }
                                 }
-                                finally
+                                catch
                                 {
-                                    client.Disconnect();
+                                    errors.Add($"Could not write to version directory {remoteVersionDirectory}");
                                 }
                             }
-                            
-                            break;
-                    }
+                            finally
+                            {
+                                client.Disconnect();
+                            }
+                        }
+
+                        break;
+                }
             }
-            
+
             return errors;
         }
     }

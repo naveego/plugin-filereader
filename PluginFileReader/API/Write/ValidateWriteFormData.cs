@@ -42,75 +42,78 @@ namespace PluginFileReader.API.Write
             if (data.FileWriteMode != Constants.FileModeLocal)
             {
                 var testFileName = "test.txt";
-                    var remoteTargetTestFileName = Path.Join(data.GetTargetDirectory(), testFileName);
-                    var localTestFileName = Path.Join(Utility.Utility.TempDirectory, testFileName);
-                    
-                    var testFile = new StreamWriter(Path.Combine(localTestFileName, testFileName));
-                    testFile.WriteLine("test");
-                    testFile.Close();
-                    
-                    switch (data.FileWriteMode)
-                    {
-                        case Constants.FileModeFtp:
-                            using (var client = Utility.Utility.GetFtpClient(settings))
+                var remoteTargetDirectory = data.GetRemoteTargetDirectory();
+                var remoteTargetTestFileName = Path.Join(remoteTargetDirectory, testFileName);
+                var localTestDirectory = data.GetLocalTargetDirectory();
+                var localTestFileName = Path.Join(localTestDirectory, testFileName);
+
+                Directory.CreateDirectory(localTestDirectory);
+                var testFile = new StreamWriter(localTestFileName);
+                testFile.WriteLine("test");
+                testFile.Close();
+
+                switch (data.FileWriteMode)
+                {
+                    case Constants.FileModeFtp:
+                        using (var client = Utility.Utility.GetFtpClient(settings))
+                        {
+                            try
+                            {
+                                if (!client.DirectoryExists(remoteTargetDirectory))
+                                {
+                                    errors.Add($"{remoteTargetDirectory} is not a directory on remote FTP");
+                                }
+                                else
+                                {
+                                    var status = client.UploadFile(localTestFileName, remoteTargetTestFileName);
+                                    if (status == FtpStatus.Failed)
+                                    {
+                                        errors.Add($"Could not write to target directory {remoteTargetDirectory}");
+                                    }
+                                }
+
+                                Utility.Utility.DeleteFileAtPath(localTestFileName, data, settings, true);
+                            }
+                            finally
+                            {
+                                client.Disconnect();
+                            }
+                        }
+
+                        break;
+                    case Constants.FileModeSftp:
+                        using (var client = Utility.Utility.GetSftpClient(settings))
+                        {
+                            try
                             {
                                 try
                                 {
-                                    if (!client.DirectoryExists(data.GetTargetDirectory()))
+                                    if (!client.Exists(remoteTargetDirectory))
                                     {
-                                        errors.Add($"{data.GetTargetDirectory()} is not a directory on remote FTP");
+                                        errors.Add($"{remoteTargetDirectory} is not a directory on remote FTP");
                                     }
                                     else
                                     {
-                                        var status = client.UploadFile(localTestFileName, remoteTargetTestFileName);
-                                        if (status == FtpStatus.Failed)
-                                        {
-                                            errors.Add($"Could not write to target directory {data.GetTargetDirectory()}");
-                                        }
+                                        var fileStream = Utility.Utility.GetFileStream(localTestFileName);
+                                        client.UploadFile(fileStream, remoteTargetTestFileName);
+                                        Utility.Utility.DeleteFileAtPath(localTestFileName, data, settings, true);
                                     }
-
-                                    Utility.Utility.DeleteFileAtPath(localTestFileName, data, settings, true);
                                 }
-                                finally
+                                catch
                                 {
-                                    client.Disconnect();
+                                    errors.Add($"Could not write to target directory {remoteTargetDirectory}");
                                 }
                             }
-
-                            break;
-                        case Constants.FileModeSftp:
-                            using (var client = Utility.Utility.GetSftpClient(settings))
+                            finally
                             {
-                                try
-                                {
-                                    try
-                                    {
-                                        if (!client.Exists(data.GetTargetDirectory()))
-                                        {
-                                            errors.Add($"{data.GetTargetDirectory()} is not a directory on remote FTP");
-                                        }
-                                        else
-                                        {
-                                            var fileStream = Utility.Utility.GetFileStream(localTestFileName);
-                                            client.UploadFile(fileStream, remoteTargetTestFileName);
-                                            Utility.Utility.DeleteFileAtPath(localTestFileName, data, settings, true);
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        errors.Add($"Could not write to target directory {data.GetTargetDirectory()}");
-                                    }
-                                }
-                                finally
-                                {
-                                    client.Disconnect();
-                                }
+                                client.Disconnect();
                             }
-                            
-                            break;
-                    }
+                        }
+
+                        break;
+                }
             }
-            
+
             return errors;
         }
     }

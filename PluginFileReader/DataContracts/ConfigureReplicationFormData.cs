@@ -37,7 +37,7 @@ namespace PluginFileReader.DataContracts
             return Path.GetFileNameWithoutExtension(GoldenRecordFileName);
         }
 
-        public string GetGoldenFilePath()
+        public string GetLocalGoldenFilePath()
         {
             switch (FileWriteMode)
             {
@@ -49,7 +49,12 @@ namespace PluginFileReader.DataContracts
             }
         }
         
-        public string GetGoldenDirectory()
+        public string GetRemoteGoldenFilePath()
+        {
+            return Path.Join(GoldenRecordFileDirectory, GoldenRecordFileName);
+        }
+        
+        public string GetLocalGoldenDirectory()
         {
             switch (FileWriteMode)
             {
@@ -59,6 +64,11 @@ namespace PluginFileReader.DataContracts
                 default:
                     return Path.Join(GoldenRecordFileDirectory);
             }
+        }
+        
+        public string GetRemoteGoldenDirectory()
+        {
+            return Path.Join(GoldenRecordFileDirectory);
         }
 
         public string GetVersionTableName()
@@ -70,7 +80,7 @@ namespace PluginFileReader.DataContracts
             return Path.GetFileNameWithoutExtension(VersionRecordFileName);
         }
 
-        public string GetVersionFilePath()
+        public string GetLocalVersionFilePath()
         {
             switch (FileWriteMode)
             {
@@ -82,7 +92,12 @@ namespace PluginFileReader.DataContracts
             }
         }
         
-        public string GetVersionDirectory()
+        public string GetRemoteVersionFilePath()
+        {
+            return Path.Join(VersionRecordFileDirectory, VersionRecordFileName);
+        }
+        
+        public string GetLocalVersionDirectory()
         {
             switch (FileWriteMode)
             {
@@ -92,6 +107,11 @@ namespace PluginFileReader.DataContracts
                 default:
                     return Path.Join(VersionRecordFileDirectory);
             }
+        }
+        
+        public string GetRemoteVersionDirectory()
+        {
+            return Path.Join(VersionRecordFileDirectory);
         }
         
         public void ConvertLegacyConfiguration()

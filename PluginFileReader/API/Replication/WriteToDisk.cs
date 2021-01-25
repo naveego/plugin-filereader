@@ -15,23 +15,24 @@ namespace PluginFileReader.API.Replication
         private static bool PendingWrites { get; set; }
 
         public static void WriteToDisk(IImportExportFile goldenImportExport,
-            IImportExportFile versionImportExport, ConfigureReplicationFormData config, Settings settings)
+            IImportExportFile versionImportExport, ConfigureReplicationFormData config, Settings settings, bool forceWrite = false)
         {
             // check if 5 seconds have passed since last write to disk
-            if ((DateTime.Now - LastWriteTime).TotalSeconds >= 5 && PendingWrites)
+            if (forceWrite || (DateTime.Now - LastWriteTime).TotalSeconds >= 5 && PendingWrites)
             {
                 // write out to disk
-                goldenImportExport.ExportTable(config.GetGoldenFilePath());
-                versionImportExport.ExportTable(config.GetVersionFilePath());
+                goldenImportExport.ExportTable(config.GetLocalGoldenFilePath());
+                versionImportExport.ExportTable(config.GetLocalVersionFilePath());
                 PendingWrites = false;
-            }
-            
-            // write to Remote
+
+                // write to Remote
                 if (config.FileWriteMode != Constants.FileModeLocal)
                 {
-                    var remoteGoldenFileName = Path.Join(config.GoldenRecordFileDirectory, config.GoldenRecordFileName);
-                    var remoteVersionFileName = Path.Join(config.VersionRecordFileDirectory, config.VersionRecordFileName);
-                    
+                    var localGoldenFileName = config.GetLocalGoldenFilePath();
+                    var remoteGoldenFileName = config.GetRemoteGoldenFilePath();
+                    var localVersionFileName = config.GetLocalVersionFilePath();
+                    var remoteVersionFileName = config.GetRemoteVersionFilePath();
+
                     switch (config.FileWriteMode)
                     {
                         case Constants.FileModeFtp:
@@ -39,13 +40,13 @@ namespace PluginFileReader.API.Replication
                             {
                                 try
                                 {
-                                    var status = client.UploadFile(config.GetGoldenFilePath(), remoteGoldenFileName);
+                                    var status = client.UploadFile(localGoldenFileName, remoteGoldenFileName);
                                     if (status == FtpStatus.Failed)
                                     {
                                         throw new Exception($"Could not write file to remote {remoteGoldenFileName}");
                                     }
-                                    
-                                    status = client.UploadFile(config.GetVersionFilePath(), remoteVersionFileName);
+
+                                    status = client.UploadFile(localVersionFileName, remoteVersionFileName);
                                     if (status == FtpStatus.Failed)
                                     {
                                         throw new Exception($"Could not write file to remote {remoteVersionFileName}");
@@ -63,19 +64,20 @@ namespace PluginFileReader.API.Replication
                             {
                                 try
                                 {
-                                    using (var fileStream = Utility.Utility.GetFileStream(config.GetGoldenFilePath()))
+                                    using (var fileStream = Utility.Utility.GetFileStream(localGoldenFileName))
                                     {
                                         client.UploadFile(fileStream, remoteGoldenFileName);
                                     }
-                                    
-                                    using (var fileStream = Utility.Utility.GetFileStream(config.GetVersionFilePath()))
+
+                                    using (var fileStream = Utility.Utility.GetFileStream(localVersionFileName))
                                     {
                                         client.UploadFile(fileStream, remoteVersionFileName);
                                     }
                                 }
                                 catch
                                 {
-                                    throw new Exception($"Could not write files to remote {remoteGoldenFileName} {remoteVersionFileName}");
+                                    throw new Exception(
+                                        $"Could not write files to remote {remoteGoldenFileName} {remoteVersionFileName}");
                                 }
                                 finally
                                 {
@@ -86,8 +88,9 @@ namespace PluginFileReader.API.Replication
                             break;
                     }
                 }
+            }
         }
-        
+
         public static void PurgeReplicationFiles()
         {
             // set triggers for async file write

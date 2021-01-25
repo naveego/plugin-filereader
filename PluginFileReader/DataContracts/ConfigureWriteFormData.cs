@@ -32,7 +32,7 @@ namespace PluginFileReader.DataContracts
             return Path.GetFileNameWithoutExtension(TargetFileName);
         }
 
-        public string GetTargetDirectory()
+        public string GetLocalTargetDirectory()
         {
             switch (FileWriteMode)
             {
@@ -43,8 +43,13 @@ namespace PluginFileReader.DataContracts
                     return Path.Join(TargetFileDirectory);
             }
         }
+        
+        public string GetRemoteTargetDirectory()
+        {
+            return Path.Join(TargetFileDirectory);
+        }
 
-        public string GetTargetFilePath()
+        public string GetLocalTargetFilePath()
         {
             switch (FileWriteMode)
             {
@@ -54,6 +59,11 @@ namespace PluginFileReader.DataContracts
                 default:
                     return Path.Join(TargetFileDirectory, TargetFileName);
             }
+        }
+        
+        public string GetRemoteTargetFilePath()
+        {
+            return Path.Join(TargetFileDirectory, TargetFileName);
         }
 
         public ConfigureReplicationFormData GetReplicationFormData()

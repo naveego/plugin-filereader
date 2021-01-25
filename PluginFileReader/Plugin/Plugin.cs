@@ -423,7 +423,7 @@ namespace PluginFileReader.Plugin
                 Logger.Info("second call...");
                 // get form data
                 var formData = JsonConvert.DeserializeObject<ConfigureWriteFormData>(request.Form.DataJson);
-
+                formData.ConvertLegacyConfiguration();
                 var errors = formData.ValidateWriteFormData(_server.Settings);
 
                 // base schema to return
@@ -470,7 +470,7 @@ namespace PluginFileReader.Plugin
             ServerCallContext context)
         {
             Logger.SetLogPrefix("configure_replication");
-            Logger.Info($"Configuring write for schema name {request.Schema.Name}...");
+            Logger.Info($"Configuring write for schema name {request?.Schema?.Name}...");
 
             var schemaJson = Replication.GetSchemaJson();
             var uiJson = Replication.GetUIJson();
@@ -482,7 +482,7 @@ namespace PluginFileReader.Plugin
                     // check for config errors
                     var replicationFormData =
                         JsonConvert.DeserializeObject<ConfigureReplicationFormData>(request.Form.DataJson);
-
+                    replicationFormData.ConvertLegacyConfiguration();
                     var errors = replicationFormData.ValidateReplicationFormData(_server.Settings);
 
                     return Task.FromResult(new ConfigureReplicationResponse
@@ -568,8 +568,8 @@ namespace PluginFileReader.Plugin
                         replicationSettings.GetVersionTableName(), Constants.SchemaName);
 
                     // prepare write locations
-                    Directory.CreateDirectory(replicationSettings.GetGoldenDirectory());
-                    Directory.CreateDirectory(replicationSettings.GetVersionDirectory());
+                    Directory.CreateDirectory(replicationSettings.GetLocalGoldenDirectory());
+                    Directory.CreateDirectory(replicationSettings.GetLocalVersionDirectory());
                 }
                 catch (Exception e)
                 {
@@ -604,7 +604,7 @@ namespace PluginFileReader.Plugin
                         writeFormData.GetTargetTableName(), Constants.SchemaName);
 
                     // prepare write location
-                    Directory.CreateDirectory(writeFormData.GetTargetDirectory());
+                    Directory.CreateDirectory(writeFormData.GetLocalTargetDirectory());
 
                     // reconcile job
                     Logger.Info($"Starting to reconcile Replication Job {request.DataVersions.JobId}");
@@ -655,6 +655,7 @@ namespace PluginFileReader.Plugin
                         JsonConvert.DeserializeObject<ConfigureReplicationFormData>(_server.WriteSettings
                             .Replication
                             .SettingsJson);
+                    config.ConvertLegacyConfiguration();
 
                     // watcher to periodically write file to disk
                     Task.Run(() =>
@@ -676,16 +677,21 @@ namespace PluginFileReader.Plugin
                         // send record to source system
                         // add await for unit testing 
                         // removed to allow multiple to run at the same time
-                        Task.Run(
+                        await Task.Run(
                             async () => await Replication.WriteRecordAsync(_server.WriteSettings.Connection, schema,
                                 record, config,
                                 responseStream), context.CancellationToken);
                     }
+                    
+                    // write any pending records to file
+                    Replication.WriteToDisk(_server.WriteSettings.GoldenImportExport,
+                        _server.WriteSettings.VersionImportExport, config, _server.Settings, true);
                 }
                 else
                 {
                     var writeConfig = JsonConvert.DeserializeObject<ConfigureWriteFormData>(schema.PublisherMetaJson);
                     var config = writeConfig.GetReplicationFormData();
+                    config.ConvertLegacyConfiguration();
 
                     // watcher to periodically write file to disk
                     Task.Run(() =>
@@ -706,12 +712,17 @@ namespace PluginFileReader.Plugin
                         // send record to source system
                         // add await for unit testing 
                         // removed to allow multiple to run at the same time
-                        Task.Run(
+                        await Task.Run(
                             async () => await Write.WriteRecordAsync(_server.WriteSettings.Connection, schema,
                                 record, config,
                                 responseStream), context.CancellationToken);
                     }
+                    
+                    // write any pending records to file
+                    Write.WriteToDisk(_server.WriteSettings.TargetImportExport, writeConfig, _server.Settings, true);
                 }
+                
+
 
                 Logger.Info($"Wrote {inCount} records to File.");
             }

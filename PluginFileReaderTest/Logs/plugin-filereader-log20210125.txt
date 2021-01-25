@@ -1,0 +1,786 @@
+2021-01-25 09:54:54.463 -05:00 [INF]  Connecting...
+2021-01-25 09:54:56.642 -05:00 [INF]  Connected.
+2021-01-25 09:54:56.711 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-25 09:54:57.218 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-25 09:54:57.228 -05:00 [INF] <discover> Schemas returned: 0
+2021-01-25 09:56:02.512 -05:00 [INF]  Connecting...
+2021-01-25 09:56:03.856 -05:00 [DBG]  Downloaded file MOCK_DATA.csv
+2021-01-25 09:56:03.894 -05:00 [INF]  Connected.
+2021-01-25 09:56:03.935 -05:00 [INF] <discover> Discovering Schemas...
+2021-01-25 09:56:04.653 -05:00 [DBG] <discover> Downloaded file MOCK_DATA.csv
+2021-01-25 09:56:04.696 -05:00 [INF] <discover> Schemas attempted: 1
+2021-01-25 09:56:04.754 -05:00 [INF] <discover> Purging table: [dbo].[CSV]
+2021-01-25 09:56:04.925 -05:00 [INF] <discover> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-25 09:56:04.925 -05:00 [INF] <discover> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-25 09:56:04.936 -05:00 [DBG] <discover> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-25 09:56:04.936 -05:00 [DBG] <discover> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-25 09:56:05.030 -05:00 [DBG] <discover> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-25 09:56:05.031 -05:00 [DBG] <discover> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-25 09:56:05.046 -05:00 [INF] <discover> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 5 rows
+2021-01-25 09:56:05.062 -05:00 [DBG] <discover> {
+  "Id": "[dbo].[CSV]",
+  "Name": "CSV",
+  "Description": "",
+  "Properties": [],
+  "Count": null,
+  "Sample": [],
+  "Query": "SELECT * FROM [dbo].[CSV]",
+  "PublisherMetaJson": "",
+  "Errors": [],
+  "DataFlowDirection": 0
+}
+2021-01-25 09:56:05.088 -05:00 [INF] <discover> Schemas returned: 1
+2021-01-25 09:56:05.102 -05:00 [INF] <test> Publishing records for schema: CSV
+2021-01-25 09:56:05.826 -05:00 [DBG] <test> Downloaded file MOCK_DATA.csv
+2021-01-25 09:56:05.891 -05:00 [INF] <test> Purging table: [dbo].[CSV]
+2021-01-25 09:56:05.911 -05:00 [INF] <test> Preparing to load file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-25 09:56:05.911 -05:00 [INF] <test> Begin loading file: ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-25 09:56:05.912 -05:00 [DBG] <test> Headers: [
+  "id",
+  "first_name",
+  "last_name",
+  "email",
+  "gender",
+  "ip_address"
+]
+2021-01-25 09:56:05.912 -05:00 [DBG] <test> Create table SQL: CREATE TABLE IF NOT EXISTS [dbo].[CSV] ([id] VARCHAR(2147483647),[first_name] VARCHAR(2147483647),[last_name] VARCHAR(2147483647),[email] VARCHAR(2147483647),[gender] VARCHAR(2147483647),[ip_address] VARCHAR(2147483647));
+2021-01-25 09:56:05.913 -05:00 [DBG] <test> Insert Row SQL: INSERT INTO dbo.[CSV] VALUES (@param1,@param2,@param3,@param4,@param5,@param6);
+2021-01-25 09:56:05.913 -05:00 [DBG] <test> Reading delimited file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-25 09:56:06.081 -05:00 [INF] <test> Loaded file ../../../Temp/CSV/MOCK_DATA.csv with 1000 rows
+2021-01-25 09:56:06.128 -05:00 [INF] <test> Published 10 records
+2021-01-25 09:56:06.128 -05:00 [INF] <test> Source file is not local, deleting local file ../../../Temp/CSV/MOCK_DATA.csv
+2021-01-25 14:27:07.429 -05:00 [INF]  Connecting...
+2021-01-25 14:27:07.519 -05:00 [INF]  Connected.
+2021-01-25 14:27:07.527 -05:00 [INF] <configure_write> Configuring write...
+2021-01-25 14:27:07.532 -05:00 [DBG] <configure_write> {
+  "Form": {
+    "DataJson": "{\"TargetFileDirectory\":\"/CSV/Output\",\"TargetFileName\":\"output.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":\"null\",\"CustomHeader\":\"custom header\",\"Columns\":[{\"Name\":\"C1\",\"DefaultValue\":\"\"},{\"Name\":\"C2\",\"DefaultValue\":\"default\"}]}",
+    "StateJson": "",
+    "IsSave": false
+  }
+}
+2021-01-25 14:27:07.545 -05:00 [INF] <configure_write> second call...
+2021-01-25 14:28:05.719 -05:00 [INF]  Connecting...
+2021-01-25 14:28:05.828 -05:00 [INF]  Connected.
+2021-01-25 14:28:05.879 -05:00 [INF] <configure_write> Configuring write...
+2021-01-25 14:28:05.882 -05:00 [DBG] <configure_write> {
+  "Form": {
+    "DataJson": "{\"TargetFileDirectory\":\"/CSV/Output\",\"TargetFileName\":\"output.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":\"null\",\"CustomHeader\":\"custom header\",\"Columns\":[{\"Name\":\"C1\",\"DefaultValue\":\"\"},{\"Name\":\"C2\",\"DefaultValue\":\"default\"}]}",
+    "StateJson": "",
+    "IsSave": false
+  }
+}
+2021-01-25 14:28:05.889 -05:00 [INF] <configure_write> second call...
+2021-01-25 14:46:17.780 -05:00 [INF]  Connecting...
+2021-01-25 14:46:17.876 -05:00 [INF]  Connected.
+2021-01-25 14:46:17.905 -05:00 [INF] <configure_write> Configuring write...
+2021-01-25 14:46:17.907 -05:00 [DBG] <configure_write> {
+  "Form": {
+    "DataJson": "{\"TargetFileDirectory\":\"/CSV/Output\",\"TargetFileName\":\"output.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":\"null\",\"CustomHeader\":\"custom header\",\"Columns\":[{\"Name\":\"C1\",\"DefaultValue\":\"\"},{\"Name\":\"C2\",\"DefaultValue\":\"default\"}]}",
+    "StateJson": "",
+    "IsSave": false
+  }
+}
+2021-01-25 14:46:17.916 -05:00 [INF] <configure_write> second call...
+2021-01-25 14:47:26.687 -05:00 [INF]  Connecting...
+2021-01-25 14:47:26.778 -05:00 [INF]  Connected.
+2021-01-25 14:47:26.786 -05:00 [INF] <configure_write> Configuring write...
+2021-01-25 14:47:26.788 -05:00 [DBG] <configure_write> {
+  "Form": {
+    "DataJson": "{\"TargetFileDirectory\":\"/Output\",\"TargetFileName\":\"output.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":\"null\",\"CustomHeader\":\"custom header\",\"Columns\":[{\"Name\":\"C1\",\"DefaultValue\":\"\"},{\"Name\":\"C2\",\"DefaultValue\":\"default\"}]}",
+    "StateJson": "",
+    "IsSave": false
+  }
+}
+2021-01-25 14:47:26.794 -05:00 [INF] <configure_write> second call...
+2021-01-25 14:49:23.574 -05:00 [INF]  Connecting...
+2021-01-25 14:49:23.672 -05:00 [INF]  Connected.
+2021-01-25 14:49:23.716 -05:00 [INF] <configure_write> Configuring write...
+2021-01-25 14:49:23.725 -05:00 [DBG] <configure_write> {
+  "Form": {
+    "DataJson": "{\"TargetFileDirectory\":\"/Output\",\"TargetFileName\":\"output.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":\"null\",\"CustomHeader\":\"custom header\",\"Columns\":[{\"Name\":\"C1\",\"DefaultValue\":\"\"},{\"Name\":\"C2\",\"DefaultValue\":\"default\"}]}",
+    "StateJson": "",
+    "IsSave": false
+  }
+}
+2021-01-25 14:49:23.744 -05:00 [INF] <configure_write> second call...
+2021-01-25 14:50:53.023 -05:00 [INF]  Connecting...
+2021-01-25 14:50:53.098 -05:00 [INF]  Connected.
+2021-01-25 14:50:53.104 -05:00 [INF] <configure_write> Configuring write...
+2021-01-25 14:50:53.106 -05:00 [DBG] <configure_write> {
+  "Form": {
+    "DataJson": "{\"TargetFileDirectory\":\"/Output\",\"TargetFileName\":\"output.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":\"null\",\"CustomHeader\":\"custom header\",\"Columns\":[{\"Name\":\"C1\",\"DefaultValue\":\"\"},{\"Name\":\"C2\",\"DefaultValue\":\"default\"}]}",
+    "StateJson": "",
+    "IsSave": false
+  }
+}
+2021-01-25 14:50:53.115 -05:00 [INF] <configure_write> second call...
+2021-01-25 14:53:12.474 -05:00 [INF]  Connecting...
+2021-01-25 14:53:12.554 -05:00 [INF]  Connected.
+2021-01-25 14:53:12.564 -05:00 [INF] <configure_write> Configuring write...
+2021-01-25 14:53:12.566 -05:00 [DBG] <configure_write> {
+  "Form": {
+    "DataJson": "{\"TargetFileDirectory\":\"/Output\",\"TargetFileName\":\"output.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":\"null\",\"CustomHeader\":\"custom header\",\"Columns\":[{\"Name\":\"C1\",\"DefaultValue\":\"\"},{\"Name\":\"C2\",\"DefaultValue\":\"default\"}]}",
+    "StateJson": "",
+    "IsSave": false
+  }
+}
+2021-01-25 14:53:12.573 -05:00 [INF] <configure_write> second call...
+2021-01-25 14:54:25.613 -05:00 [INF]  Connecting...
+2021-01-25 14:54:25.699 -05:00 [INF]  Connected.
+2021-01-25 14:54:25.705 -05:00 [INF] <configure_write> Configuring write...
+2021-01-25 14:54:25.711 -05:00 [DBG] <configure_write> {
+  "Form": {
+    "DataJson": "{\"TargetFileDirectory\":\"/Output\",\"TargetFileName\":\"output.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":\"null\",\"CustomHeader\":\"custom header\",\"Columns\":[{\"Name\":\"C1\",\"DefaultValue\":\"\"},{\"Name\":\"C2\",\"DefaultValue\":\"default\"}]}",
+    "StateJson": "",
+    "IsSave": false
+  }
+}
+2021-01-25 14:54:25.723 -05:00 [INF] <configure_write> second call...
+2021-01-25 14:57:32.216 -05:00 [INF]  Connecting...
+2021-01-25 14:57:32.285 -05:00 [INF]  Connected.
+2021-01-25 14:57:32.291 -05:00 [INF] <configure_replication> Configuring write for schema name ...
+2021-01-25 16:17:10.039 -05:00 [INF]  Connecting...
+2021-01-25 16:17:10.143 -05:00 [INF]  Connected.
+2021-01-25 16:17:10.148 -05:00 [INF] <configure_replication> Configuring write for schema name ...
+2021-01-25 16:18:55.307 -05:00 [INF]  Connecting...
+2021-01-25 16:18:55.416 -05:00 [INF]  Connected.
+2021-01-25 16:18:55.449 -05:00 [INF] <configure_replication> Configuring write for schema name ...
+2021-01-25 16:21:16.141 -05:00 [INF]  Connecting...
+2021-01-25 16:21:16.228 -05:00 [INF]  Connected.
+2021-01-25 16:21:16.234 -05:00 [INF] <configure_replication> Configuring write for schema name ...
+2021-01-25 16:40:54.065 -05:00 [INF]  Connecting...
+2021-01-25 16:40:54.125 -05:00 [INF]  Connected.
+2021-01-25 16:40:54.133 -05:00 [INF] <jobUnitTest> Preparing write...
+2021-01-25 16:40:54.150 -05:00 [DBG] <jobUnitTest> {
+  "CommitSlaSeconds": 1,
+  "Schema": {
+    "Id": "test",
+    "Name": "test",
+    "Description": "",
+    "Properties": [
+      {
+        "Id": "Id",
+        "Name": "Id",
+        "Description": "",
+        "Type": 3,
+        "IsKey": true,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      },
+      {
+        "Id": "Name",
+        "Name": "Name",
+        "Description": "",
+        "Type": 0,
+        "IsKey": false,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      }
+    ],
+    "Count": null,
+    "Sample": [],
+    "Query": "",
+    "PublisherMetaJson": "",
+    "Errors": [],
+    "DataFlowDirection": 0
+  },
+  "Replication": {
+    "Versions": [],
+    "SettingsJson": "{\"GoldenRecordFileDirectory\":\"../../../MockData/ReplicationDirectory\",\"GoldenRecordFileName\":\"golden.csv\",\"VersionRecordFileDirectory\":\"../../../MockData/ReplicationDirectory\",\"VersionRecordFileName\":\"version.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":null,\"CustomHeader\":null}"
+  },
+  "DataVersions": {
+    "JobId": "jobUnitTest",
+    "JobDataVersion": 1,
+    "ShapeId": "shapeUnitTest",
+    "ShapeDataVersion": 2
+  }
+}
+2021-01-25 16:40:54.257 -05:00 [INF] <jobUnitTest> Starting to reconcile Replication Job jobUnitTest
+2021-01-25 16:40:54.262 -05:00 [INF] <jobUnitTest> SchemaName: dbo Golden Table: golden Version Table: version job: jobUnitTest
+2021-01-25 16:40:54.262 -05:00 [INF] <jobUnitTest> Getting previous metadata job: jobUnitTest
+2021-01-25 16:40:54.267 -05:00 [DBG] <jobUnitTest> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[NaveegoReplicationMetaData]([NaveegoJobId] varchar(2147483647) NOT NULL UNIQUE,[Request] varchar(2147483647),[NaveegoShapeId] varchar(2147483647),[NaveegoShapeName] varchar(2147483647),[Timestamp] varchar(2147483647),PRIMARY KEY ([NaveegoJobId]));
+2021-01-25 16:40:54.564 -05:00 [INF] <jobUnitTest> Got previous metadata job: jobUnitTest
+2021-01-25 16:40:54.564 -05:00 [INF] <jobUnitTest> Generating current metadata job: jobUnitTest
+2021-01-25 16:40:54.564 -05:00 [INF] <jobUnitTest> Generated current metadata job: jobUnitTest
+2021-01-25 16:40:54.564 -05:00 [INF] <jobUnitTest> No Previous metadata creating tables job: jobUnitTest
+2021-01-25 16:40:54.565 -05:00 [DBG] <jobUnitTest> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[golden]([Id] VARCHAR(2147483647),[Name] VARCHAR(2147483647),[NaveegoReplicationRecordId] VARCHAR(2147483647) NOT NULL UNIQUE,[NaveegoVersionIds] VARCHAR(2147483647),PRIMARY KEY ([NaveegoReplicationRecordId]));
+2021-01-25 16:40:54.569 -05:00 [DBG] <jobUnitTest> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[version]([Id] VARCHAR(2147483647),[Name] VARCHAR(2147483647),[NaveegoReplicationVersionRecordId] VARCHAR(2147483647) NOT NULL UNIQUE,[NaveegoReplicationRecordId] VARCHAR(2147483647),PRIMARY KEY ([NaveegoReplicationVersionRecordId]));
+2021-01-25 16:40:54.578 -05:00 [INF] <jobUnitTest> Created tables job: jobUnitTest
+2021-01-25 16:40:54.578 -05:00 [INF] <jobUnitTest> Updating metadata job: jobUnitTest
+2021-01-25 16:40:54.596 -05:00 [INF] <jobUnitTest> Updated metadata job: jobUnitTest
+2021-01-25 16:40:54.596 -05:00 [INF] <jobUnitTest> Finished reconciling Replication Job jobUnitTest
+2021-01-25 16:40:54.596 -05:00 [INF] <jobUnitTest> Write prepared.
+2021-01-25 16:40:54.605 -05:00 [INF] <jobUnitTest> Writing records to File...
+2021-01-25 16:40:54.992 -05:00 [ERR] <jobUnitTest> Could not write file to remote ../../../MockData/ReplicationDirectory/golden.csv
+System.Exception: Could not write file to remote ../../../MockData/ReplicationDirectory/golden.csv
+   at PluginFileReader.API.Replication.Replication.WriteToDisk(IImportExportFile goldenImportExport, IImportExportFile versionImportExport, ConfigureReplicationFormData config, Settings settings) in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/API/Replication/WriteToDisk.cs:line 50
+   at PluginFileReader.Plugin.Plugin.<>c__DisplayClass12_1.<WriteStream>b__0() in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Plugin/Plugin.cs:line 666
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.<>c.<.cctor>b__274_0(Object obj)
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location where exception was thrown ---
+   at PluginFileReader.Plugin.Plugin.WriteStream(IAsyncStreamReader`1 requestStream, IServerStreamWriter`1 responseStream, ServerCallContext context) in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Plugin/Plugin.cs:line 660
+2021-01-25 16:41:27.713 -05:00 [INF]  Connecting...
+2021-01-25 16:41:27.799 -05:00 [INF]  Connected.
+2021-01-25 16:41:27.809 -05:00 [INF] <jobUnitTest> Preparing write...
+2021-01-25 16:41:27.836 -05:00 [DBG] <jobUnitTest> {
+  "CommitSlaSeconds": 1,
+  "Schema": {
+    "Id": "test",
+    "Name": "test",
+    "Description": "",
+    "Properties": [
+      {
+        "Id": "Id",
+        "Name": "Id",
+        "Description": "",
+        "Type": 3,
+        "IsKey": true,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      },
+      {
+        "Id": "Name",
+        "Name": "Name",
+        "Description": "",
+        "Type": 0,
+        "IsKey": false,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      }
+    ],
+    "Count": null,
+    "Sample": [],
+    "Query": "",
+    "PublisherMetaJson": "",
+    "Errors": [],
+    "DataFlowDirection": 0
+  },
+  "Replication": {
+    "Versions": [],
+    "SettingsJson": "{\"GoldenRecordFileDirectory\":\"/Repl\",\"GoldenRecordFileName\":\"golden.csv\",\"VersionRecordFileDirectory\":\"/Repl\",\"VersionRecordFileName\":\"version.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":null,\"CustomHeader\":null}"
+  },
+  "DataVersions": {
+    "JobId": "jobUnitTest",
+    "JobDataVersion": 1,
+    "ShapeId": "shapeUnitTest",
+    "ShapeDataVersion": 2
+  }
+}
+2021-01-25 16:41:27.930 -05:00 [INF] <jobUnitTest> Starting to reconcile Replication Job jobUnitTest
+2021-01-25 16:41:27.933 -05:00 [INF] <jobUnitTest> SchemaName: dbo Golden Table: golden Version Table: version job: jobUnitTest
+2021-01-25 16:41:27.934 -05:00 [INF] <jobUnitTest> Getting previous metadata job: jobUnitTest
+2021-01-25 16:41:27.941 -05:00 [DBG] <jobUnitTest> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[NaveegoReplicationMetaData]([NaveegoJobId] varchar(2147483647) NOT NULL UNIQUE,[Request] varchar(2147483647),[NaveegoShapeId] varchar(2147483647),[NaveegoShapeName] varchar(2147483647),[Timestamp] varchar(2147483647),PRIMARY KEY ([NaveegoJobId]));
+2021-01-25 16:41:28.181 -05:00 [INF] <jobUnitTest> Got previous metadata job: jobUnitTest
+2021-01-25 16:41:28.181 -05:00 [INF] <jobUnitTest> Generating current metadata job: jobUnitTest
+2021-01-25 16:41:28.181 -05:00 [INF] <jobUnitTest> Generated current metadata job: jobUnitTest
+2021-01-25 16:41:28.181 -05:00 [INF] <jobUnitTest> Updating metadata job: jobUnitTest
+2021-01-25 16:41:28.229 -05:00 [INF] <jobUnitTest> Updated metadata job: jobUnitTest
+2021-01-25 16:41:28.229 -05:00 [INF] <jobUnitTest> Finished reconciling Replication Job jobUnitTest
+2021-01-25 16:41:28.229 -05:00 [INF] <jobUnitTest> Write prepared.
+2021-01-25 16:41:28.237 -05:00 [INF] <jobUnitTest> Writing records to File...
+2021-01-25 16:41:28.607 -05:00 [ERR] <jobUnitTest> Could not write file to remote /Repl/golden.csv
+System.Exception: Could not write file to remote /Repl/golden.csv
+   at PluginFileReader.API.Replication.Replication.WriteToDisk(IImportExportFile goldenImportExport, IImportExportFile versionImportExport, ConfigureReplicationFormData config, Settings settings) in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/API/Replication/WriteToDisk.cs:line 50
+   at PluginFileReader.Plugin.Plugin.<>c__DisplayClass12_1.<WriteStream>b__0() in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Plugin/Plugin.cs:line 666
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.<>c.<.cctor>b__274_0(Object obj)
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location where exception was thrown ---
+   at PluginFileReader.Plugin.Plugin.WriteStream(IAsyncStreamReader`1 requestStream, IServerStreamWriter`1 responseStream, ServerCallContext context) in /home/wyatt/repos/naveego/plugin-filereader/PluginFileReader/Plugin/Plugin.cs:line 660
+2021-01-25 16:42:21.081 -05:00 [INF]  Connecting...
+2021-01-25 16:42:21.156 -05:00 [INF]  Connected.
+2021-01-25 16:42:21.209 -05:00 [INF] <jobUnitTest> Preparing write...
+2021-01-25 16:42:21.229 -05:00 [DBG] <jobUnitTest> {
+  "CommitSlaSeconds": 1,
+  "Schema": {
+    "Id": "test",
+    "Name": "test",
+    "Description": "",
+    "Properties": [
+      {
+        "Id": "Id",
+        "Name": "Id",
+        "Description": "",
+        "Type": 3,
+        "IsKey": true,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      },
+      {
+        "Id": "Name",
+        "Name": "Name",
+        "Description": "",
+        "Type": 0,
+        "IsKey": false,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      }
+    ],
+    "Count": null,
+    "Sample": [],
+    "Query": "",
+    "PublisherMetaJson": "",
+    "Errors": [],
+    "DataFlowDirection": 0
+  },
+  "Replication": {
+    "Versions": [],
+    "SettingsJson": "{\"GoldenRecordFileDirectory\":\"/Repl\",\"GoldenRecordFileName\":\"golden.csv\",\"VersionRecordFileDirectory\":\"/Repl\",\"VersionRecordFileName\":\"version.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":null,\"CustomHeader\":null}"
+  },
+  "DataVersions": {
+    "JobId": "jobUnitTest",
+    "JobDataVersion": 1,
+    "ShapeId": "shapeUnitTest",
+    "ShapeDataVersion": 2
+  }
+}
+2021-01-25 16:42:21.305 -05:00 [INF] <jobUnitTest> Starting to reconcile Replication Job jobUnitTest
+2021-01-25 16:42:21.307 -05:00 [INF] <jobUnitTest> SchemaName: dbo Golden Table: golden Version Table: version job: jobUnitTest
+2021-01-25 16:42:21.307 -05:00 [INF] <jobUnitTest> Getting previous metadata job: jobUnitTest
+2021-01-25 16:42:21.310 -05:00 [DBG] <jobUnitTest> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[NaveegoReplicationMetaData]([NaveegoJobId] varchar(2147483647) NOT NULL UNIQUE,[Request] varchar(2147483647),[NaveegoShapeId] varchar(2147483647),[NaveegoShapeName] varchar(2147483647),[Timestamp] varchar(2147483647),PRIMARY KEY ([NaveegoJobId]));
+2021-01-25 16:42:21.458 -05:00 [INF] <jobUnitTest> Got previous metadata job: jobUnitTest
+2021-01-25 16:42:21.458 -05:00 [INF] <jobUnitTest> Generating current metadata job: jobUnitTest
+2021-01-25 16:42:21.458 -05:00 [INF] <jobUnitTest> Generated current metadata job: jobUnitTest
+2021-01-25 16:42:21.458 -05:00 [INF] <jobUnitTest> Updating metadata job: jobUnitTest
+2021-01-25 16:42:21.498 -05:00 [INF] <jobUnitTest> Updated metadata job: jobUnitTest
+2021-01-25 16:42:21.498 -05:00 [INF] <jobUnitTest> Finished reconciling Replication Job jobUnitTest
+2021-01-25 16:42:21.498 -05:00 [INF] <jobUnitTest> Write prepared.
+2021-01-25 16:42:21.505 -05:00 [INF] <jobUnitTest> Writing records to File...
+2021-01-25 16:43:06.539 -05:00 [INF]  Connecting...
+2021-01-25 16:43:06.645 -05:00 [INF]  Connected.
+2021-01-25 16:43:06.669 -05:00 [INF] <jobUnitTest> Preparing write...
+2021-01-25 16:43:06.685 -05:00 [DBG] <jobUnitTest> {
+  "CommitSlaSeconds": 1,
+  "Schema": {
+    "Id": "test",
+    "Name": "test",
+    "Description": "",
+    "Properties": [
+      {
+        "Id": "Id",
+        "Name": "Id",
+        "Description": "",
+        "Type": 3,
+        "IsKey": true,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      },
+      {
+        "Id": "Name",
+        "Name": "Name",
+        "Description": "",
+        "Type": 0,
+        "IsKey": false,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      }
+    ],
+    "Count": null,
+    "Sample": [],
+    "Query": "",
+    "PublisherMetaJson": "",
+    "Errors": [],
+    "DataFlowDirection": 0
+  },
+  "Replication": {
+    "Versions": [],
+    "SettingsJson": "{\"GoldenRecordFileDirectory\":\"/Repl\",\"GoldenRecordFileName\":\"golden.csv\",\"VersionRecordFileDirectory\":\"/Repl\",\"VersionRecordFileName\":\"version.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":null,\"CustomHeader\":null}"
+  },
+  "DataVersions": {
+    "JobId": "jobUnitTest",
+    "JobDataVersion": 1,
+    "ShapeId": "shapeUnitTest",
+    "ShapeDataVersion": 2
+  }
+}
+2021-01-25 16:43:06.769 -05:00 [INF] <jobUnitTest> Starting to reconcile Replication Job jobUnitTest
+2021-01-25 16:43:06.772 -05:00 [INF] <jobUnitTest> SchemaName: dbo Golden Table: golden Version Table: version job: jobUnitTest
+2021-01-25 16:43:06.772 -05:00 [INF] <jobUnitTest> Getting previous metadata job: jobUnitTest
+2021-01-25 16:43:06.774 -05:00 [DBG] <jobUnitTest> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[NaveegoReplicationMetaData]([NaveegoJobId] varchar(2147483647) NOT NULL UNIQUE,[Request] varchar(2147483647),[NaveegoShapeId] varchar(2147483647),[NaveegoShapeName] varchar(2147483647),[Timestamp] varchar(2147483647),PRIMARY KEY ([NaveegoJobId]));
+2021-01-25 16:43:06.942 -05:00 [INF] <jobUnitTest> Got previous metadata job: jobUnitTest
+2021-01-25 16:43:06.942 -05:00 [INF] <jobUnitTest> Generating current metadata job: jobUnitTest
+2021-01-25 16:43:06.942 -05:00 [INF] <jobUnitTest> Generated current metadata job: jobUnitTest
+2021-01-25 16:43:06.942 -05:00 [INF] <jobUnitTest> Updating metadata job: jobUnitTest
+2021-01-25 16:43:06.977 -05:00 [INF] <jobUnitTest> Updated metadata job: jobUnitTest
+2021-01-25 16:43:06.977 -05:00 [INF] <jobUnitTest> Finished reconciling Replication Job jobUnitTest
+2021-01-25 16:43:06.977 -05:00 [INF] <jobUnitTest> Write prepared.
+2021-01-25 16:43:06.989 -05:00 [INF] <jobUnitTest> Writing records to File...
+2021-01-25 16:43:56.524 -05:00 [INF]  Connecting...
+2021-01-25 16:43:56.620 -05:00 [INF]  Connected.
+2021-01-25 16:43:56.697 -05:00 [INF] <jobUnitTest> Preparing write...
+2021-01-25 16:43:56.733 -05:00 [DBG] <jobUnitTest> {
+  "CommitSlaSeconds": 1,
+  "Schema": {
+    "Id": "test",
+    "Name": "test",
+    "Description": "",
+    "Properties": [
+      {
+        "Id": "Id",
+        "Name": "Id",
+        "Description": "",
+        "Type": 3,
+        "IsKey": true,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      },
+      {
+        "Id": "Name",
+        "Name": "Name",
+        "Description": "",
+        "Type": 0,
+        "IsKey": false,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      }
+    ],
+    "Count": null,
+    "Sample": [],
+    "Query": "",
+    "PublisherMetaJson": "",
+    "Errors": [],
+    "DataFlowDirection": 0
+  },
+  "Replication": {
+    "Versions": [],
+    "SettingsJson": "{\"GoldenRecordFileDirectory\":\"/Repl\",\"GoldenRecordFileName\":\"golden.csv\",\"VersionRecordFileDirectory\":\"/Repl\",\"VersionRecordFileName\":\"version.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":null,\"CustomHeader\":null}"
+  },
+  "DataVersions": {
+    "JobId": "jobUnitTest",
+    "JobDataVersion": 1,
+    "ShapeId": "shapeUnitTest",
+    "ShapeDataVersion": 2
+  }
+}
+2021-01-25 16:43:56.812 -05:00 [INF] <jobUnitTest> Starting to reconcile Replication Job jobUnitTest
+2021-01-25 16:43:56.814 -05:00 [INF] <jobUnitTest> SchemaName: dbo Golden Table: golden Version Table: version job: jobUnitTest
+2021-01-25 16:43:56.814 -05:00 [INF] <jobUnitTest> Getting previous metadata job: jobUnitTest
+2021-01-25 16:43:56.817 -05:00 [DBG] <jobUnitTest> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[NaveegoReplicationMetaData]([NaveegoJobId] varchar(2147483647) NOT NULL UNIQUE,[Request] varchar(2147483647),[NaveegoShapeId] varchar(2147483647),[NaveegoShapeName] varchar(2147483647),[Timestamp] varchar(2147483647),PRIMARY KEY ([NaveegoJobId]));
+2021-01-25 16:43:56.966 -05:00 [INF] <jobUnitTest> Got previous metadata job: jobUnitTest
+2021-01-25 16:43:56.966 -05:00 [INF] <jobUnitTest> Generating current metadata job: jobUnitTest
+2021-01-25 16:43:56.966 -05:00 [INF] <jobUnitTest> Generated current metadata job: jobUnitTest
+2021-01-25 16:43:56.966 -05:00 [INF] <jobUnitTest> Updating metadata job: jobUnitTest
+2021-01-25 16:43:57.014 -05:00 [INF] <jobUnitTest> Updated metadata job: jobUnitTest
+2021-01-25 16:43:57.014 -05:00 [INF] <jobUnitTest> Finished reconciling Replication Job jobUnitTest
+2021-01-25 16:43:57.014 -05:00 [INF] <jobUnitTest> Write prepared.
+2021-01-25 16:43:57.022 -05:00 [INF] <jobUnitTest> Writing records to File...
+2021-01-25 16:45:28.420 -05:00 [INF]  Connecting...
+2021-01-25 16:45:28.496 -05:00 [INF]  Connected.
+2021-01-25 16:45:28.553 -05:00 [INF] <jobUnitTest> Preparing write...
+2021-01-25 16:45:28.568 -05:00 [DBG] <jobUnitTest> {
+  "CommitSlaSeconds": 1,
+  "Schema": {
+    "Id": "test",
+    "Name": "test",
+    "Description": "",
+    "Properties": [
+      {
+        "Id": "Id",
+        "Name": "Id",
+        "Description": "",
+        "Type": 3,
+        "IsKey": true,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      },
+      {
+        "Id": "Name",
+        "Name": "Name",
+        "Description": "",
+        "Type": 0,
+        "IsKey": false,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      }
+    ],
+    "Count": null,
+    "Sample": [],
+    "Query": "",
+    "PublisherMetaJson": "",
+    "Errors": [],
+    "DataFlowDirection": 0
+  },
+  "Replication": {
+    "Versions": [],
+    "SettingsJson": "{\"GoldenRecordFileDirectory\":\"/Repl\",\"GoldenRecordFileName\":\"golden.csv\",\"VersionRecordFileDirectory\":\"/Repl\",\"VersionRecordFileName\":\"version.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":null,\"CustomHeader\":null}"
+  },
+  "DataVersions": {
+    "JobId": "jobUnitTest",
+    "JobDataVersion": 1,
+    "ShapeId": "shapeUnitTest",
+    "ShapeDataVersion": 2
+  }
+}
+2021-01-25 16:45:28.651 -05:00 [INF] <jobUnitTest> Starting to reconcile Replication Job jobUnitTest
+2021-01-25 16:45:28.653 -05:00 [INF] <jobUnitTest> SchemaName: dbo Golden Table: golden Version Table: version job: jobUnitTest
+2021-01-25 16:45:28.653 -05:00 [INF] <jobUnitTest> Getting previous metadata job: jobUnitTest
+2021-01-25 16:45:28.656 -05:00 [DBG] <jobUnitTest> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[NaveegoReplicationMetaData]([NaveegoJobId] varchar(2147483647) NOT NULL UNIQUE,[Request] varchar(2147483647),[NaveegoShapeId] varchar(2147483647),[NaveegoShapeName] varchar(2147483647),[Timestamp] varchar(2147483647),PRIMARY KEY ([NaveegoJobId]));
+2021-01-25 16:45:28.810 -05:00 [INF] <jobUnitTest> Got previous metadata job: jobUnitTest
+2021-01-25 16:45:28.810 -05:00 [INF] <jobUnitTest> Generating current metadata job: jobUnitTest
+2021-01-25 16:45:28.810 -05:00 [INF] <jobUnitTest> Generated current metadata job: jobUnitTest
+2021-01-25 16:45:28.811 -05:00 [INF] <jobUnitTest> Updating metadata job: jobUnitTest
+2021-01-25 16:45:28.849 -05:00 [INF] <jobUnitTest> Updated metadata job: jobUnitTest
+2021-01-25 16:45:28.849 -05:00 [INF] <jobUnitTest> Finished reconciling Replication Job jobUnitTest
+2021-01-25 16:45:28.849 -05:00 [INF] <jobUnitTest> Write prepared.
+2021-01-25 16:45:28.857 -05:00 [INF] <jobUnitTest> Writing records to File...
+2021-01-25 16:53:09.079 -05:00 [INF]  Connecting...
+2021-01-25 16:53:09.132 -05:00 [INF]  Connected.
+2021-01-25 16:53:09.140 -05:00 [INF] <jobUnitTest> Preparing write...
+2021-01-25 16:53:09.156 -05:00 [DBG] <jobUnitTest> {
+  "CommitSlaSeconds": 1,
+  "Schema": {
+    "Id": "test",
+    "Name": "test",
+    "Description": "",
+    "Properties": [
+      {
+        "Id": "Id",
+        "Name": "Id",
+        "Description": "",
+        "Type": 3,
+        "IsKey": true,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      },
+      {
+        "Id": "Name",
+        "Name": "Name",
+        "Description": "",
+        "Type": 0,
+        "IsKey": false,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "",
+        "TypeAtSource": "",
+        "IsNullable": false
+      }
+    ],
+    "Count": null,
+    "Sample": [],
+    "Query": "",
+    "PublisherMetaJson": "",
+    "Errors": [],
+    "DataFlowDirection": 0
+  },
+  "Replication": {
+    "Versions": [],
+    "SettingsJson": "{\"GoldenRecordFileDirectory\":\"/Repl\",\"GoldenRecordFileName\":\"golden.csv\",\"VersionRecordFileDirectory\":\"/Repl\",\"VersionRecordFileName\":\"version.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":null,\"CustomHeader\":null}"
+  },
+  "DataVersions": {
+    "JobId": "jobUnitTest",
+    "JobDataVersion": 1,
+    "ShapeId": "shapeUnitTest",
+    "ShapeDataVersion": 2
+  }
+}
+2021-01-25 16:53:09.221 -05:00 [INF] <jobUnitTest> Starting to reconcile Replication Job jobUnitTest
+2021-01-25 16:53:09.223 -05:00 [INF] <jobUnitTest> SchemaName: dbo Golden Table: golden Version Table: version job: jobUnitTest
+2021-01-25 16:53:09.223 -05:00 [INF] <jobUnitTest> Getting previous metadata job: jobUnitTest
+2021-01-25 16:53:09.227 -05:00 [DBG] <jobUnitTest> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[NaveegoReplicationMetaData]([NaveegoJobId] varchar(2147483647) NOT NULL UNIQUE,[Request] varchar(2147483647),[NaveegoShapeId] varchar(2147483647),[NaveegoShapeName] varchar(2147483647),[Timestamp] varchar(2147483647),PRIMARY KEY ([NaveegoJobId]));
+2021-01-25 16:53:09.459 -05:00 [INF] <jobUnitTest> Got previous metadata job: jobUnitTest
+2021-01-25 16:53:09.459 -05:00 [INF] <jobUnitTest> Generating current metadata job: jobUnitTest
+2021-01-25 16:53:09.459 -05:00 [INF] <jobUnitTest> Generated current metadata job: jobUnitTest
+2021-01-25 16:53:09.459 -05:00 [INF] <jobUnitTest> Updating metadata job: jobUnitTest
+2021-01-25 16:53:09.504 -05:00 [INF] <jobUnitTest> Updated metadata job: jobUnitTest
+2021-01-25 16:53:09.504 -05:00 [INF] <jobUnitTest> Finished reconciling Replication Job jobUnitTest
+2021-01-25 16:53:09.504 -05:00 [INF] <jobUnitTest> Write prepared.
+2021-01-25 16:53:09.511 -05:00 [INF] <jobUnitTest> Writing records to File...
+2021-01-25 16:53:09.521 -05:00 [DBG] <jobUnitTest> Starting timer for record1
+2021-01-25 16:53:09.525 -05:00 [DBG] <jobUnitTest> {
+  "Action": 0,
+  "DataJson": "{\"Id\":1,\"Name\":\"Test Company\"}",
+  "RealTimeStateJson": "",
+  "Cause": "",
+  "CorrelationId": "test",
+  "RecordId": "record1",
+  "Versions": [
+    {
+      "ConnectionId": "",
+      "JobId": "",
+      "SchemaId": "",
+      "RecordId": "version1",
+      "DataJson": "{\"Id\":1,\"Name\":\"Test Company\"}",
+      "SchemaDataJson": ""
+    }
+  ]
+}
+2021-01-25 16:53:09.539 -05:00 [DBG] <jobUnitTest> shapeId: dbo | recordId: record1 - UPSERT
+2021-01-25 16:53:09.547 -05:00 [DBG] <jobUnitTest> Inserting record: record1
+2021-01-25 16:53:09.548 -05:00 [DBG] <jobUnitTest> Insert record query: INSERT INTO [dbo].[golden]([Id],[Name],[NaveegoReplicationRecordId],[NaveegoVersionIds]) VALUES ('1','Test Company','record1','["version1"]');
+2021-01-25 16:53:09.562 -05:00 [DBG] <jobUnitTest> shapeId: dbo | recordId: record1 | versionId: version1 - UPSERT
+2021-01-25 16:53:09.563 -05:00 [DBG] <jobUnitTest> Inserting record: version1
+2021-01-25 16:53:09.563 -05:00 [DBG] <jobUnitTest> Insert record query: INSERT INTO [dbo].[version]([Id],[Name],[NaveegoReplicationVersionRecordId],[NaveegoReplicationRecordId]) VALUES ('1','Test Company','version1','record1');
+2021-01-25 16:53:09.566 -05:00 [DBG] <jobUnitTest> Acknowledged Record record1 time: 44
+2021-01-25 16:53:10.452 -05:00 [INF] <jobUnitTest> Wrote 1 records to File.
+2021-01-25 17:10:01.399 -05:00 [INF]  Connecting...
+2021-01-25 17:10:01.451 -05:00 [INF]  Connected.
+2021-01-25 17:10:01.454 -05:00 [INF] <configure_write> Configuring write...
+2021-01-25 17:10:01.456 -05:00 [DBG] <configure_write> {
+  "Form": {
+    "DataJson": "{\"TargetFileDirectory\":\"/Output\",\"TargetFileName\":\"target.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":\"null\",\"CustomHeader\":\"custom header\",\"Columns\":[{\"Name\":\"Id\",\"DefaultValue\":\"\"},{\"Name\":\"Name\",\"DefaultValue\":\"default\"}]}",
+    "StateJson": "",
+    "IsSave": false
+  }
+}
+2021-01-25 17:10:01.461 -05:00 [INF] <configure_write> second call...
+2021-01-25 17:10:02.669 -05:00 [INF] <jobUnitTest_write> Preparing write...
+2021-01-25 17:10:02.690 -05:00 [DBG] <jobUnitTest_write> {
+  "CommitSlaSeconds": 1,
+  "Schema": {
+    "Id": "target.csv",
+    "Name": "target.csv",
+    "Description": "",
+    "Properties": [
+      {
+        "Id": "Id",
+        "Name": "Id",
+        "Description": "",
+        "Type": 0,
+        "IsKey": false,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "{\"Name\":\"Id\",\"DefaultValue\":\"\"}",
+        "TypeAtSource": "",
+        "IsNullable": false
+      },
+      {
+        "Id": "Name",
+        "Name": "Name",
+        "Description": "",
+        "Type": 0,
+        "IsKey": false,
+        "IsCreateCounter": false,
+        "IsUpdateCounter": false,
+        "PublisherMetaJson": "{\"Name\":\"Name\",\"DefaultValue\":\"default\"}",
+        "TypeAtSource": "",
+        "IsNullable": false
+      }
+    ],
+    "Count": null,
+    "Sample": [],
+    "Query": "target.csv",
+    "PublisherMetaJson": "{\"TargetFileDirectory\":\"/Output\",\"TargetFileName\":\"target.csv\",\"FileWriteMode\":\"FTP\",\"IncludeHeader\":true,\"QuoteWrap\":false,\"Delimiter\":\",\",\"NullValue\":\"null\",\"CustomHeader\":\"custom header\",\"Columns\":[{\"Name\":\"Id\",\"DefaultValue\":\"\"},{\"Name\":\"Name\",\"DefaultValue\":\"default\"}]}",
+    "Errors": [],
+    "DataFlowDirection": 1
+  },
+  "Replication": null,
+  "DataVersions": {
+    "JobId": "jobUnitTest_write",
+    "JobDataVersion": 1,
+    "ShapeId": "shapeUnitTest",
+    "ShapeDataVersion": 2
+  }
+}
+2021-01-25 17:10:02.755 -05:00 [INF] <jobUnitTest_write> Starting to reconcile Replication Job jobUnitTest_write
+2021-01-25 17:10:02.761 -05:00 [INF] <jobUnitTest_write> SchemaName: dbo Golden Table: target Version Table: NaveegoDefaultVersion job: jobUnitTest_write
+2021-01-25 17:10:02.761 -05:00 [INF] <jobUnitTest_write> Getting previous metadata job: jobUnitTest_write
+2021-01-25 17:10:02.765 -05:00 [DBG] <jobUnitTest_write> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[NaveegoReplicationMetaData]([NaveegoJobId] varchar(2147483647) NOT NULL UNIQUE,[Request] varchar(2147483647),[NaveegoShapeId] varchar(2147483647),[NaveegoShapeName] varchar(2147483647),[Timestamp] varchar(2147483647),PRIMARY KEY ([NaveegoJobId]));
+2021-01-25 17:10:03.041 -05:00 [INF] <jobUnitTest_write> Got previous metadata job: jobUnitTest_write
+2021-01-25 17:10:03.041 -05:00 [INF] <jobUnitTest_write> Generating current metadata job: jobUnitTest_write
+2021-01-25 17:10:03.041 -05:00 [INF] <jobUnitTest_write> Generated current metadata job: jobUnitTest_write
+2021-01-25 17:10:03.041 -05:00 [INF] <jobUnitTest_write> No Previous metadata creating tables job: jobUnitTest_write
+2021-01-25 17:10:03.041 -05:00 [DBG] <jobUnitTest_write> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[target]([Id] VARCHAR(2147483647),[Name] VARCHAR(2147483647),[NaveegoReplicationRecordId] VARCHAR(2147483647) NOT NULL UNIQUE,[NaveegoVersionIds] VARCHAR(2147483647),PRIMARY KEY ([NaveegoReplicationRecordId]));
+2021-01-25 17:10:03.044 -05:00 [DBG] <jobUnitTest_write> Creating Table: CREATE TABLE IF NOT EXISTS 
+[dbo].[NaveegoDefaultVersion]([Id] VARCHAR(2147483647),[Name] VARCHAR(2147483647),[NaveegoReplicationVersionRecordId] VARCHAR(2147483647) NOT NULL UNIQUE,[NaveegoReplicationRecordId] VARCHAR(2147483647),PRIMARY KEY ([NaveegoReplicationVersionRecordId]));
+2021-01-25 17:10:03.052 -05:00 [INF] <jobUnitTest_write> Created tables job: jobUnitTest_write
+2021-01-25 17:10:03.052 -05:00 [INF] <jobUnitTest_write> Updating metadata job: jobUnitTest_write
+2021-01-25 17:10:03.073 -05:00 [INF] <jobUnitTest_write> Updated metadata job: jobUnitTest_write
+2021-01-25 17:10:03.073 -05:00 [INF] <jobUnitTest_write> Finished reconciling Replication Job jobUnitTest_write
+2021-01-25 17:10:03.073 -05:00 [INF] <jobUnitTest_write> Write prepared.
+2021-01-25 17:10:03.082 -05:00 [INF] <jobUnitTest_write> Writing records to File...
+2021-01-25 17:10:03.089 -05:00 [DBG] <jobUnitTest_write> Starting timer for record1
+2021-01-25 17:10:03.092 -05:00 [DBG] <jobUnitTest_write> {
+  "Action": 0,
+  "DataJson": "{\"Id\":1}",
+  "RealTimeStateJson": "",
+  "Cause": "",
+  "CorrelationId": "test",
+  "RecordId": "record1",
+  "Versions": [
+    {
+      "ConnectionId": "",
+      "JobId": "",
+      "SchemaId": "",
+      "RecordId": "version1",
+      "DataJson": "{\"Id\":1}",
+      "SchemaDataJson": ""
+    }
+  ]
+}
+2021-01-25 17:10:03.094 -05:00 [DBG] <jobUnitTest_write> adding default value
+2021-01-25 17:10:03.094 -05:00 [DBG] <jobUnitTest_write> {
+  "Id": 1,
+  "NaveegoReplicationRecordId": "record1",
+  "NaveegoVersionIds": null,
+  "Name": "default"
+}
+2021-01-25 17:10:03.094 -05:00 [DBG] <jobUnitTest_write> shapeId: dbo | recordId: record1 - UPSERT
+2021-01-25 17:10:03.100 -05:00 [DBG] <jobUnitTest_write> Inserting record: record1
+2021-01-25 17:10:03.101 -05:00 [DBG] <jobUnitTest_write> Insert record query: INSERT INTO [dbo].[target]([Id],[Name],[NaveegoReplicationRecordId],[NaveegoVersionIds]) VALUES ('1','default','record1',NULL);
+2021-01-25 17:10:03.105 -05:00 [DBG] <jobUnitTest_write> Acknowledged Record record1 time: 15
+2021-01-25 17:10:03.682 -05:00 [INF] <jobUnitTest_write> Wrote 1 records to File.
