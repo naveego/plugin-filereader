@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentFTP;
 using Newtonsoft.Json;
 using PluginFileReader.API.Utility;
@@ -66,7 +68,7 @@ namespace PluginFileReader.Helper
                 if (rootPath.FileReadMode != Constants.FileModeLocal)
                 {
                     directoryPath = Path.Join(Utility.TempDirectory, rootPath.RootPath);
-                    LoadRemoteFilesIntoTempDirectory(rootPath);
+                    LoadRemoteFilesIntoTempDirectory(rootPath).Wait();
                 }
 
                 if (filesByDirectory.TryGetValue(directoryPath, out var existingFiles))
@@ -84,63 +86,76 @@ namespace PluginFileReader.Helper
             return filesByDirectory;
         }
 
-        private void LoadRemoteFilesIntoTempDirectory(RootPathObject rootPath)
+
+        private static readonly SemaphoreSlim LoadRemoteSemaphoreSlim = new SemaphoreSlim(1, 1);
+
+        private async Task LoadRemoteFilesIntoTempDirectory(RootPathObject rootPath)
         {
-            var tempDirectory = Path.Join(Utility.TempDirectory, rootPath.RootPath);
-
-            switch (rootPath.FileReadMode)
+            try
             {
-                case Constants.FileModeFtp:
-                    using (var client = Utility.GetFtpClient(this))
-                    {
-                        var mask = new Regex(rootPath.Filter
-                            .Replace(".", "[.]")
-                            .Replace("*", ".*")
-                            .Replace("?", "."));
+                await LoadRemoteSemaphoreSlim.WaitAsync();
 
-                        foreach (var item in client.GetListing(rootPath.RootPath))
+                var tempDirectory = Path.Join(Utility.TempDirectory, rootPath.RootPath);
+
+                switch (rootPath.FileReadMode)
+                {
+                    case Constants.FileModeFtp:
+                        using (var client = Utility.GetFtpClient(this))
                         {
-                            // if this is a file
-                            if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
+                            var mask = new Regex(rootPath.Filter
+                                .Replace(".", "[.]")
+                                .Replace("*", ".*")
+                                .Replace("?", "."));
+
+                            foreach (var item in await client.GetListingAsync(rootPath.RootPath))
                             {
-                                var status = client.DownloadFile(Path.Combine(tempDirectory, item.Name), item.FullName);
-                                if (status == FtpStatus.Failed)
+                                // if this is a file
+                                if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
                                 {
-                                    throw new Exception($"Could not download target file {item.FullName}");
+                                    var status = await client.DownloadFileAsync(Path.Combine(tempDirectory, item.Name),
+                                        item.FullName);
+                                    if (status == FtpStatus.Failed)
+                                    {
+                                        throw new Exception($"Could not download target file {item.FullName}");
+                                    }
+
+                                    Logger.Debug($"Downloaded file {item.Name}");
                                 }
-
-                                Logger.Debug($"Downloaded file {item.Name}");
                             }
+
+                            await client.DisconnectAsync();
                         }
 
-                        client.Disconnect();
-                    }
-
-                    break;
-                case Constants.FileModeSftp:
-                    using (var client = Utility.GetSftpClient(this))
-                    {
-                        var mask = new Regex(rootPath.Filter
-                            .Replace(".", "[.]")
-                            .Replace("*", ".*")
-                            .Replace("?", "."));
-
-                        var allFiles = client.ListDirectory(rootPath.RootPath);
-                        var downloadFiles = allFiles.Where(f => f.IsDirectory == false && mask.IsMatch(f.Name));
-
-                        foreach (var file in downloadFiles)
+                        break;
+                    case Constants.FileModeSftp:
+                        using (var client = Utility.GetSftpClient(this))
                         {
-                            using (var targetFile = File.Create(Path.Combine(tempDirectory, file.Name)))
+                            var mask = new Regex(rootPath.Filter
+                                .Replace(".", "[.]")
+                                .Replace("*", ".*")
+                                .Replace("?", "."));
+
+                            var allFiles = client.ListDirectory(rootPath.RootPath);
+                            var downloadFiles = allFiles.Where(f => f.IsDirectory == false && mask.IsMatch(f.Name));
+
+                            foreach (var file in downloadFiles)
                             {
-                                client.DownloadFile(file.FullName, targetFile);
-                                Logger.Debug($"Downloaded file {file.Name}");
+                                using (var targetFile = File.Create(Path.Combine(tempDirectory, file.Name)))
+                                {
+                                    client.DownloadFile(file.FullName, targetFile);
+                                    Logger.Debug($"Downloaded file {file.Name}");
+                                }
                             }
+
+                            client.Disconnect();
                         }
 
-                        client.Disconnect();
-                    }
-
-                    break;
+                        break;
+                }
+            }
+            finally
+            {
+                LoadRemoteSemaphoreSlim.Release();
             }
         }
 
@@ -366,7 +381,7 @@ namespace PluginFileReader.Helper
                             {
                                 throw new Exception($"{rootPath.RootPath} is not a directory on remote SFTP");
                             }
-                            
+
                             if (rootPath.CleanupAction == Constants.CleanupActionArchive)
                             {
                                 if (!client.Exists(rootPath.ArchivePath))
@@ -421,7 +436,7 @@ namespace PluginFileReader.Helper
             foreach (var rootPath in RootPaths)
             {
                 // check read permissions by attempting to download all target files
-                LoadRemoteFilesIntoTempDirectory(rootPath);
+                LoadRemoteFilesIntoTempDirectory(rootPath).Wait();
 
                 // check write permissions to configured archive directories by writing a test file and deleting it
                 if (rootPath.CleanupAction == Constants.CleanupActionArchive)
@@ -435,7 +450,7 @@ namespace PluginFileReader.Helper
                     var testFile = new StreamWriter(localTestFileName);
                     testFile.WriteLine("test");
                     testFile.Close();
-                    
+
                     switch (rootPath.FileReadMode)
                     {
                         case Constants.FileModeFtp:
@@ -446,9 +461,10 @@ namespace PluginFileReader.Helper
                                     var status = client.UploadFile(localTestFileName, remoteTestFileName);
                                     if (status == FtpStatus.Failed)
                                     {
-                                        throw new Exception($"Could not write to archive directory {rootPath.ArchivePath}");
+                                        throw new Exception(
+                                            $"Could not write to archive directory {rootPath.ArchivePath}");
                                     }
-                                    
+
                                     Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);
                                 }
                                 finally

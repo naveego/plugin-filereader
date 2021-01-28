@@ -22,7 +22,7 @@ namespace PluginFileReader.Plugin
         private readonly ServerStatus _server;
 
         private TaskCompletionSource<bool> _tcs;
-
+        
         private static readonly SemaphoreSlim DiscoverSemaphoreSlim = new SemaphoreSlim(1, 1);
 
         public Plugin()
