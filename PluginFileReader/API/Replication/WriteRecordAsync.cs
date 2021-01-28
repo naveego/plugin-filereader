@@ -152,6 +152,11 @@ namespace PluginFileReader.API.Replication
                 timer.Stop();
                 Logger.Debug($"Failed Record {record.RecordId} time: {timer.ElapsedMilliseconds}");
 
+                if (e.Message.Contains("library routine called out of sequence"))
+                {
+                    throw;
+                }
+
                 return e.Message;
             }
             finally

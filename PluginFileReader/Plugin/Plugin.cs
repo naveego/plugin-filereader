@@ -656,36 +656,42 @@ namespace PluginFileReader.Plugin
                             .Replication
                             .SettingsJson);
                     config.ConvertLegacyConfiguration();
-
-                    // watcher to periodically write file to disk
-                    Task.Run(() =>
-                    {
-                        while (_server.Connected)
-                        {
-                            Replication.WriteToDisk(_server.WriteSettings.GoldenImportExport,
-                                _server.WriteSettings.VersionImportExport, config, _server.Settings);
-                            Thread.Sleep(1000);
-                        }
-                    });
-
-                    while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
-                           _server.WriteConfigured)
-                    {
-                        var record = requestStream.Current;
-                        inCount++;
-
-                        // send record to source system
-                        // add await for unit testing 
-                        // removed to allow multiple to run at the same time
-                        Task.Run(
-                            async () => await Replication.WriteRecordAsync(_server.WriteSettings.Connection, schema,
-                                record, config,
-                                responseStream), context.CancellationToken);
-                    }
                     
-                    // write any pending records to file
-                    Replication.WriteToDisk(_server.WriteSettings.GoldenImportExport,
-                        _server.WriteSettings.VersionImportExport, config, _server.Settings, true);
+                    try
+                    {
+                        // watcher to periodically write file to disk
+                        Task.Run(() =>
+                        {
+                            while (_server.Connected)
+                            {
+                                Replication.WriteToDisk(_server.WriteSettings.GoldenImportExport,
+                                    _server.WriteSettings.VersionImportExport, config, _server.Settings);
+                                Thread.Sleep(1000);
+                            }
+                        });
+
+                        while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
+                               _server.WriteConfigured)
+                        {
+                            var record = requestStream.Current;
+                            inCount++;
+
+                            // send record to source system
+                            // add await for unit testing 
+                            // removed to allow multiple to run at the same time
+                            Task.Run(
+                                async () => await Replication.WriteRecordAsync(_server.WriteSettings.Connection, schema,
+                                    record, config,
+                                    responseStream), context.CancellationToken);
+                        }
+                    }
+                    finally
+                    {
+                        // write any pending records to file
+                        Replication.WriteToDisk(_server.WriteSettings.GoldenImportExport,
+                            _server.WriteSettings.VersionImportExport, config, _server.Settings, true);
+                    }
+
                 }
                 else
                 {
@@ -693,42 +699,47 @@ namespace PluginFileReader.Plugin
                     var config = writeConfig.GetReplicationFormData();
                     config.ConvertLegacyConfiguration();
 
-                    // watcher to periodically write file to disk
-                    Task.Run(() =>
+                    try
                     {
-                        while (_server.Connected)
+                        // watcher to periodically write file to disk
+                        await Task.Run(() =>
                         {
-                            Write.WriteToDisk(_server.WriteSettings.TargetImportExport, writeConfig, _server.Settings);
-                            Thread.Sleep(1000);
+                            while (_server.Connected)
+                            {
+                                Write.WriteToDisk(_server.WriteSettings.TargetImportExport, writeConfig,
+                                    _server.Settings);
+                                Thread.Sleep(1000);
+                            }
+                        });
+
+                        while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
+                               _server.WriteConfigured)
+                        {
+                            var record = requestStream.Current;
+                            inCount++;
+
+                            // send record to source system
+                            // add await for unit testing 
+                            // removed to allow multiple to run at the same time
+                            await Task.Run(
+                                async () => await Write.WriteRecordAsync(_server.WriteSettings.Connection, schema,
+                                    record, config,
+                                    responseStream), context.CancellationToken);
                         }
-                    });
-
-                    while (await requestStream.MoveNext(context.CancellationToken) && _server.Connected &&
-                           _server.WriteConfigured)
-                    {
-                        var record = requestStream.Current;
-                        inCount++;
-
-                        // send record to source system
-                        // add await for unit testing 
-                        // removed to allow multiple to run at the same time
-                        Task.Run(
-                            async () => await Write.WriteRecordAsync(_server.WriteSettings.Connection, schema,
-                                record, config,
-                                responseStream), context.CancellationToken);
                     }
-                    
-                    // write any pending records to file
-                    Write.WriteToDisk(_server.WriteSettings.TargetImportExport, writeConfig, _server.Settings, true);
+                    finally
+                    {
+                        // write any pending records to file
+                        Write.WriteToDisk(_server.WriteSettings.TargetImportExport, writeConfig, _server.Settings, true);
+                    }
                 }
                 
-
-
                 Logger.Info($"Wrote {inCount} records to File.");
             }
             catch (Exception e)
             {
                 Logger.Error(e, e.Message, context);
+                throw;
             }
         }
 
