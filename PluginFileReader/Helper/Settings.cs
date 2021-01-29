@@ -43,15 +43,16 @@ namespace PluginFileReader.Helper
 
                 if (!ArchivePathIsSetOnAllRootPaths())
                 {
-                    throw new Exception("A RootPath does not have an Archive Path set when the Clean Up Action is Archive");
+                    throw new Exception(
+                        "A RootPath does not have an Archive Path set when the Clean Up Action is Archive");
                 }
 
                 if (!ColumnsValidOnFixedWidthColumnsRootPaths())
                 {
                     throw new Exception("A RootPath set to Fixed Width Columns has no columns defined");
                 }
-
-                if (!RemoteHasRequiredPermissions())
+                
+                if (!RemoteHasRequiredPermissions().Result)
                 {
                     throw new Exception(
                         "A Remote RootPath does not have the required permissions to perform actions configured");
@@ -418,12 +419,13 @@ namespace PluginFileReader.Helper
 
             return true;
         }
-        
+
         private bool ArchivePathIsSetOnAllRootPaths()
         {
             foreach (var rootPath in RootPaths)
             {
-                if (rootPath.CleanupAction == Constants.CleanupActionArchive && string.IsNullOrEmpty(rootPath.ArchivePath))
+                if (rootPath.CleanupAction == Constants.CleanupActionArchive &&
+                    string.IsNullOrEmpty(rootPath.ArchivePath))
                 {
                     throw new Exception($"{rootPath.RootPath} is set to Archive and does not have an Archive Path set");
                 }
@@ -449,72 +451,84 @@ namespace PluginFileReader.Helper
             return true;
         }
 
-        private bool RemoteHasRequiredPermissions()
+        private static readonly SemaphoreSlim UploadRemoteSemaphoreSlim = new SemaphoreSlim(1, 1);
+
+        private async Task<bool> RemoteHasRequiredPermissions()
         {
             foreach (var rootPath in RootPaths)
             {
                 // check read permissions by attempting to download all target files
-                LoadRemoteFilesIntoTempDirectory(rootPath).Wait();
+                await LoadRemoteFilesIntoTempDirectory(rootPath);
 
-                // check write permissions to configured archive directories by writing a test file and deleting it
-                if (rootPath.CleanupAction == Constants.CleanupActionArchive)
+                try
                 {
-                    var testFileName = "test.txt";
-                    var remoteTestFileName = Path.Join(rootPath.ArchivePath, testFileName);
-                    var localTestDirectory = Path.Join(Utility.TempDirectory, rootPath.ArchivePath);
-                    var localTestFileName = Path.Join(Utility.TempDirectory, rootPath.ArchivePath, testFileName);
+                    await UploadRemoteSemaphoreSlim.WaitAsync();
 
-                    Directory.CreateDirectory(localTestDirectory);
-                    var testFile = new StreamWriter(localTestFileName);
-                    testFile.WriteLine("test");
-                    testFile.Close();
-
-                    switch (rootPath.FileReadMode)
+                    // check write permissions to configured archive directories by writing a test file and deleting it
+                    if (rootPath.CleanupAction == Constants.CleanupActionArchive)
                     {
-                        case Constants.FileModeFtp:
-                            using (var client = Utility.GetFtpClient(this))
-                            {
-                                try
+                        var testFileName = "test.txt";
+                        var remoteTestFileName = Path.Join(rootPath.ArchivePath, testFileName);
+                        var localTestDirectory = Path.Join(Utility.TempDirectory, rootPath.ArchivePath);
+                        var localTestFileName = Path.Join(Utility.TempDirectory, rootPath.ArchivePath, testFileName);
+
+                        Directory.CreateDirectory(localTestDirectory);
+                        var testFile = new StreamWriter(localTestFileName);
+                        await testFile.WriteLineAsync("test");
+                        testFile.Close();
+
+                        switch (rootPath.FileReadMode)
+                        {
+                            case Constants.FileModeFtp:
+                                using (var client = Utility.GetFtpClient(this))
                                 {
-                                    var status = client.UploadFile(localTestFileName, remoteTestFileName);
-                                    if (status == FtpStatus.Failed)
+                                    try
+                                    {
+                                        var status = await client.UploadFileAsync(localTestFileName, remoteTestFileName);
+                                        if (status == FtpStatus.Failed)
+                                        {
+                                            throw new Exception(
+                                                $"Could not write to archive directory {rootPath.ArchivePath}");
+                                        }
+
+                                        Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);
+                                    }
+                                    finally
+                                    {
+                                        await client.DisconnectAsync();
+                                    }
+                                }
+
+                                break;
+                            case Constants.FileModeSftp:
+                                using (var client = Utility.GetSftpClient(this))
+                                {
+                                    try
+                                    {
+                                        var fileStream = Utility.GetFileStream(localTestFileName);
+                                        client.UploadFile(fileStream, remoteTestFileName);
+                                        Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);
+                                    }
+                                    catch
                                     {
                                         throw new Exception(
                                             $"Could not write to archive directory {rootPath.ArchivePath}");
                                     }
+                                    finally
+                                    {
+                                        client.Disconnect();
+                                    }
+                                }
 
-                                    Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);
-                                }
-                                finally
-                                {
-                                    client.Disconnect();
-                                }
-                            }
-
-                            break;
-                        case Constants.FileModeSftp:
-                            using (var client = Utility.GetSftpClient(this))
-                            {
-                                try
-                                {
-                                    var fileStream = Utility.GetFileStream(localTestFileName);
-                                    client.UploadFile(fileStream, remoteTestFileName);
-                                    Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);
-                                }
-                                catch
-                                {
-                                    throw new Exception($"Could not write to archive directory {rootPath.ArchivePath}");
-                                }
-                                finally
-                                {
-                                    client.Disconnect();
-                                }
-                            }
-
-                            break;
-                        default:
-                            continue;
+                                break;
+                            default:
+                                continue;
+                        }
                     }
+                }
+                finally
+                {
+                    UploadRemoteSemaphoreSlim.Release();
                 }
             }
 
