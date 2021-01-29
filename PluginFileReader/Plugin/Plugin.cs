@@ -660,6 +660,7 @@ namespace PluginFileReader.Plugin
                     try
                     {
                         // watcher to periodically write file to disk
+                        // SHOULD NOT BE AWAITED
                         Task.Run(() =>
                         {
                             while (_server.Connected)
@@ -702,7 +703,8 @@ namespace PluginFileReader.Plugin
                     try
                     {
                         // watcher to periodically write file to disk
-                        await Task.Run(() =>
+                        // SHOULD NOT BE AWAITED
+                        Task.Run(() =>
                         {
                             while (_server.Connected)
                             {

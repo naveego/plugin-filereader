@@ -41,6 +41,11 @@ namespace PluginFileReader.Helper
                     throw new Exception("A RootPath does not have a Mode set");
                 }
 
+                if (!ArchivePathIsSetOnAllRootPaths())
+                {
+                    throw new Exception("A RootPath does not have an Archive Path set when the Clean Up Action is Archive");
+                }
+
                 if (!ColumnsValidOnFixedWidthColumnsRootPaths())
                 {
                     throw new Exception("A RootPath set to Fixed Width Columns has no columns defined");
@@ -408,6 +413,19 @@ namespace PluginFileReader.Helper
                 if (string.IsNullOrEmpty(rootPath.Mode))
                 {
                     throw new Exception($"{rootPath.RootPath} does not have a Mode set");
+                }
+            }
+
+            return true;
+        }
+        
+        private bool ArchivePathIsSetOnAllRootPaths()
+        {
+            foreach (var rootPath in RootPaths)
+            {
+                if (rootPath.CleanupAction == Constants.CleanupActionArchive && string.IsNullOrEmpty(rootPath.ArchivePath))
+                {
+                    throw new Exception($"{rootPath.RootPath} is set to Archive and does not have an Archive Path set");
                 }
             }
 
