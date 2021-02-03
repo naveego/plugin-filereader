@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using PluginFileReader.Helper;
 using Renci.SshNet;
 
@@ -7,9 +9,31 @@ namespace PluginFileReader.API.Utility
     {
         public static SftpClient GetSftpClient(Settings settings)
         {
-            var client = new SftpClient(settings.FtpHostname, settings.FtpPort, settings.FtpUsername, settings.FtpPassword);
+            SftpClient client = null;
             
-            client.Connect();
+            if (!string.IsNullOrWhiteSpace(settings.FtpPassword))
+            {
+                client = new SftpClient(settings.FtpHostname, settings.FtpPort, settings.FtpUsername, settings.FtpPassword);
+            }
+
+            if (!string.IsNullOrWhiteSpace(settings.FtpSshKey))
+            {
+                var privateKeyFiles = new []
+                {
+                    new PrivateKeyFile(settings.FtpSshKey)
+                };
+
+                client = new SftpClient(settings.FtpHostname, settings.FtpPort, settings.FtpUsername, privateKeyFiles);
+            }
+
+            if (client != null)
+            {
+                client.Connect();
+            }
+            else
+            {
+                throw new Exception("SFTP Client could not be initialized.");
+            }
 
             return client;
         }

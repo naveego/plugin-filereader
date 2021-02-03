@@ -196,6 +196,12 @@
           "description": "Password for any root paths using FTP/SFTP.",
           "default": ""
         },
+        "FtpSshKey": {
+          "type": "string",
+          "title": "SFTP SSH Key",
+          "description": "Path to SSH private key for any root paths using SFTP.",
+          "default": ""
+        },
         "RootPaths": {
           "title": "Root Paths",
           "description": "The folder(s) containing the files.",

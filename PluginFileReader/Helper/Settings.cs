@@ -21,6 +21,7 @@ namespace PluginFileReader.Helper
         public int FtpPort { get; set; }
         public string FtpUsername { get; set; }
         public string FtpPassword { get; set; }
+        public string FtpSshKey { get; set; }
         public List<RootPathObject> RootPaths { get; set; }
 
         /// <summary>
@@ -102,6 +103,7 @@ namespace PluginFileReader.Helper
                 await LoadRemoteSemaphoreSlim.WaitAsync();
 
                 var tempDirectory = Path.Join(Utility.TempDirectory, rootPath.RootPath);
+                Directory.CreateDirectory(tempDirectory);
 
                 switch (rootPath.FileReadMode)
                 {
