@@ -39,6 +39,7 @@
         "FtpPort",
         "FtpUsername",
         "FtpPassword",
+        "FtpSshKey",
         "RootPaths"
       ],
       "FtpPassword": {
