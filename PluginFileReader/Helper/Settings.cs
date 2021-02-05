@@ -86,7 +86,11 @@ namespace PluginFileReader.Helper
                 {
                     var files = new List<string>();
                     files.AddRange(Directory.GetFiles(directoryPath, rootPath.Filter));
-                    filesByDirectory.Add(rootPath.RootPath, files);
+
+                    if (!filesByDirectory.TryAdd(rootPath.RootPath, files))
+                    {
+                        filesByDirectory[rootPath.RootPath].AddRange(files);
+                    }
                 }
             }
 
