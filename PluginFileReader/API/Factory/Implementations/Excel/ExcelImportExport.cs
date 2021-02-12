@@ -23,7 +23,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
             _rootPath = rootPath;
             _tableName = tableName;
             _schemaName = schemaName;
-            
+
             // required for parsing dos era excel files
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         }
@@ -34,11 +34,12 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
         }
 
 
-        public long WriteLineToFile(string filePathAndName, Dictionary<string, object> recordMap, bool includeHeader = false, long lineNumber = -1)
+        public long WriteLineToFile(string filePathAndName, Dictionary<string, object> recordMap,
+            bool includeHeader = false, long lineNumber = -1)
         {
             throw new System.NotImplementedException();
         }
-        
+
         public long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = -1)
         {
             var rowsRead = 0;
@@ -62,16 +63,16 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
 
                         var rawValue = reader.GetValue(cell.ColumnIndex);
 
-                        if(!excelCellsValues.TryAdd(cell.ColumnName, rawValue))
+                        if (!excelCellsValues.TryAdd(cell.ColumnName, rawValue))
                         {
                             excelCellsValues.Add(cell.GetUniqueName(), rawValue);
                         }
-                        
+
                         currentRow++;
                     }
                 }
             }
-            
+
             using (var stream = Utility.Utility.GetFileStream(filePathAndName))
             {
                 using (var reader = ExcelReaderFactory.CreateReader(stream))
@@ -84,7 +85,11 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                             rowsSkipped++;
                         }
                     }
-                    
+                    else
+                    {
+                        reader.Read();
+                    }
+
                     // get desired column indexes
                     columnIndexes = rootPath.ModeSettings.ExcelModeSettings.GetAllExcelColumnIndexes();
 
@@ -92,7 +97,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                     {
                         columnIndexes = Enumerable.Range(0, reader.FieldCount).ToList();
                     }
-                    
+
                     // get column names
                     foreach (var i in columnIndexes)
                     {
@@ -104,7 +109,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                             {
                                 field = $"NO_HEADER_COLUMN_{i}";
                             }
-                            
+
                             if (headerColumns.Contains(field))
                             {
                                 headerColumns.Add($"{field}_DUPLICATE_{i}");
@@ -119,7 +124,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                             headerColumns.Add($"COLUMN_{i}");
                         }
                     }
-                    
+
                     // setup db table
                     var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (");
 
@@ -139,7 +144,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                     querySb.Append(");");
 
                     var query = querySb.ToString();
-            
+
                     Logger.Debug($"Create table query: {query}");
 
                     var cmd = new SqlDatabaseCommand
@@ -149,14 +154,14 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                     };
 
                     cmd.ExecuteNonQuery();
-                    
+
                     // prepare insert cmd with parameters
                     querySb = new StringBuilder($"INSERT INTO [{_schemaName}].[{_tableName}] (");
                     foreach (var column in headerColumns)
                     {
                         querySb.Append($"[{column}],");
                     }
-                    
+
                     foreach (var cell in excelCellsValues)
                     {
                         querySb.Append($"[{cell.Key}],");
@@ -171,7 +176,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                         querySb.Append($"{paramName},");
                         cmd.Parameters.Add(paramName);
                     }
-                    
+
                     foreach (var cell in excelCellsValues)
                     {
                         var paramName = $"@param{cell.Key.Replace(" ", "")}";
@@ -183,14 +188,14 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                     querySb.Append(");");
 
                     query = querySb.ToString();
-            
+
                     Logger.Debug($"Insert record query: {query}");
 
                     cmd.CommandText = query;
-                    
+
                     // read records
                     var trans = _conn.BeginTransaction();
-                    
+
                     try
                     {
                         // read all lines from file
@@ -198,10 +203,11 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                         {
                             foreach (var column in headerColumns)
                             {
-                                var rawValue = reader.GetValue(columnIndexes[headerColumns.IndexOf(column)])?.ToString();
+                                var rawValue = reader.GetValue(columnIndexes[headerColumns.IndexOf(column)])
+                                    ?.ToString();
                                 cmd.Parameters[$"@param{headerColumns.IndexOf(column)}"].Value = rawValue;
                             }
-                            
+
                             foreach (var cell in excelCellsValues)
                             {
                                 var rawValue = cell.Value?.ToString();
@@ -219,7 +225,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                                 trans = _conn.BeginTransaction();
                             }
                         }
-            
+
                         // commit any pending inserts
                         trans.Commit();
                     }
