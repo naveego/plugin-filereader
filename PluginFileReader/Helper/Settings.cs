@@ -578,6 +578,9 @@ namespace PluginFileReader.Helper
 
         // AS400 MODE SETTINGS
         public AS400Settings AS400Settings { get; set; }
+
+        // XML MODE SETTINGS
+        public XMLSettings XMLSettings { get; set; }
     }
 
     public class DelimitedSettings
@@ -636,6 +639,11 @@ namespace PluginFileReader.Helper
         public string AS400FormatsConfigurationFile { get; set; }
         public int KeyValueWidth { get; set; }
         public List<AS400Format> Formats { get; set; }
+    }
+
+    public class XMLSettings
+    {
+
     }
 
     public class Column
