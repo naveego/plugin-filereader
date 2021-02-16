@@ -142,10 +142,10 @@ namespace PluginFileReader.API.Factory.Implementations.XML
                     {
                         break;
                     }
-
-                    // commit any pending inserts
-                    trans.Commit();
                 }
+                
+                // commit any pending inserts
+                trans.Commit();
 
             }
             catch (Exception e)
@@ -166,39 +166,35 @@ namespace PluginFileReader.API.Factory.Implementations.XML
         {
             List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
             JToken token = JToken.Parse(json);
-            JToken child;
 
-            if (token.Children().Count() == 1)
+            if (token.HasValues)
             {
-                // child = token.Children().First();
+                var childToken = token.First().First().Value<JToken>();
 
-                // if (child.Value.Type == JTokenType.Array)
-                // {
-                //     foreach (JToken item in child.Children())
-                //     {
-                //         Dictionary<string, object> dict = new Dictionary<string, object>();
-                //         FillDictionaryFromJToken(dict, item, "");
-                //         list.Add(dict);
-                //     }
-                // }
+                if (childToken.HasValues && childToken.Children().Count() == 1)
+                {
+                    childToken = childToken.First().First().Value<JToken>();
+                    
+                    if (childToken.Type == JTokenType.Array)
+                    {
+                        foreach (JToken item in childToken.Children())
+                        {
+                            Dictionary<string, object> tempDict = new Dictionary<string, object>();
+                            FillDictionaryFromJToken(tempDict, item, "");
+                            list.Add(tempDict);
+                        }
+                    
+                        return list;
+                    }
+                }
             }
-            else
-            {
-                Dictionary<string, object> dict = new Dictionary<string, object>();
-                FillDictionaryFromJToken(dict, token, "");
-                list.Add(dict);
-            }
+            
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            FillDictionaryFromJToken(dict, token, "");
+            list.Add(dict);
 
             return list;
         }
-
-        // public static Dictionary<string, object> DeserializeAndFlattenToDictionary(string json)
-        // {
-        //     Dictionary<string, object> dict = new Dictionary<string, object>();
-        //     JToken token = JToken.Parse(json);
-        //     FillDictionaryFromJToken(dict, token, "");
-        //     return dict;
-        // }
 
         private static void FillDictionaryFromJToken(Dictionary<string, object> dict, JToken token, string prefix)
         {
