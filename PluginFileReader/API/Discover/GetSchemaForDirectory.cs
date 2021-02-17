@@ -42,7 +42,7 @@ namespace PluginFileReader.API.Discover
             
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
-            Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths.Take(1).ToList(), sampleSize);
+            Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths, sampleSize, 1);
             
             var schema = new Schema
             {
