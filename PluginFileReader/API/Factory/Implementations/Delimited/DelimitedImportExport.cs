@@ -260,8 +260,11 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                             foreach (string fieldValue in DelimitedReader.Fields)
                             {
                                 csvColumnCount++;
-                                cmd.Parameters["@param" + csvColumnCount].Value =
-                                    fieldValue; //Assign File Column to parameter
+                                if (cmd.Parameters.IndexOf("@param" + csvColumnCount) != -1)
+                                {
+                                    cmd.Parameters["@param" + csvColumnCount].Value =
+                                        fieldValue; //Assign File Column to parameter
+                                }
                             }
 
                             cmd.ExecuteNonQuery();
