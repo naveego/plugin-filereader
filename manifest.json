@@ -159,6 +159,8 @@
                   }
                 }
               }
+            },
+            "XMLSettings": {
             }
           }
         }
@@ -275,6 +277,7 @@
                   "Delimited",
                   "Fixed Width Columns",
                   "Excel",
+                  "XML",
                   "AS400"
                 ]
               }
@@ -322,6 +325,28 @@
                                   true
                                 ]
                               }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "Mode": {
+                        "enum": [
+                          "XML"
+                        ]
+                      },
+                      "ModeSettings": {
+                        "type": "object",
+                        "title": "",
+                        "properties": {
+                          "XMLSettings": {
+                            "type": "object",
+                            "title": "XML Settings",
+                            "description": "This mode requires no additional settings.",
+                            "properties": {
                             }
                           }
                         }

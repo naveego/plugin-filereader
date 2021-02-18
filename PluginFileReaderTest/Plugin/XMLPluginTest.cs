@@ -268,21 +268,21 @@ namespace PluginFileReaderTest.Plugin
             Assert.Single(response.Schemas);
 
             var schema = response.Schemas[0];
-            // Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
-            // Assert.Equal("ReadDirectory", schema.Name);
-            // Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
-            // // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
-            // // Assert.Equal(1000, schema.Count.Value);
-            // Assert.Equal(10, schema.Sample.Count);
-            // Assert.Equal(10, schema.Properties.Count);
+            Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
+            Assert.Equal("ReadDirectory", schema.Name);
+            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
+            // Assert.Equal(1000, schema.Count.Value);
+            Assert.Equal(2, schema.Sample.Count);
+            Assert.Equal(17, schema.Properties.Count);
 
-            // var property = schema.Properties[0];
-            // Assert.Equal("HCPCS Code", property.Id);
-            // Assert.Equal("HCPCS Code", property.Name);
-            // Assert.Equal("", property.Description);
-            // Assert.Equal(PropertyType.String, property.Type);
-            // Assert.False(property.IsKey);
-            // Assert.True(property.IsNullable);
+            var property = schema.Properties[0];
+            Assert.Equal("HEADER.@report_date", property.Id);
+            Assert.Equal("HEADER.@report_date", property.Name);
+            Assert.Equal("", property.Description);
+            Assert.Equal(PropertyType.String, property.Type);
+            Assert.False(property.IsKey);
+            Assert.True(property.IsNullable);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -306,7 +306,7 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings(null, 8);
+            var connectRequest = GetConnectSettings(null, 0, "sample_vl_creditreport*.xml");
 
             var discoverAllRequest = new DiscoverSchemasRequest
             {
@@ -330,21 +330,21 @@ namespace PluginFileReaderTest.Plugin
             Assert.Single(response.Schemas);
 
             var schema = response.Schemas[0];
-            // Assert.Equal($"test", schema.Id);
-            // Assert.Equal("test", schema.Name);
-            // Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
-            // // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
-            // // Assert.Equal(1000, schema.Count.Value);
-            // Assert.Equal(5, schema.Sample.Count);
-            // Assert.Equal(10, schema.Properties.Count);
+            Assert.Equal($"test", schema.Id);
+            Assert.Equal("test", schema.Name);
+            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
+            // Assert.Equal(1000, schema.Count.Value);
+            Assert.Equal(1, schema.Sample.Count);
+            Assert.Equal(529, schema.Properties.Count);
 
-            // var property = schema.Properties[0];
-            // Assert.Equal("HCPCS Code", property.Id);
-            // Assert.Equal("HCPCS Code", property.Name);
-            // Assert.Equal("", property.Description);
-            // Assert.Equal(PropertyType.String, property.Type);
-            // Assert.False(property.IsKey);
-            // Assert.True(property.IsNullable);
+            var property = schema.Properties[0];
+            Assert.Equal("CREDITDATA.@xsi:noNamespaceSchemaLocation", property.Id);
+            Assert.Equal("CREDITDATA.@xsi:noNamespaceSchemaLocation", property.Name);
+            Assert.Equal("", property.Description);
+            Assert.Equal(PropertyType.String, property.Type);
+            Assert.False(property.IsKey);
+            Assert.True(property.IsNullable);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -368,14 +368,14 @@ namespace PluginFileReaderTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings(null, 8);
+            var connectRequest = GetConnectSettings(null, 0, "sample_vl_creditreport*.xml");
 
             var schemaRequest = new DiscoverSchemasRequest
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
 
-            var settings = GetSettings();
+            var settings = GetSettings(null, 0, "sample_vl_creditreport*.xml");
             var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
             schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
             {
@@ -406,11 +406,81 @@ namespace PluginFileReaderTest.Plugin
             }
 
             // assert
-            Assert.Equal(1, records.Count);
+            Assert.Equal(2, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            // Assert.Equal("90371", record["HCPCS Code"]);
-            // Assert.Equal("Hep b ig im", record["Short Description"]);
+            Assert.Equal("5164", record["CREDITDATA.CONSUMER.@ssn"]);
+            Assert.Equal("string", record["CREDITDATA.CONSUMER.@firstname"]);
+            // Assert.Equal("1 ML", record["HCPCS Code Dosage"]);
+            // Assert.Equal("115.892", record["Payment Limit"]);
+            // Assert.Equal("", record["Vaccine AWP%"]);
+            // Assert.Equal("", record["Vaccine Limit"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
+        public async Task ReadStreamArrayTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = { Publisher.BindService(new PluginFileReader.Plugin.Plugin()) },
+                Ports = { new ServerPort("localhost", 0, ServerCredentials.Insecure) }
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings(null, 0, "array.xml");
+
+            var schemaRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+
+            var settings = GetSettings(null, 0, "sample_vl_creditreport*.xml");
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                RootPath = settings.RootPaths.First()
+            });
+
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(schemaRequest);
+            request.Schema = schemasResponse.Schemas[0];
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(2, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal("5429", record["HEADER.@report_id"]);
+            Assert.Equal("string", record["HEADER.@date_ordered"]);
             // Assert.Equal("1 ML", record["HCPCS Code Dosage"]);
             // Assert.Equal("115.892", record["Payment Limit"]);
             // Assert.Equal("", record["Vaccine AWP%"]);
