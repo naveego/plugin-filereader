@@ -157,12 +157,12 @@ namespace PluginFileReader.Plugin
                 {
                     await DiscoverSemaphoreSlim.WaitAsync();
 
-                    var files = _server.Settings.GetAllFilesByDirectory();
+                    var files = _server.Settings.GetAllFilesByRootPath();
                     Logger.Info($"Schemas attempted: {files.Count}");
 
                     var schemas = _server.Settings.RootPaths.Select(p =>
                             Discover.GetSchemasForDirectory(Utility.GetImportExportFactory(p.Mode), p,
-                                files[p.RootPath],
+                                files[p.RootPathName()],
                                 sampleSize))
                         .ToList();
 
@@ -191,7 +191,7 @@ namespace PluginFileReader.Plugin
 
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
 
-                var files = _server.Settings.GetAllFilesByDirectory();
+                var files = _server.Settings.GetAllFilesByRootPath();
                 var conn = Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
                 if (sampleSize == 0)
@@ -208,7 +208,7 @@ namespace PluginFileReader.Plugin
 
                     Utility.LoadDirectoryFilesIntoDb(
                         Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
-                        tableName, schemaName, files[rootPath.RootPath].Take(1).ToList(), sampleSize);
+                        tableName, schemaName, files[rootPath.RootPathName()], sampleSize, 1);
                 }
 
                 var schemas = refreshSchemas.Select(s => Discover.GetSchemaForQuery(s, sampleSize))
@@ -253,7 +253,7 @@ namespace PluginFileReader.Plugin
             try
             {
                 var conn = Utility.GetSqlConnection(jobId);
-                var filesByDirectory = _server.Settings.GetAllFilesByDirectory();
+                var filesByRootPath = _server.Settings.GetAllFilesByRootPath();
 
                 if (schema.PublisherMetaJson != "")
                 {
@@ -262,7 +262,7 @@ namespace PluginFileReader.Plugin
                         JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
                     var rootPath =
                         _server.Settings.RootPaths.First(r => r.RootPath == schemaMetaJson.RootPath.RootPath);
-                    var files = filesByDirectory[rootPath.RootPath];
+                    var files = filesByRootPath[rootPath.RootPathName()];
                     var schemaName = Constants.SchemaName;
                     var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
                         ? new DirectoryInfo(rootPath.RootPath).Name
@@ -308,7 +308,7 @@ namespace PluginFileReader.Plugin
                     // schema is query based so everything in query needs to be loaded first
                     foreach (var rootPath in rootPaths)
                     {
-                        var files = filesByDirectory[rootPath.RootPath];
+                        var files = filesByRootPath[rootPath.RootPathName()];
                         var schemaName = Constants.SchemaName;
                         var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
                             ? new DirectoryInfo(rootPath.RootPath).Name
@@ -345,7 +345,7 @@ namespace PluginFileReader.Plugin
 
                 foreach (var rootPath in _server.Settings.RootPaths)
                 {
-                    var files = filesByDirectory[rootPath.RootPath];
+                    var files = filesByRootPath[rootPath.RootPath];
                     switch (rootPath.CleanupAction)
                     {
                         case Constants.CleanupActionDelete:
