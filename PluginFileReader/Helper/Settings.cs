@@ -18,7 +18,7 @@ namespace PluginFileReader.Helper
   {
     public string GlobalColumnsConfigurationFile { get; set; }
     public string FtpHostname { get; set; }
-    public int FtpPort { get; set; }
+    public int? FtpPort { get; set; } = 21;
     public string FtpUsername { get; set; }
     public string FtpPassword { get; set; }
     public string FtpSshKey { get; set; }

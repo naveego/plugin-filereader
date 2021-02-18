@@ -13,7 +13,7 @@ namespace PluginFileReader.API.Utility
             
             if (!string.IsNullOrWhiteSpace(settings.FtpPassword))
             {
-                client = new SftpClient(settings.FtpHostname, settings.FtpPort, settings.FtpUsername, settings.FtpPassword);
+                client = new SftpClient(settings.FtpHostname, settings.FtpPort.Value, settings.FtpUsername, settings.FtpPassword);
             }
 
             if (!string.IsNullOrWhiteSpace(settings.FtpSshKey))
@@ -23,7 +23,7 @@ namespace PluginFileReader.API.Utility
                     new PrivateKeyFile(settings.FtpSshKey)
                 };
 
-                client = new SftpClient(settings.FtpHostname, settings.FtpPort, settings.FtpUsername, privateKeyFiles);
+                client = new SftpClient(settings.FtpHostname, settings.FtpPort.Value, settings.FtpUsername, privateKeyFiles);
             }
 
             if (client != null)

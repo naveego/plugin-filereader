@@ -10,8 +10,8 @@ namespace PluginFileReader.API.Utility
         {
             var client = new FtpClient(settings.FtpHostname);
             client.Credentials = new NetworkCredential(settings.FtpUsername, settings.FtpPassword);
-            client.Port = settings.FtpPort;
-                        
+            client.Port = settings.FtpPort.Value;
+
             client.Connect();
 
             return client;
