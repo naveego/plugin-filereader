@@ -51,6 +51,14 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             XmlDocument doc = new XmlDocument();
             // doc.PreserveWhitespace = true;
             doc.Load(filePathAndName);
+            
+            foreach (XmlNode node in doc)
+            {
+                if (node.NodeType == XmlNodeType.XmlDeclaration)
+                {
+                    doc.RemoveChild(node);
+                }
+            }
 
             // convert xml to json
             var json = JsonConvert.SerializeXmlNode(doc);

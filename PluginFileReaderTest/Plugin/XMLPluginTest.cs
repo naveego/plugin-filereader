@@ -31,6 +31,8 @@ namespace PluginFileReaderTest.Plugin
             bool configureEmpty = false)
         {
             Directory.CreateDirectory(ArchivePath);
+            Directory.CreateDirectory(ReadPath);
+            Directory.CreateDirectory(ReadDifferentPath);
 
             foreach (var filePath in Directory.GetFiles(ArchivePath))
             {
@@ -411,16 +413,79 @@ namespace PluginFileReaderTest.Plugin
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             Assert.Equal("5164", record["CREDITDATA.CONSUMER.@ssn"]);
             Assert.Equal("string", record["CREDITDATA.CONSUMER.@firstname"]);
-            // Assert.Equal("1 ML", record["HCPCS Code Dosage"]);
-            // Assert.Equal("115.892", record["Payment Limit"]);
-            // Assert.Equal("", record["Vaccine AWP%"]);
-            // Assert.Equal("", record["Vaccine Limit"]);
 
             // cleanup
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
 
+        [Fact]
+        public async Task ReadStreamXMLHeaderTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = { Publisher.BindService(new PluginFileReader.Plugin.Plugin()) },
+                Ports = { new ServerPort("localhost", 0, ServerCredentials.Insecure) }
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings(null, 0, "xmlfile.xml");
+
+            var schemaRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+
+            var settings = GetSettings(null, 0, "xmlfile.xml");
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                RootPath = settings.RootPaths.First()
+            });
+
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(schemaRequest);
+            request.Schema = schemasResponse.Schemas[0];
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(12, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal("bk101", record["@id"]);
+            Assert.Equal("Gambardella, Matthew", record["author"]);
+            Assert.Equal("Computer", record["genre"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
         [Fact]
         public async Task ReadStreamArrayTest()
         {
