@@ -345,7 +345,7 @@ namespace PluginFileReader.Plugin
 
                 foreach (var rootPath in _server.Settings.RootPaths)
                 {
-                    var files = filesByRootPath[rootPath.RootPath];
+                    var files = filesByRootPath[rootPath.RootPathName()];
                     switch (rootPath.CleanupAction)
                     {
                         case Constants.CleanupActionDelete:
