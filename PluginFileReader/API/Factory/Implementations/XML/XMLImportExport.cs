@@ -51,13 +51,24 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             XmlDocument doc = new XmlDocument();
             // doc.PreserveWhitespace = true;
             doc.Load(filePathAndName);
+
+            List<XmlNode> removeList = new List<XmlNode>();
             
             foreach (XmlNode node in doc)
             {
-                if (node.NodeType == XmlNodeType.XmlDeclaration)
+                if (
+                    node.NodeType == XmlNodeType.XmlDeclaration 
+                    || node.NodeType == XmlNodeType.Comment 
+                    || node.NodeType == XmlNodeType.ProcessingInstruction
+                )
                 {
-                    doc.RemoveChild(node);
+                    removeList.Add(node);
                 }
+            }
+
+            foreach (var node in removeList)
+            {
+                doc.RemoveChild(node);
             }
 
             // convert xml to json
