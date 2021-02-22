@@ -185,7 +185,7 @@
           "type": "number",
           "title": "FTP Port",
           "description": "Port for any root paths using FTP/SFTP.",
-          "default": ""
+          "default": 22
         },
         "FtpUsername": {
           "type": "string",
