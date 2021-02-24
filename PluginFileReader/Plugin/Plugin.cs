@@ -157,7 +157,7 @@ namespace PluginFileReader.Plugin
                 {
                     await DiscoverSemaphoreSlim.WaitAsync();
 
-                    var files = _server.Settings.GetAllFilesByRootPath();
+                    var files = _server.Settings.GetAllFilesByRootPath(1);
                     Logger.Info($"Schemas attempted: {files.Count}");
 
                     var schemas = _server.Settings.RootPaths.Select(p =>
@@ -191,7 +191,7 @@ namespace PluginFileReader.Plugin
 
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
 
-                var files = _server.Settings.GetAllFilesByRootPath();
+                var files = _server.Settings.GetAllFilesByRootPath(1);
                 var conn = Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
                 if (sampleSize == 0)

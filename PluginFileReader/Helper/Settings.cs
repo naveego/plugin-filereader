@@ -65,7 +65,7 @@ namespace PluginFileReader.Helper
         /// Gets all files from location defined by RootPath and Filters and returns in a dictionary by directory
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string, List<string>> GetAllFilesByRootPath()
+        public Dictionary<string, List<string>> GetAllFilesByRootPath(int limitPerRootPath = -1)
         {
             var filesByRootPath = new Dictionary<string, List<string>>();
             foreach (var rootPath in RootPaths)
@@ -76,7 +76,7 @@ namespace PluginFileReader.Helper
                 if (rootPath.FileReadMode != Constants.FileModeLocal)
                 {
                     directoryPath = Path.Join(Utility.TempDirectory, rootPath.RootPath);
-                    LoadRemoteFilesIntoTempDirectory(rootPath).Wait();
+                    LoadRemoteFilesIntoTempDirectory(rootPath, limitPerRootPath).Wait();
                 }
 
                 if (filesByRootPath.TryGetValue(rootPathName, out var existingFiles))
@@ -101,13 +101,15 @@ namespace PluginFileReader.Helper
 
         private static readonly SemaphoreSlim LoadRemoteSemaphoreSlim = new SemaphoreSlim(1, 1);
 
-        private async Task LoadRemoteFilesIntoTempDirectory(RootPathObject rootPath)
+        private async Task LoadRemoteFilesIntoTempDirectory(RootPathObject rootPath, int limit = -1)
         {
             if (rootPath.FileReadMode != Constants.FileModeLocal)
             {
                 try
                 {
                     await LoadRemoteSemaphoreSlim.WaitAsync();
+
+                    var filesPulled = 0;
 
                     var tempDirectory = Path.Join(Utility.TempDirectory, rootPath.RootPath);
                     Directory.CreateDirectory(tempDirectory);
@@ -127,6 +129,11 @@ namespace PluginFileReader.Helper
                                     // if this is a file
                                     if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
                                     {
+                                        if (limit != -1 && filesPulled == limit)
+                                        {
+                                            break;
+                                        }
+                                        
                                         var status = await client.DownloadFileAsync(
                                             Path.Combine(tempDirectory, item.Name),
                                             item.FullName);
@@ -134,6 +141,8 @@ namespace PluginFileReader.Helper
                                         {
                                             throw new Exception($"Could not download target file {item.FullName}");
                                         }
+
+                                        filesPulled++;
 
                                         Logger.Debug($"Downloaded file {item.Name}");
                                     }
@@ -156,9 +165,17 @@ namespace PluginFileReader.Helper
 
                                 foreach (var file in downloadFiles)
                                 {
+                                    if (limit != -1 && filesPulled == limit)
+                                    {
+                                        break;
+                                    }
+                                    
                                     using (var targetFile = File.Create(Path.Combine(tempDirectory, file.Name)))
                                     {
                                         client.DownloadFile(file.FullName, targetFile);
+
+                                        filesPulled++;
+                                        
                                         Logger.Debug($"Downloaded file {file.Name}");
                                     }
                                 }
@@ -471,7 +488,7 @@ namespace PluginFileReader.Helper
                 if (rootPath.FileReadMode != Constants.FileModeLocal)
                 {
                     // check read permissions by attempting to download all target files
-                    await LoadRemoteFilesIntoTempDirectory(rootPath);
+                    await LoadRemoteFilesIntoTempDirectory(rootPath, 1);
 
                     try
                     {
