@@ -53,6 +53,11 @@ namespace PluginFileReader.Helper
                     throw new Exception("A RootPath set to Fixed Width Columns has no columns defined");
                 }
 
+                if (!XmlKeysValidOnXmlRootPaths())
+                {
+                    throw new Exception("A RootPath set to XML has invalid configuration");
+                }
+
                 if (!RemoteHasRequiredPermissions().Result)
                 {
                     throw new Exception(
@@ -472,6 +477,31 @@ namespace PluginFileReader.Helper
                     {
                         throw new Exception(
                             $"{rootPath.RootPath} is set to Fixed Width Columns and has no Columns defined");
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private bool XmlKeysValidOnXmlRootPaths()
+        {
+            foreach (var rootPath in RootPaths)
+            {
+                if (rootPath.Mode == Constants.ModeXML)
+                {
+                    if (rootPath.ModeSettings.XMLSettings?.XmlKeys == null || rootPath.ModeSettings.XMLSettings?.XmlKeys?.Count == 0)
+                    {
+                        throw new Exception($"{rootPath.RootPath} is set to XML and has no Xml Keys defined.");
+                    }
+
+                    foreach (var xmlKey in rootPath.ModeSettings.XMLSettings.XmlKeys)
+                    {
+                        if (string.IsNullOrWhiteSpace(xmlKey.ElementId))
+                        {
+                            throw new Exception(
+                                $"{rootPath.RootPath} contains an XML Key where the Element Id is null.");
+                        }
                     }
                 }
             }
