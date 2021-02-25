@@ -4,7 +4,7 @@ using SQLDatabase.Net.SQLDatabaseClient;
 
 namespace PluginFileReader.API.Factory.Implementations.XML
 {
-    public class XMLImportExportFactory : IImportExportFactory
+    public class XmlImportExportFactory : IImportExportFactory
     {
         public bool CustomDiscover { get; set; } = false;
         
@@ -12,7 +12,7 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             RootPathObject rootPath,
             string tableName, string schemaName)
         {
-            return new XMLImportExport(sqlDatabaseConnection, rootPath, tableName, schemaName);
+            return new XmlImportExport(sqlDatabaseConnection, rootPath, tableName, schemaName);
         }
 
         public IImportExportFile MakeImportExportFile(SqlDatabaseConnection sqlDatabaseConnection,

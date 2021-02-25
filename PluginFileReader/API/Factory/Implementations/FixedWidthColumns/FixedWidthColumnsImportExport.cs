@@ -33,6 +33,18 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
             throw new NotImplementedException();
         }
 
+        public List<SchemaTable> GetAllTableNames(string filePathAndName)
+        {
+            return new List<SchemaTable>
+            {
+                {new SchemaTable
+                {
+                    SchemaName = _schemaName,
+                    TableName = _tableName
+                }}
+            };
+        }
+
         public long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = long.MaxValue)
         {
             // setup db table

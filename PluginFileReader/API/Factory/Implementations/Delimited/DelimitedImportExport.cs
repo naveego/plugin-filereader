@@ -80,6 +80,18 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             throw new NotImplementedException();
         }
 
+        public List<SchemaTable> GetAllTableNames(string filePathAndName)
+        {
+            return new List<SchemaTable>
+            {
+                {new SchemaTable
+                {
+                    SchemaName = SchemaName,
+                    TableName = TableName
+                }}
+            };
+        }
+        
         public long ExportTable(string filePathAndName, bool appendToFile = false)
         {
             SQLDatabaseConnection.Open();

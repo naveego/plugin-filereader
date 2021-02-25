@@ -32,5 +32,17 @@ namespace PluginFileReader.API.Factory
         /// <param name="lineNumber"></param>
         /// <returns>the line number of record written to the file</returns>
         long WriteLineToFile(string filePathAndName, Dictionary<string, object> recordMap, bool includeHeader = false, long lineNumber = -1);
+
+        /// <summary>
+        /// Gets all table names
+        /// </summary>
+        /// <returns></returns>
+        List<SchemaTable> GetAllTableNames(string filePathAndName);
+    }
+
+    public class SchemaTable
+    {
+        public string SchemaName { get; set; }
+        public string TableName { get; set; }
     }
 }

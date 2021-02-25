@@ -34,7 +34,6 @@ namespace PluginFileReader.API.Discover
             var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
                 ? new DirectoryInfo(rootPath.RootPath).Name
                 : rootPath.Name;
-            var schemaId = $"[{schemaName}].[{tableName}]";
             var publisherMetaJson = new SchemaPublisherMetaJson
             {
                 RootPath = rootPath
@@ -43,23 +42,30 @@ namespace PluginFileReader.API.Discover
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
             Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths, sampleSize, 1);
+
+            var tableNames = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName).GetAllTableNames(paths.FirstOrDefault());
+
+            var schemas = new List<Schema>();
             
-            var schema = new Schema
+            foreach (var table in tableNames)
             {
-                Id = schemaId,
-                Name = tableName,
-                DataFlowDirection = Schema.Types.DataFlowDirection.Read,
-                Query = $"SELECT * FROM {schemaId}",
-                Properties = {},
-            };
+                var tableNameId = $"[{table.SchemaName}].[{table.TableName}]";
+                var schema = new Schema
+                {
+                    Id = tableNameId,
+                    Name = table.TableName,
+                    DataFlowDirection = Schema.Types.DataFlowDirection.Read,
+                    Query = $"SELECT * FROM {tableNameId}",
+                    Properties = {},
+                };
 
-            schema = GetSchemaForQuery(schema, sampleSize, rootPath?.ModeSettings?.FixedWidthSettings?.Columns);
-            schema.PublisherMetaJson = JsonConvert.SerializeObject(publisherMetaJson);
+                schema = GetSchemaForQuery(schema, sampleSize, rootPath?.ModeSettings?.FixedWidthSettings?.Columns);
+                schema.PublisherMetaJson = JsonConvert.SerializeObject(publisherMetaJson);
+                
+                schemas.Add(schema);
+            }
 
-            return new List<Schema>
-            {
-                schema
-            };
+            return schemas;
         }
     }
 }

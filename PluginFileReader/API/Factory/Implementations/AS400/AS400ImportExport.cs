@@ -255,6 +255,18 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             throw new NotImplementedException();
         }
 
+        public List<SchemaTable> GetAllTableNames(string filePathAndName)
+        {
+            return new List<SchemaTable>
+            {
+                {new SchemaTable
+                {
+                    SchemaName = _schemaName,
+                    TableName = _tableName
+                }}
+            };
+        }
+
         private void CreateTable(string schemaName, string tableName, List<Column> columns)
         {
             // setup db table

@@ -95,7 +95,17 @@ namespace PluginFileReaderTest.Plugin
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
                             ModeSettings = new ModeSettings{
-                              XMLSettings = new XMLSettings {}
+                              XMLSettings = new XmlSettings
+                              {
+                                  XmlKeys = new List<XmlKey>
+                                  {
+                                      new XmlKey
+                                      {
+                                          ElementId = "HEADER",
+                                          AttributeId = "customer_number",
+                                      }
+                                  }
+                              }
                             }
                         },
                         new RootPathObject
@@ -108,7 +118,17 @@ namespace PluginFileReaderTest.Plugin
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
                             ModeSettings = new ModeSettings{
-                              XMLSettings = new XMLSettings {}
+                                XMLSettings = new XmlSettings
+                                {
+                                    XmlKeys = new List<XmlKey>
+                                    {
+                                        new XmlKey
+                                        {
+                                            ElementId = "HEADER",
+                                            AttributeId = "customer_number",
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -124,7 +144,17 @@ namespace PluginFileReaderTest.Plugin
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
                             ModeSettings = new ModeSettings{
-                              XMLSettings = new XMLSettings {}
+                                XMLSettings = new XmlSettings
+                                {
+                                    XmlKeys = new List<XmlKey>
+                                    {
+                                        new XmlKey
+                                        {
+                                            ElementId = "HEADER",
+                                            AttributeId = "customer_number",
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -319,7 +349,7 @@ namespace PluginFileReaderTest.Plugin
             var request = new DiscoverSchemasRequest
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
-                ToRefresh = { GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]") },
+                ToRefresh = { GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory_HEADER]") },
             };
 
             // act

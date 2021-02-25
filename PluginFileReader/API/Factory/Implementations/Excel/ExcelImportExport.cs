@@ -40,6 +40,18 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
             throw new System.NotImplementedException();
         }
 
+        public List<SchemaTable> GetAllTableNames(string filePathAndName)
+        {
+            return new List<SchemaTable>
+            {
+                {new SchemaTable
+                {
+                    SchemaName = _schemaName,
+                    TableName = _tableName
+                }}
+            };
+        }
+
         public long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = -1)
         {
             var rowsRead = 0;

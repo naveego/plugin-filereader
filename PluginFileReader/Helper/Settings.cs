@@ -616,7 +616,7 @@ namespace PluginFileReader.Helper
         public AS400Settings AS400Settings { get; set; }
 
         // XML MODE SETTINGS
-        public XMLSettings XMLSettings { get; set; }
+        public XmlSettings XMLSettings { get; set; }
     }
 
     public class DelimitedSettings
@@ -736,7 +736,14 @@ namespace PluginFileReader.Helper
     }
 
     // XML SETTINGS
-    public class XMLSettings
+    public class XmlSettings
     {
+        public List<XmlKey> XmlKeys { get; set; }
+    }
+
+    public class XmlKey
+    {
+        public string ElementId { get; set; }
+        public string AttributeId { get; set; }
     }
 }

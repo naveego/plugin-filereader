@@ -27,7 +27,7 @@ namespace PluginFileReader.API.Utility
                 case Constants.ModeAS400:
                     return new AS400ImportExportFactory();
                 case Constants.ModeXML:
-                    return new XMLImportExportFactory();
+                    return new XmlImportExportFactory();
                 default:
                     return null;
             }
