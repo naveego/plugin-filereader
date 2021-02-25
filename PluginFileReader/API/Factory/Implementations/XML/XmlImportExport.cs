@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -127,6 +128,7 @@ namespace PluginFileReader.API.Factory.Implementations.XML
 
             // parse xml into multiple tables
             DataSet dataSet = new DataSet();
+            dataSet.Locale = CultureInfo.InvariantCulture;
             dataSet.ReadXml(filePathAndName, XmlReadMode.InferSchema);
 
             // create and load each table
