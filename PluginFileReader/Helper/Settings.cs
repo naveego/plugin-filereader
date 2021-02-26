@@ -768,6 +768,7 @@ namespace PluginFileReader.Helper
     // XML SETTINGS
     public class XmlSettings
     {
+        public string XsdFilePathAndName { get; set; }
         public List<XmlKey> XmlKeys { get; set; }
     }
 

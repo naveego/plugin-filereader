@@ -51,7 +51,7 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             
             // parse xml into multiple tables
             DataSet dataSet = new DataSet();
-            dataSet.ReadXml(filePathAndName, XmlReadMode.InferSchema);
+            dataSet.ReadXmlSchema(_rootPath.ModeSettings.XMLSettings.XsdFilePathAndName);
 
             // create and load each table
             foreach (DataTable table in dataSet.Tables)
@@ -128,8 +128,10 @@ namespace PluginFileReader.API.Factory.Implementations.XML
 
             // parse xml into multiple tables
             DataSet dataSet = new DataSet();
+            dataSet.ReadXmlSchema(rootPath.ModeSettings.XMLSettings.XsdFilePathAndName);
             dataSet.Locale = CultureInfo.InvariantCulture;
-            dataSet.ReadXml(filePathAndName, XmlReadMode.InferSchema);
+            dataSet.EnforceConstraints = false;
+            dataSet.ReadXml(filePathAndName, XmlReadMode.Auto);
 
             // create and load each table
             foreach (DataTable table in dataSet.Tables)
