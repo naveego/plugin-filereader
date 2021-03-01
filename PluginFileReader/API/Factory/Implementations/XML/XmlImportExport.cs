@@ -55,7 +55,6 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             var stream = Utility.Utility.GetStream(_rootPath.ModeSettings.XMLSettings.XsdFilePathAndName,
                 _rootPath.FileReadMode);
             dataSet.ReadXmlSchema(stream);
-            stream.Close();
 
             // create and load each table
             foreach (DataTable table in dataSet.Tables)
@@ -85,7 +84,6 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             var stream = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
             XmlDocument doc = new XmlDocument();
             doc.Load(stream);
-            stream.Close();
 
             foreach (var xmlKey in rootPath.ModeSettings.XMLSettings.XmlKeys)
             {
@@ -138,14 +136,12 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             stream = Utility.Utility.GetStream(rootPath.ModeSettings.XMLSettings.XsdFilePathAndName,
                 rootPath.FileReadMode);
             dataSet.ReadXmlSchema(stream);
-            stream.Close();
-            
+
             dataSet.Locale = CultureInfo.InvariantCulture;
             dataSet.EnforceConstraints = false;
 
             stream = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
             dataSet.ReadXml(stream, XmlReadMode.Auto);
-            stream.Close();
 
             // create and load each table
             foreach (DataTable table in dataSet.Tables)

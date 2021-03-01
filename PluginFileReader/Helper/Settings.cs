@@ -206,8 +206,9 @@ namespace PluginFileReader.Helper
                                             break;
                                         }
 
-                                        var stream = await client.OpenReadAsync(item.FullName);
-                                        stream.Close();
+                                        using (await client.OpenReadAsync(item.FullName))
+                                        {
+                                        }
 
                                         filesPulled++;
 
