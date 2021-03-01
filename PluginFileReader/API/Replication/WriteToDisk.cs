@@ -36,7 +36,7 @@ namespace PluginFileReader.API.Replication
                     switch (config.FileWriteMode)
                     {
                         case Constants.FileModeFtp:
-                            using (var client = Utility.Utility.GetFtpClient(settings))
+                            using (var client = Utility.Utility.GetFtpClient())
                             {
                                 try
                                 {
@@ -60,16 +60,16 @@ namespace PluginFileReader.API.Replication
 
                             break;
                         case Constants.FileModeSftp:
-                            using (var client = Utility.Utility.GetSftpClient(settings))
+                            using (var client = Utility.Utility.GetSftpClient())
                             {
                                 try
                                 {
-                                    using (var fileStream = Utility.Utility.GetFileStream(localGoldenFileName))
+                                    using (var fileStream = Utility.Utility.GetStream(localGoldenFileName, config.FileWriteMode))
                                     {
                                         client.UploadFile(fileStream, remoteGoldenFileName);
                                     }
 
-                                    using (var fileStream = Utility.Utility.GetFileStream(localVersionFileName))
+                                    using (var fileStream = Utility.Utility.GetStream(localVersionFileName, config.FileWriteMode))
                                     {
                                         client.UploadFile(fileStream, remoteVersionFileName);
                                     }

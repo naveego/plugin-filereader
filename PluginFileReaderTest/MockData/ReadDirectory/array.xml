@@ -1,8 +1,0 @@
-<CREDITARRAY>
-  <CREDITDATA>
-    <HEADER report_date="string" date_ordered="string" report_to="string" customer_number="string" customer_name="string" customer_address="string" customer_citystatezip="string" customer_phone="string" report_owner="string" report_id="5429" fnma_job="string" loan_type="string" reference_number="string" repositories="string" property_address="string" report_charge="string" instant_view_pw="string" />
-  </CREDITDATA>
-  <CREDITDATA>
-    <HEADER report_date="string" date_ordered="string" report_to="string" customer_number="string" customer_name="string" customer_address="string" customer_citystatezip="string" customer_phone="string" report_owner="string" report_id="5429" fnma_job="string" loan_type="string" reference_number="string" repositories="string" property_address="string" report_charge="string" instant_view_pw="string" />
-  </CREDITDATA>
-</CREDITARRAY>

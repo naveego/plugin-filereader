@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 using FluentFTP;
 using Newtonsoft.Json;
 using PluginFileReader.API.Utility;
-using Renci.SshNet;
-using Renci.SshNet.Common;
+using PluginFileReader.DataContracts;
 
 namespace PluginFileReader.Helper
 {
@@ -18,7 +17,7 @@ namespace PluginFileReader.Helper
     {
         public string GlobalColumnsConfigurationFile { get; set; }
         public string FtpHostname { get; set; }
-        public int? FtpPort { get; set; } = 21;
+        public int? FtpPort { get; set; } = 22;
         public string FtpUsername { get; set; }
         public string FtpPassword { get; set; }
         public string FtpSshKey { get; set; }
@@ -78,24 +77,26 @@ namespace PluginFileReader.Helper
                 var directoryPath = rootPath.RootPath;
                 var rootPathName = rootPath.RootPathName();
 
+                List<string> filesToAdd;
+
                 if (rootPath.FileReadMode != Constants.FileModeLocal)
                 {
-                    directoryPath = Path.Join(Utility.TempDirectory, rootPath.RootPath);
-                    LoadRemoteFilesIntoTempDirectory(rootPath, limitPerRootPath).Wait();
+                    filesToAdd = GetRemoteFiles(rootPath).Result;
+                }
+                else
+                {
+                    filesToAdd = Directory.GetFiles(directoryPath, rootPath.Filter).ToList();
                 }
 
                 if (filesByRootPath.TryGetValue(rootPathName, out var existingFiles))
                 {
-                    existingFiles.AddRange(Directory.GetFiles(directoryPath, rootPath.Filter));
+                    existingFiles.AddRange(filesToAdd);
                 }
                 else
                 {
-                    var files = new List<string>();
-                    files.AddRange(Directory.GetFiles(directoryPath, rootPath.Filter));
-
-                    if (!filesByRootPath.TryAdd(rootPathName, files))
+                    if (!filesByRootPath.TryAdd(rootPathName, filesToAdd))
                     {
-                        filesByRootPath[rootPathName].AddRange(files);
+                        filesByRootPath[rootPathName].AddRange(filesToAdd);
                     }
                 }
             }
@@ -103,10 +104,79 @@ namespace PluginFileReader.Helper
             return filesByRootPath;
         }
 
+        private static readonly SemaphoreSlim GetRemoteSemaphoreSlim = new SemaphoreSlim(1, 1);
+
+        private async Task<List<string>> GetRemoteFiles(RootPathObject rootPath)
+        {
+            var files = new List<string>();
+
+            if (rootPath.FileReadMode != Constants.FileModeLocal)
+            {
+                try
+                {
+                    await GetRemoteSemaphoreSlim.WaitAsync();
+
+                    switch (rootPath.FileReadMode)
+                    {
+                        case Constants.FileModeFtp:
+                            using (var client = Utility.GetFtpClient())
+                            {
+                                var mask = new Regex(rootPath.Filter
+                                    .Replace(".", "[.]")
+                                    .Replace("*", ".*")
+                                    .Replace("?", "."));
+
+                                foreach (var item in await client.GetListingAsync(rootPath.RootPath))
+                                {
+                                    // if this is a file
+                                    if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
+                                    {
+                                        files.Add(item.FullName);
+
+                                        Logger.Debug($"Added file {item.Name}");
+                                    }
+                                }
+
+                                await client.DisconnectAsync();
+                            }
+
+                            break;
+                        case Constants.FileModeSftp:
+                            using (var client = Utility.GetSftpClient())
+                            {
+                                var mask = new Regex(rootPath.Filter
+                                    .Replace(".", "[.]")
+                                    .Replace("*", ".*")
+                                    .Replace("?", "."));
+
+                                var allFiles = client.ListDirectory(rootPath.RootPath);
+                                var downloadFiles = allFiles.Where(f => f.IsDirectory == false && mask.IsMatch(f.Name));
+
+                                foreach (var file in downloadFiles)
+                                {
+                                    files.Add(file.FullName);
+
+                                    Logger.Debug($"Added file {file.Name}");
+                                }
+
+                                client.Disconnect();
+                            }
+
+                            break;
+                    }
+                }
+                finally
+                {
+                    GetRemoteSemaphoreSlim.Release();
+                }
+            }
+
+            return files;
+        }
 
         private static readonly SemaphoreSlim LoadRemoteSemaphoreSlim = new SemaphoreSlim(1, 1);
 
-        private async Task LoadRemoteFilesIntoTempDirectory(RootPathObject rootPath, int limit = -1)
+        private async Task OpenRemoteFiles(RootPathObject rootPath, int limit = -1)
         {
             if (rootPath.FileReadMode != Constants.FileModeLocal)
             {
@@ -116,13 +186,10 @@ namespace PluginFileReader.Helper
 
                     var filesPulled = 0;
 
-                    var tempDirectory = Path.Join(Utility.TempDirectory, rootPath.RootPath);
-                    Directory.CreateDirectory(tempDirectory);
-
                     switch (rootPath.FileReadMode)
                     {
                         case Constants.FileModeFtp:
-                            using (var client = Utility.GetFtpClient(this))
+                            using (var client = Utility.GetFtpClient())
                             {
                                 var mask = new Regex(rootPath.Filter
                                     .Replace(".", "[.]")
@@ -138,18 +205,13 @@ namespace PluginFileReader.Helper
                                         {
                                             break;
                                         }
-                                        
-                                        var status = await client.DownloadFileAsync(
-                                            Path.Combine(tempDirectory, item.Name),
-                                            item.FullName);
-                                        if (status == FtpStatus.Failed)
-                                        {
-                                            throw new Exception($"Could not download target file {item.FullName}");
-                                        }
+
+                                        var stream = await client.OpenReadAsync(item.FullName);
+                                        stream.Close();
 
                                         filesPulled++;
 
-                                        Logger.Debug($"Downloaded file {item.Name}");
+                                        Logger.Debug($"Opened file {item.Name}");
                                     }
                                 }
 
@@ -158,7 +220,7 @@ namespace PluginFileReader.Helper
 
                             break;
                         case Constants.FileModeSftp:
-                            using (var client = Utility.GetSftpClient(this))
+                            using (var client = Utility.GetSftpClient())
                             {
                                 var mask = new Regex(rootPath.Filter
                                     .Replace(".", "[.]")
@@ -174,14 +236,12 @@ namespace PluginFileReader.Helper
                                     {
                                         break;
                                     }
-                                    
-                                    using (var targetFile = File.Create(Path.Combine(tempDirectory, file.Name)))
-                                    {
-                                        client.DownloadFile(file.FullName, targetFile);
 
+                                    using (client.OpenRead(file.FullName))
+                                    {
                                         filesPulled++;
-                                        
-                                        Logger.Debug($"Downloaded file {file.Name}");
+
+                                        Logger.Debug($"Opened file {file.Name}");
                                     }
                                 }
 
@@ -386,7 +446,7 @@ namespace PluginFileReader.Helper
 
                 if (rootPath.FileReadMode == Constants.FileModeFtp)
                 {
-                    using (var client = Utility.GetFtpClient(this))
+                    using (var client = Utility.GetFtpClient())
                     {
                         try
                         {
@@ -412,7 +472,7 @@ namespace PluginFileReader.Helper
 
                 if (rootPath.FileReadMode == Constants.FileModeSftp)
                 {
-                    using (var client = Utility.GetSftpClient(this))
+                    using (var client = Utility.GetSftpClient())
                     {
                         try
                         {
@@ -490,7 +550,8 @@ namespace PluginFileReader.Helper
             {
                 if (rootPath.Mode == Constants.ModeXML)
                 {
-                    if (rootPath.ModeSettings.XMLSettings?.XmlKeys == null || rootPath.ModeSettings.XMLSettings?.XmlKeys?.Count == 0)
+                    if (rootPath.ModeSettings.XMLSettings?.XmlKeys == null ||
+                        rootPath.ModeSettings.XMLSettings?.XmlKeys?.Count == 0)
                     {
                         throw new Exception($"{rootPath.RootPath} is set to XML and has no Xml Keys defined.");
                     }
@@ -518,7 +579,7 @@ namespace PluginFileReader.Helper
                 if (rootPath.FileReadMode != Constants.FileModeLocal)
                 {
                     // check read permissions by attempting to download all target files
-                    await LoadRemoteFilesIntoTempDirectory(rootPath, 1);
+                    await OpenRemoteFiles(rootPath, 1);
 
                     try
                     {
@@ -541,7 +602,7 @@ namespace PluginFileReader.Helper
                             switch (rootPath.FileReadMode)
                             {
                                 case Constants.FileModeFtp:
-                                    using (var client = Utility.GetFtpClient(this))
+                                    using (var client = Utility.GetFtpClient())
                                     {
                                         try
                                         {
@@ -563,11 +624,12 @@ namespace PluginFileReader.Helper
 
                                     break;
                                 case Constants.FileModeSftp:
-                                    using (var client = Utility.GetSftpClient(this))
+                                    using (var client = Utility.GetSftpClient())
                                     {
                                         try
                                         {
-                                            var fileStream = Utility.GetFileStream(localTestFileName);
+                                            var fileStream = Utility.GetStream(localTestFileName,
+                                                rootPath.FileReadMode);
                                             client.UploadFile(fileStream, remoteTestFileName);
                                             Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);
                                         }
@@ -596,6 +658,23 @@ namespace PluginFileReader.Helper
             }
 
             return true;
+        }
+
+        public void InitializeFtpSettings()
+        {
+            Utility.InitializeFtpSettings(GetFtpSettings());
+        }
+
+        private FtpSettings GetFtpSettings()
+        {
+            return new FtpSettings
+            {
+                FtpHostname = FtpHostname,
+                FtpPort = FtpPort,
+                FtpUsername = FtpUsername,
+                FtpPassword = FtpPassword,
+                FtpSshKey = FtpSshKey
+            };
         }
     }
 

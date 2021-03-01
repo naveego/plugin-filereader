@@ -31,7 +31,7 @@ namespace PluginFileReader.API.Write
                     switch (config.FileWriteMode)
                     {
                         case Constants.FileModeFtp:
-                            using (var client = Utility.Utility.GetFtpClient(settings))
+                            using (var client = Utility.Utility.GetFtpClient())
                             {
                                 try
                                 {
@@ -49,11 +49,11 @@ namespace PluginFileReader.API.Write
 
                             break;
                         case Constants.FileModeSftp:
-                            using (var client = Utility.Utility.GetSftpClient(settings))
+                            using (var client = Utility.Utility.GetSftpClient())
                             {
                                 try
                                 {
-                                    using (var fileStream = Utility.Utility.GetFileStream(localFileName))
+                                    using (var fileStream = Utility.Utility.GetStream(localFileName, config.FileWriteMode))
                                     {
                                         client.UploadFile(fileStream, remoteFileName);
                                     }

@@ -77,28 +77,6 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
 
         /// <summary>
         /// Initializes a new instance of the DelimitedFileReader class for the
-        /// specified stream.
-        /// </summary>
-        /// <param name="stream">The stream to read from</param>
-        public DelimitedFileReader(Stream stream)
-        {
-            InitCsvReader();
-            _reader = new StreamReader(stream, true);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the DelimitedFileReader class for the
-        /// specified file path.
-        /// </summary>
-        /// <param name="path">The name of the CSV file to read from</param>
-        public DelimitedFileReader(string path)
-        {
-            InitCsvReader();
-            _reader = new StreamReader(path, true);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the DelimitedFileReader class for the
         /// specified file path.
         /// </summary>
         /// <param name="path">The name of the CSV file to read from</param>
@@ -106,8 +84,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         public DelimitedFileReader(string path, RootPathObject rootPath)
         {
             InitCsvReader();
-            // _reader = new StreamReader(path, encoding);
-            _reader = Utility.Utility.GetStreamReader(path);
+            _reader = Utility.Utility.GetStreamReader(path, rootPath.FileReadMode);
         }
 
         public void RestrictToColumns(params int[] columnIndexes)

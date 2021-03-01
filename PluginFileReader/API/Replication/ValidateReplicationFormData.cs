@@ -77,7 +77,7 @@ namespace PluginFileReader.API.Replication
                 switch (data.FileWriteMode)
                 {
                     case Constants.FileModeFtp:
-                        using (var client = Utility.Utility.GetFtpClient(settings))
+                        using (var client = Utility.Utility.GetFtpClient())
                         {
                             try
                             {
@@ -120,7 +120,7 @@ namespace PluginFileReader.API.Replication
 
                         break;
                     case Constants.FileModeSftp:
-                        using (var client = Utility.Utility.GetSftpClient(settings))
+                        using (var client = Utility.Utility.GetSftpClient())
                         {
                             try
                             {
@@ -132,7 +132,7 @@ namespace PluginFileReader.API.Replication
                                     }
                                     else
                                     {
-                                        var fileStream = Utility.Utility.GetFileStream(localGoldenTestFileName);
+                                        var fileStream = Utility.Utility.GetStream(localGoldenTestFileName, data.FileWriteMode);
                                         client.UploadFile(fileStream, remoteGoldenTestFileName);
                                         Utility.Utility.DeleteFileAtPath(localGoldenTestFileName, data, settings, true);
                                     }
@@ -150,7 +150,7 @@ namespace PluginFileReader.API.Replication
                                     }
                                     else
                                     {
-                                        var fileStream = Utility.Utility.GetFileStream(localVersionTestFileName);
+                                        var fileStream = Utility.Utility.GetStream(localVersionTestFileName, data.FileWriteMode);
                                         client.UploadFile(fileStream, remoteVersionTestFileName);
                                         Utility.Utility.DeleteFileAtPath(localVersionTestFileName, data, settings, true);
                                     }

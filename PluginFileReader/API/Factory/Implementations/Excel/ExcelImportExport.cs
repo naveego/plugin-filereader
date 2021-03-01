@@ -85,7 +85,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                 }
             }
 
-            using (var stream = Utility.Utility.GetFileStream(filePathAndName))
+            using (var stream = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode))
             {
                 using (var reader = ExcelReaderFactory.CreateReader(stream))
                 {

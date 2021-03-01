@@ -35,7 +35,7 @@ namespace PluginFileReader.API.Utility
                     switch (mode)
                     {
                         case Constants.FileModeFtp:
-                            using (var client = GetFtpClient(settings))
+                            using (var client = GetFtpClient())
                             {
                                 try
                                 {
@@ -49,7 +49,7 @@ namespace PluginFileReader.API.Utility
 
                             break;
                         case Constants.FileModeSftp:
-                            using (var client = GetSftpClient(settings))
+                            using (var client = GetSftpClient())
                             {
                                 try
                                 {

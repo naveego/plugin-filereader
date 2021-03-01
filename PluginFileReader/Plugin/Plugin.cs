@@ -78,6 +78,7 @@ namespace PluginFileReader.Plugin
                 _server.Settings.ConvertLegacySettings();
                 _server.Settings.ReconcileColumnsConfigurationFiles();
                 _server.Settings.ReconcileAS400FormatsFiles();
+                _server.Settings.InitializeFtpSettings();
                 _server.Settings.Validate();
             }
             catch (Exception e)

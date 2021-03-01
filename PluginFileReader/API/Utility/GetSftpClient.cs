@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
 using Renci.SshNet;
 
@@ -7,23 +8,30 @@ namespace PluginFileReader.API.Utility
 {
     public static partial class Utility
     {
-        public static SftpClient GetSftpClient(Settings settings)
+        private static FtpSettings Settings { get; set; }
+
+        public static void InitializeFtpSettings(FtpSettings settings)
+        {
+            Settings = settings;
+        }
+        
+        public static SftpClient GetSftpClient()
         {
             SftpClient client = null;
             
-            if (!string.IsNullOrWhiteSpace(settings.FtpPassword))
+            if (!string.IsNullOrWhiteSpace(Settings.FtpPassword))
             {
-                client = new SftpClient(settings.FtpHostname, settings.FtpPort.Value, settings.FtpUsername, settings.FtpPassword);
+                client = new SftpClient(Settings.FtpHostname, Settings.FtpPort.Value, Settings.FtpUsername, Settings.FtpPassword);
             }
 
-            if (!string.IsNullOrWhiteSpace(settings.FtpSshKey))
+            if (!string.IsNullOrWhiteSpace(Settings.FtpSshKey))
             {
                 var privateKeyFiles = new []
                 {
-                    new PrivateKeyFile(settings.FtpSshKey)
+                    new PrivateKeyFile(Settings.FtpSshKey)
                 };
 
-                client = new SftpClient(settings.FtpHostname, settings.FtpPort.Value, settings.FtpUsername, privateKeyFiles);
+                client = new SftpClient(Settings.FtpHostname, Settings.FtpPort.Value, Settings.FtpUsername, privateKeyFiles);
             }
 
             if (client != null)

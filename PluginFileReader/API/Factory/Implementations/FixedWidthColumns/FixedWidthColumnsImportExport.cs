@@ -87,7 +87,7 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
             cmd.ExecuteNonQuery();
 
             // read file into db
-            var file = Utility.Utility.GetStreamReader(filePathAndName);
+            var file = Utility.Utility.GetStreamReader(filePathAndName, rootPath.FileReadMode);
             string line;
             var rowsRead = 0;
             var rowsSkipped = 0;

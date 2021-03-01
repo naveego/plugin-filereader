@@ -20,11 +20,12 @@ namespace PluginFileReader.API.Utility
                         DeleteFileAtPath(path, rootPath, settings, false);
                         break;
                     case Constants.FileModeFtp:
-                        using (var client = GetFtpClient(settings))
+                        using (var client = GetFtpClient())
                         {
                             try
                             {
-                                client.UploadFile(path, archiveFileName);
+                                var localFileStream = GetStream(path, rootPath.FileReadMode);
+                                client.Upload(localFileStream, archiveFileName);
                                 DeleteFileAtPath(path, rootPath, settings, true);
                             }
                             finally
@@ -35,11 +36,11 @@ namespace PluginFileReader.API.Utility
 
                         break;
                     case Constants.FileModeSftp:
-                        using (var client = GetSftpClient(settings))
+                        using (var client = GetSftpClient())
                         {
                             try
                             {
-                                var localFileStream = GetFileStream(path);
+                                var localFileStream = GetStream(path, rootPath.FileReadMode);
                                 client.UploadFile(localFileStream, archiveFileName);
                                 DeleteFileAtPath(path, rootPath, settings, true);
                             }

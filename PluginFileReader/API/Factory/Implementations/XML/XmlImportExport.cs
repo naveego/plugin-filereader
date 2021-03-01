@@ -51,7 +51,11 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             
             // parse xml into multiple tables
             DataSet dataSet = new DataSet();
-            dataSet.ReadXmlSchema(_rootPath.ModeSettings.XMLSettings.XsdFilePathAndName);
+
+            var stream = Utility.Utility.GetStream(_rootPath.ModeSettings.XMLSettings.XsdFilePathAndName,
+                _rootPath.FileReadMode);
+            dataSet.ReadXmlSchema(stream);
+            stream.Close();
 
             // create and load each table
             foreach (DataTable table in dataSet.Tables)
@@ -78,8 +82,10 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             var globalKeyValue = "";
             
             // load xml doc
+            var stream = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
             XmlDocument doc = new XmlDocument();
-            doc.Load(filePathAndName);
+            doc.Load(stream);
+            stream.Close();
 
             foreach (var xmlKey in rootPath.ModeSettings.XMLSettings.XmlKeys)
             {
@@ -125,13 +131,21 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             }
 
             globalKeyValue = globalKeySb.ToString();
-
+            
             // parse xml into multiple tables
             DataSet dataSet = new DataSet();
-            dataSet.ReadXmlSchema(rootPath.ModeSettings.XMLSettings.XsdFilePathAndName);
+
+            stream = Utility.Utility.GetStream(rootPath.ModeSettings.XMLSettings.XsdFilePathAndName,
+                rootPath.FileReadMode);
+            dataSet.ReadXmlSchema(stream);
+            stream.Close();
+            
             dataSet.Locale = CultureInfo.InvariantCulture;
             dataSet.EnforceConstraints = false;
-            dataSet.ReadXml(filePathAndName, XmlReadMode.Auto);
+
+            stream = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
+            dataSet.ReadXml(stream, XmlReadMode.Auto);
+            stream.Close();
 
             // create and load each table
             foreach (DataTable table in dataSet.Tables)

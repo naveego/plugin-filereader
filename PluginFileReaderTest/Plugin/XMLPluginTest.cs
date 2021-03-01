@@ -104,7 +104,8 @@ namespace PluginFileReaderTest.Plugin
                                           ElementId = "HEADER",
                                           AttributeId = "customer_number",
                                       }
-                                  }
+                                  },
+                                  XsdFilePathAndName = "../../../MockData/XMLData/VL_CREDITREPORT.xsd"
                               }
                             }
                         },
@@ -127,7 +128,8 @@ namespace PluginFileReaderTest.Plugin
                                             ElementId = "HEADER",
                                             AttributeId = "customer_number",
                                         }
-                                    }
+                                    },
+                                    XsdFilePathAndName = "../../../MockData/XMLData/VL_CREDITREPORT.xsd"
                                 }
                             }
                         }
@@ -153,7 +155,8 @@ namespace PluginFileReaderTest.Plugin
                                             ElementId = "HEADER",
                                             AttributeId = "customer_number",
                                         }
-                                    }
+                                    },
+                                    XsdFilePathAndName = "../../../MockData/XMLData/VL_CREDITREPORT.xsd"
                                 }
                             }
                         }
