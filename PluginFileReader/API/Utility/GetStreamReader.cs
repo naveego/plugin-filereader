@@ -1,13 +1,17 @@
 using System;
 using System.IO;
+using FluentFTP;
 using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
+using Renci.SshNet;
 
 namespace PluginFileReader.API.Utility
 {
     public static partial class Utility
     {
         public static string TempDirectory = "";
+        private static FtpClient _ftpClient;
+        private static SftpClient _sftpClient;
 
         public static StreamReader GetStreamReader(string filePathAndName, string fileMode)
         {
@@ -19,25 +23,33 @@ namespace PluginFileReader.API.Utility
             switch (fileMode)
             {
                 case Constants.FileModeFtp:
-                    using (var client = Utility.GetFtpClient())
+                    if (_ftpClient == null)
                     {
-                        var stream = client.OpenRead(filePathAndName);
-                        client.Disconnect();
-                        
-                        return stream;
+                        _ftpClient = GetFtpClient();
                     }
 
-                    break;
+                    if (!_ftpClient.IsConnected)
+                    {
+                        _ftpClient.Connect();
+                    }
+                    
+                    var ftpStream = _ftpClient.OpenRead(filePathAndName);
+                    
+                    return ftpStream;
                 case Constants.FileModeSftp:
-                    using (var client = Utility.GetSftpClient())
+                    if (_sftpClient == null)
                     {
-                        var stream = client.OpenRead(filePathAndName);
-                        client.Disconnect();
-
-                        return stream;
+                        _sftpClient = GetSftpClient();
                     }
 
-                    break;
+                    if (!_sftpClient.IsConnected)
+                    {
+                        _sftpClient.Connect();
+                    }
+
+                    var sftpStream = _sftpClient.OpenRead(filePathAndName);
+
+                    return sftpStream;
                 case Constants.FileModeLocal:
                 default:
                     return new FileStream(filePathAndName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
