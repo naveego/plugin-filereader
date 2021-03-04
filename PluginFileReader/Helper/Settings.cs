@@ -283,7 +283,7 @@ namespace PluginFileReader.Helper
                 }
 
                 var tableName = selectTableSplit.TrimStart('[').TrimEnd(']');
-                rootPaths.Add(RootPaths.Find(r => new DirectoryInfo(r.RootPath).Name.ToLower() == tableName));
+                rootPaths.AddRange(RootPaths.FindAll(r => tableName.Contains(new DirectoryInfo(r.RootPathName()).Name.ToLower())));
             }
 
             foreach (var joinSplit in joinSplits.Skip(1))
@@ -296,10 +296,10 @@ namespace PluginFileReader.Helper
                 }
 
                 var tableName = joinTableSplit.TrimStart('[').TrimEnd(']');
-                rootPaths.Add(RootPaths.Find(r => new DirectoryInfo(r.RootPath).Name.ToLower() == tableName));
+                rootPaths.AddRange(RootPaths.FindAll(r => tableName.Contains(new DirectoryInfo(r.RootPathName()).Name.ToLower())));
             }
 
-            return rootPaths.Where(r => r != null).GroupBy(r => r.RootPath).Select(g => g.First()).ToList();
+            return rootPaths.Where(r => r != null).GroupBy(r => r.RootPathName()).Select(g => g.First()).ToList();
         }
 
         /// <summary>
