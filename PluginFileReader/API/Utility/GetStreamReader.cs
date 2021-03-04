@@ -1,24 +1,55 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using FluentFTP;
-using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
 using Renci.SshNet;
 
 namespace PluginFileReader.API.Utility
 {
+    public class StreamWrapper
+    {
+        public FtpClient FtpClient { get; set; } = null;
+        public SftpClient SftpClient { get; set; } = null;
+        public Stream Stream { get; set; }
+        public StreamReader StreamReader
+        {
+            get
+            {
+                if (_streamReader != null)
+                {
+                    return _streamReader;
+                }
+
+                _streamReader = new StreamReader(Stream);
+                
+                return _streamReader;
+            }
+        }
+
+        private StreamReader _streamReader { get; set; } = null;
+
+        public void Close()
+        {
+            FtpClient?.Disconnect();
+            SftpClient?.Disconnect();
+            StreamReader?.Close();
+            Stream?.Close();
+        }
+    }
+    
     public static partial class Utility
     {
         public static string TempDirectory = "";
-        private static FtpClient _ftpClient;
-        private static SftpClient _sftpClient;
+        // private static FtpClient _ftpClient;
+        // private static SftpClient _sftpClient;
 
-        public static StreamReader GetStreamReader(string filePathAndName, string fileMode)
-        {
-            return new StreamReader(GetStream(filePathAndName, fileMode));
-        }
+        // public static StreamReader GetStreamReader(string filePathAndName, string fileMode)
+        // {
+        //     return new StreamReader(GetStream(filePathAndName, fileMode));
+        // }
 
-        public static Stream GetStream(string filePathAndName, string fileMode)
+        public static StreamWrapper GetStream(string filePathAndName, string fileMode)
         {
             try
             {
@@ -27,42 +58,47 @@ namespace PluginFileReader.API.Utility
                 switch (fileMode)
                 {
                     case Constants.FileModeFtp:
-                        if (_ftpClient == null)
-                        {
-                            _ftpClient = GetFtpClient();
-                        }
+                        var ftpClient = GetFtpClient();
 
-                        if (!_ftpClient.IsConnected)
+                        if (!ftpClient.IsConnected)
                         {
-                            _ftpClient.Connect();
+                            ftpClient.Connect();
                         }
                     
-                        var ftpStream = _ftpClient.OpenRead(filePathAndName);
+                        var ftpStream = ftpClient.OpenRead(filePathAndName);
                     
                         Logger.Info($"Opened FTP stream for file: {filePathAndName} from {fileMode}");
-                    
-                        return ftpStream;
+
+                        return new StreamWrapper
+                        {
+                            FtpClient = ftpClient,
+                            Stream = ftpStream
+                        };
                     case Constants.FileModeSftp:
-                        if (_sftpClient == null)
-                        {
-                            _sftpClient = GetSftpClient();
-                        }
+                        var sftpClient = GetSftpClient();
 
-                        if (!_sftpClient.IsConnected)
+                        if (!sftpClient.IsConnected)
                         {
-                            _sftpClient.Connect();
+                            sftpClient.Connect();
                         }
-
-                        var sftpStream = _sftpClient.OpenRead(filePathAndName);
+                        
+                        var sftpStream = sftpClient.OpenRead(filePathAndName);
                     
                         Logger.Info($"Opened SFTP stream for file: {filePathAndName} from {fileMode}");
 
-                        return sftpStream;
+                        return new StreamWrapper
+                        {
+                            SftpClient = sftpClient,
+                            Stream = sftpStream
+                        };
                     case Constants.FileModeLocal:
                     default:
                         Logger.Info($"Opened Local stream for file: {filePathAndName} from {fileMode}");
                     
-                        return new FileStream(filePathAndName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        return new StreamWrapper
+                        {
+                            Stream = new FileStream(filePathAndName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                        };
                 }
             }
             catch (Exception e)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using PluginFileReader.API.Utility;
 using PluginFileReader.Helper;
 
 namespace PluginFileReader.API.Factory.Implementations.Delimited
@@ -11,7 +12,8 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
     /// </summary>
     public class DelimitedFileReader : IDisposable
     {
-        // Private members        
+        // Private members 
+        private readonly StreamWrapper _streamWrapper;
         private readonly StreamReader _reader;
         private string _currentLineText;
         private int _currentPosition;
@@ -84,7 +86,8 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         public DelimitedFileReader(string path, RootPathObject rootPath)
         {
             InitCsvReader();
-            _reader = Utility.Utility.GetStreamReader(path, rootPath.FileReadMode);
+            _streamWrapper = Utility.Utility.GetStream(path, rootPath.FileReadMode);
+            _reader = _streamWrapper.StreamReader;
         }
 
         public void RestrictToColumns(params int[] columnIndexes)
@@ -312,6 +315,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         public void Dispose()
         {
             _reader.Dispose();
+            _streamWrapper.Close();
         }
     }
 }

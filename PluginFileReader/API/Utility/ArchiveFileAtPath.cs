@@ -25,7 +25,8 @@ namespace PluginFileReader.API.Utility
                             try
                             {
                                 var localFileStream = GetStream(path, rootPath.FileReadMode);
-                                client.Upload(localFileStream, archiveFileName);
+                                client.Upload(localFileStream.Stream, archiveFileName);
+                                localFileStream.Close();
                                 DeleteFileAtPath(path, rootPath, settings, true);
                             }
                             finally
@@ -41,7 +42,8 @@ namespace PluginFileReader.API.Utility
                             try
                             {
                                 var localFileStream = GetStream(path, rootPath.FileReadMode);
-                                client.UploadFile(localFileStream, archiveFileName);
+                                client.UploadFile(localFileStream.Stream, archiveFileName);
+                                localFileStream.Close();
                                 DeleteFileAtPath(path, rootPath, settings, true);
                             }
                             finally

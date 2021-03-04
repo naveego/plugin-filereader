@@ -94,8 +94,9 @@ namespace PluginFileReader.API.Write
                                     }
                                     else
                                     {
-                                        var fileStream = Utility.Utility.GetStream(localTestFileName, data.FileWriteMode);
-                                        client.UploadFile(fileStream, remoteTargetTestFileName);
+                                        var fileStream = Utility.Utility.GetStream(localTestFileName, Constants.FileModeLocal);
+                                        client.UploadFile(fileStream.Stream, remoteTargetTestFileName);
+                                        fileStream.Close();
                                         Utility.Utility.DeleteFileAtPath(localTestFileName, data, settings, true);
                                     }
                                 }

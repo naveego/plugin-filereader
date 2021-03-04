@@ -53,10 +53,9 @@ namespace PluginFileReader.API.Write
                             {
                                 try
                                 {
-                                    using (var fileStream = Utility.Utility.GetStream(localFileName, config.FileWriteMode))
-                                    {
-                                        client.UploadFile(fileStream, remoteFileName);
-                                    }
+                                    var fileStream = Utility.Utility.GetStream(localFileName, config.FileWriteMode);
+                                    client.UploadFile(fileStream.Stream, remoteFileName);
+                                    fileStream.Close();
                                 }
                                 catch
                                 {

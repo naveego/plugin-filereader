@@ -77,7 +77,8 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             }
 
             // read file into db
-            var file = Utility.Utility.GetStreamReader(filePathAndName, rootPath.FileReadMode);
+            var streamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
+            var file = streamWrapper.StreamReader;
             string line;
             var recordsInserted = 0;
 
@@ -238,6 +239,9 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
 
                 // commit any pending inserts
                 trans.Commit();
+                
+                // close down file
+                streamWrapper.Close();
             }
             catch (Exception e)
             {

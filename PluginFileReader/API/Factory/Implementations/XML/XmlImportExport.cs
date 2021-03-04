@@ -5,12 +5,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
+using PluginFileReader.API.Utility;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json;
 
 namespace PluginFileReader.API.Factory.Implementations.XML
 {
@@ -54,7 +53,8 @@ namespace PluginFileReader.API.Factory.Implementations.XML
 
             var stream = Utility.Utility.GetStream(_rootPath.ModeSettings.XMLSettings.XsdFilePathAndName,
                 _rootPath.FileReadMode);
-            dataSet.ReadXmlSchema(stream);
+            dataSet.ReadXmlSchema(stream.Stream);
+            stream.Close();
 
             // create and load each table
             foreach (DataTable table in dataSet.Tables)
@@ -83,7 +83,7 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             // load xml doc
             var stream = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
             XmlDocument doc = new XmlDocument();
-            doc.Load(stream);
+            doc.Load(stream.Stream);
 
             foreach (var xmlKey in rootPath.ModeSettings.XMLSettings.XmlKeys)
             {
@@ -130,18 +130,22 @@ namespace PluginFileReader.API.Factory.Implementations.XML
 
             globalKeyValue = globalKeySb.ToString();
             
+            stream.Close();
+            
             // parse xml into multiple tables
             DataSet dataSet = new DataSet();
 
             stream = Utility.Utility.GetStream(rootPath.ModeSettings.XMLSettings.XsdFilePathAndName,
                 rootPath.FileReadMode);
-            dataSet.ReadXmlSchema(stream);
+            dataSet.ReadXmlSchema(stream.Stream);
+            stream.Close();
 
             dataSet.Locale = CultureInfo.InvariantCulture;
             dataSet.EnforceConstraints = false;
 
             stream = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
-            dataSet.ReadXml(stream, XmlReadMode.Auto);
+            dataSet.ReadXml(stream.Stream, XmlReadMode.Auto);
+            stream.Close();
 
             // create and load each table
             foreach (DataTable table in dataSet.Tables)

@@ -132,8 +132,9 @@ namespace PluginFileReader.API.Replication
                                     }
                                     else
                                     {
-                                        var fileStream = Utility.Utility.GetStream(localGoldenTestFileName, data.FileWriteMode);
-                                        client.UploadFile(fileStream, remoteGoldenTestFileName);
+                                        var fileStream = Utility.Utility.GetStream(localGoldenTestFileName, Constants.FileModeLocal);
+                                        client.UploadFile(fileStream.Stream, remoteGoldenTestFileName);
+                                        fileStream.Close();
                                         Utility.Utility.DeleteFileAtPath(localGoldenTestFileName, data, settings, true);
                                     }
                                 }
@@ -150,8 +151,9 @@ namespace PluginFileReader.API.Replication
                                     }
                                     else
                                     {
-                                        var fileStream = Utility.Utility.GetStream(localVersionTestFileName, data.FileWriteMode);
-                                        client.UploadFile(fileStream, remoteVersionTestFileName);
+                                        var fileStream = Utility.Utility.GetStream(localVersionTestFileName, Constants.FileModeLocal);
+                                        client.UploadFile(fileStream.Stream, remoteVersionTestFileName);
+                                        fileStream.Close();
                                         Utility.Utility.DeleteFileAtPath(localVersionTestFileName, data, settings, true);
                                     }
                                 }

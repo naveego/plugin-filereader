@@ -64,15 +64,15 @@ namespace PluginFileReader.API.Replication
                             {
                                 try
                                 {
-                                    using (var fileStream = Utility.Utility.GetStream(localGoldenFileName, config.FileWriteMode))
-                                    {
-                                        client.UploadFile(fileStream, remoteGoldenFileName);
-                                    }
+                                    var goldenFileStream =
+                                        Utility.Utility.GetStream(localGoldenFileName, Constants.FileModeLocal);
+                                    client.UploadFile(goldenFileStream.Stream, remoteGoldenFileName);
+                                    goldenFileStream.Close();
 
-                                    using (var fileStream = Utility.Utility.GetStream(localVersionFileName, config.FileWriteMode))
-                                    {
-                                        client.UploadFile(fileStream, remoteVersionFileName);
-                                    }
+                                    var versionFileStream =
+                                        Utility.Utility.GetStream(localVersionFileName, Constants.FileModeLocal);
+                                    client.UploadFile(versionFileStream.Stream, remoteVersionFileName);
+                                    versionFileStream.Close();
                                 }
                                 catch
                                 {
