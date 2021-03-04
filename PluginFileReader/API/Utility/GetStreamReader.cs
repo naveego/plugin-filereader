@@ -20,39 +20,55 @@ namespace PluginFileReader.API.Utility
 
         public static Stream GetStream(string filePathAndName, string fileMode)
         {
-            switch (fileMode)
+            try
             {
-                case Constants.FileModeFtp:
-                    if (_ftpClient == null)
-                    {
-                        _ftpClient = GetFtpClient();
-                    }
+                Logger.Info($"Getting stream for file: {filePathAndName} from {fileMode}");
+            
+                switch (fileMode)
+                {
+                    case Constants.FileModeFtp:
+                        if (_ftpClient == null)
+                        {
+                            _ftpClient = GetFtpClient();
+                        }
 
-                    if (!_ftpClient.IsConnected)
-                    {
-                        _ftpClient.Connect();
-                    }
+                        if (!_ftpClient.IsConnected)
+                        {
+                            _ftpClient.Connect();
+                        }
                     
-                    var ftpStream = _ftpClient.OpenRead(filePathAndName);
+                        var ftpStream = _ftpClient.OpenRead(filePathAndName);
                     
-                    return ftpStream;
-                case Constants.FileModeSftp:
-                    if (_sftpClient == null)
-                    {
-                        _sftpClient = GetSftpClient();
-                    }
+                        Logger.Info($"Opened FTP stream for file: {filePathAndName} from {fileMode}");
+                    
+                        return ftpStream;
+                    case Constants.FileModeSftp:
+                        if (_sftpClient == null)
+                        {
+                            _sftpClient = GetSftpClient();
+                        }
 
-                    if (!_sftpClient.IsConnected)
-                    {
-                        _sftpClient.Connect();
-                    }
+                        if (!_sftpClient.IsConnected)
+                        {
+                            _sftpClient.Connect();
+                        }
 
-                    var sftpStream = _sftpClient.OpenRead(filePathAndName);
+                        var sftpStream = _sftpClient.OpenRead(filePathAndName);
+                    
+                        Logger.Info($"Opened SFTP stream for file: {filePathAndName} from {fileMode}");
 
-                    return sftpStream;
-                case Constants.FileModeLocal:
-                default:
-                    return new FileStream(filePathAndName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        return sftpStream;
+                    case Constants.FileModeLocal:
+                    default:
+                        Logger.Info($"Opened Local stream for file: {filePathAndName} from {fileMode}");
+                    
+                        return new FileStream(filePathAndName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Could not open stream for file: {filePathAndName} from {fileMode}");
+                throw;
             }
         }
     }

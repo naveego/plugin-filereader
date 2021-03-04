@@ -159,7 +159,7 @@ namespace PluginFileReader.Plugin
                     await DiscoverSemaphoreSlim.WaitAsync();
 
                     var files = _server.Settings.GetAllFilesByRootPath(1);
-                    Logger.Info($"Schemas attempted: {files.Count}");
+                    Logger.Info($"Files attempted: {files.Count}");
 
                     var schemas = _server.Settings.RootPaths.Select(p =>
                             Discover.GetSchemasForDirectory(Utility.GetImportExportFactory(p.Mode), p,

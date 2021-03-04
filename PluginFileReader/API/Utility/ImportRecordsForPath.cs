@@ -12,11 +12,11 @@ namespace PluginFileReader.API.Utility
             RootPathObject rootPath,
             string tableName, string schemaName, string path, long limit = long.MaxValue)
         {
-            Logger.Info($"Preparing to load file: {path}");
+            Logger.Info($"Preparing to load file: {path} from {rootPath.FileReadMode}");
             var importExportFile = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName);
-            Logger.Info($"Begin loading file: {path}");
+            Logger.Info($"Begin loading file: {path} from {rootPath.FileReadMode}");
             var rowsWritten = importExportFile.ImportTable(path, rootPath, limit);
-            Logger.Info($"Loaded file {path} with {rowsWritten} rows");
+            Logger.Info($"Loaded file {path} with {rowsWritten} rows from {rootPath.FileReadMode}");
 
             return rowsWritten;
         }
