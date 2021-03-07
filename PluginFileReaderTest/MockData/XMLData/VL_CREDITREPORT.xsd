@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="CREDITDATA">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="HEADER">
+          <xs:complexType>
+            <xs:attribute name="report_date" type="xs:string" use="optional" />
+            <xs:attribute name="date_ordered" type="xs:string" use="optional" />
+            <xs:attribute name="report_to" type="xs:string" use="optional" />
+            <xs:attribute name="customer_number" type="xs:string" use="optional" />
+            <xs:attribute name="customer_name" type="xs:string" use="optional" />
+            <xs:attribute name="customer_address" type="xs:string" use="optional" />
+            <xs:attribute name="customer_citystatezip" type="xs:string" use="optional" />
+            <xs:attribute name="customer_phone" type="xs:string" use="optional" />
+            <xs:attribute name="report_owner" type="xs:string" use="optional" />
+            <xs:attribute name="report_id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="fnma_job" type="xs:string" use="optional" />
+            <xs:attribute name="loan_type" type="xs:string" use="optional" />
+            <xs:attribute name="reference_number" type="xs:string" use="optional" />
+            <xs:attribute name="repositories" type="xs:string" use="optional" />
+            <xs:attribute name="property_address" type="xs:string" use="optional" />
+            <xs:attribute name="report_charge" type="xs:string" use="optional" />
+            <xs:attribute name="instant_view_pw" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="CONSUMER">
+          <xs:complexType>
+            <xs:attribute name="firstname" type="xs:string" use="optional" />
+            <xs:attribute name="middlename" type="xs:string" use="optional" />
+            <xs:attribute name="lastname" type="xs:string" use="optional" />
+            <xs:attribute name="suffix" type="xs:string" use="optional" />
+            <xs:attribute name="ssn" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="dob" type="xs:string" use="optional" />
+            <xs:attribute name="marital_status" type="xs:string" use="optional" />
+            <xs:attribute name="dependents" type="xs:string" use="optional" />
+            <xs:attribute name="consumer_code" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="ADDRESS">
+          <xs:complexType>
+            <xs:attribute name="streetnumber" type="xs:string" use="optional" />
+            <xs:attribute name="streetdirection" type="xs:string" use="optional" />
+            <xs:attribute name="streetname" type="xs:string" use="optional" />
+            <xs:attribute name="streettype" type="xs:string" use="optional" />
+            <xs:attribute name="aptnumber" type="xs:string" use="optional" />
+            <xs:attribute name="city" type="xs:string" use="optional" />
+            <xs:attribute name="state" type="xs:string" use="optional" />
+            <xs:attribute name="zip" type="xs:string" use="optional" />
+            <xs:attribute name="years_at_address" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="RISK_MODEL">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="RISK_FACTOR">
+                <xs:complexType>
+                  <xs:attribute name="factor_code" type="xs:string" use="optional" />
+                  <xs:attribute name="factor_text" type="xs:string" use="optional" />
+                  <xs:attribute name="fact_inquiries" type="xs:string" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="risk_score" type="xs:string" use="optional" />
+            <xs:attribute name="source_bureau" type="xs:string" use="optional" />
+            <xs:attribute name="model_type" type="xs:string" use="optional" />
+            <xs:attribute name="model_name" type="xs:string" use="optional" />
+            <xs:attribute name="minimum_score" type="xs:string" use="optional" />
+            <xs:attribute name="maximum_score" type="xs:string" use="optional" />
+            <xs:attribute name="percentile" type="xs:string" use="optional" />
+            <xs:attribute name="consumer_code" type="xs:string" use="optional" />
+            <xs:attribute name="file_id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="lpq_ignore_score" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="DEROGATORY_SUMMARY">
+          <xs:complexType>
+            <xs:attribute name="trade_bankruptcy_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="trade_collection_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="inquiry_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="pubrec_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="trade_satisfactory_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="trade_current_adverse_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="trade_previous_adverse_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="trade_oldest_date" type="xs:string" use="optional" />
+            <xs:attribute name="trade_oldest_credname" type="xs:string" use="optional" />
+            <xs:attribute name="day_30" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="day_60" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="day_90" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="latest_late_date" type="xs:string" use="optional" />
+            <xs:attribute name="trade_chargeoff_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="derog_other" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="dispute_count" type="xs:unsignedByte" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="TRADELINE">
+          <xs:complexType>
+            <xs:sequence>
+            <xs:element name="id" type="xs:unsignedInt" />
+              <xs:element name="file_id">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="0"/>
+                    <xs:maxLength value="50"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            <xs:element name="consumer_code" type="xs:string"  />
+            <xs:element name="source_bureau" type="xs:string"  />
+            <xs:element name="creditor_name" type="xs:string"  />
+            <xs:element name="subscriber_number" type="xs:string"  />
+            <xs:element name="address" type="xs:string"  />
+            <xs:element name="city" type="xs:string"  />
+            <xs:element name="state" type="xs:string"  />
+            <xs:element name="zip" type="xs:string"  />
+            <xs:element name="phone" type="xs:string"  />
+            <xs:element name="account_number" type="xs:string"  />
+            <xs:element name="date_open" type="xs:string"  />
+            <xs:element name="date_reported" type="xs:string"  />
+            <xs:element name="past_due" type="xs:string"  />
+            <xs:element name="high_credit" type="xs:string"  />
+            <xs:element name="credit_limit" type="xs:string"  />
+            <xs:element name="account_type_text" type="xs:string"  />
+            <xs:element name="account_type_code" type="xs:string"  />
+            <xs:element name="account_type_ext" type="xs:string"  />
+            <xs:element name="term" type="xs:string"  />
+            <xs:element name="balance" type="xs:string"  />
+            <xs:element name="payment" type="xs:string"  />
+            <xs:element name="day_30" type="xs:string"  />
+            <xs:element name="day_60" type="xs:string"  />
+            <xs:element name="day_90" type="xs:string"  />
+            <xs:element name="months_reviewed" type="xs:string"  />
+            <xs:element name="date_last_past_due" type="xs:string"  />
+            <xs:element name="history_startdate" type="xs:string"  />
+            <xs:element name="two_year_history" type="xs:string"  />
+            <xs:element name="account_status_text" type="xs:string"  />
+            <xs:element name="account_status_code" type="xs:string"  />
+            <xs:element name="account_status_ext" type="xs:string"  />
+            <xs:element name="ecoa" type="xs:string"  />
+            <xs:element name="last_activity" type="xs:string"  />
+            <xs:element name="late_dates" type="xs:string"  />
+            <xs:element name="edited" type="xs:string"  />
+            <xs:element name="supplement" type="xs:string"  />
+            <xs:element name="remark_text" type="xs:string"  />
+            <xs:element name="owner" type="xs:unsignedByte"  />
+            <xs:element name="kind_of_business" type="xs:string"  />
+            <xs:element name="secured" type="xs:string"  />
+            <xs:element name="lpq_last_modified_date" type="xs:date"  />
+            <xs:element name="include_in_debt" type="xs:string"  />
+            <xs:element name="open_status" type="xs:string"  />
+            <xs:element name="is_current_lender" type="xs:string"  />
+            <xs:element name="comment" type="xs:string"  />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="INQUIRY">
+          <xs:complexType>
+            <xs:attribute name="source_bureau" type="xs:string" use="optional" />
+            <xs:attribute name="inquiry_date" type="xs:string" use="optional" />
+            <xs:attribute name="inquiry_company" type="xs:string" use="optional" />
+            <xs:attribute name="edited" type="xs:string" use="optional" />
+            <xs:attribute name="supplement" type="xs:string" use="optional" />
+            <xs:attribute name="id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="consumer_code" type="xs:string" use="optional" />
+            <xs:attribute name="ecoa" type="xs:string" use="optional" />
+            <xs:attribute name="file_id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="kind_of_business" type="xs:string" use="optional" />
+            <xs:attribute name="subscriber_number" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="INFILE">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="optional" />
+            <xs:attribute name="file_id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="consumer_code" type="xs:string" use="optional" />
+            <xs:attribute name="source_bureau" type="xs:string" use="optional" />
+            <xs:attribute name="date_requested" type="xs:string" use="optional" />
+            <xs:attribute name="infile_date" type="xs:string" use="optional" />
+            <xs:attribute name="no_record_found" type="xs:string" use="optional" />
+            <xs:attribute name="ssn_mismatch" type="xs:string" use="optional" />
+            <xs:attribute name="error_message" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="SSN_VARIATION">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" name="id" type="xs:unsignedInt"/>
+              <xs:element minOccurs="0" name="file_id" type="xs:unsignedInt" />
+              <xs:element minOccurs="0" name="consumer_code" type="xs:string"/>
+              <xs:element minOccurs="0" name="source_bureau" type="xs:string"  />
+              <xs:element minOccurs="0" name="ssn" type="xs:unsignedInt"  />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="ALIAS_VARIATION">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="file_id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="consumer_code" type="xs:string" use="optional" />
+            <xs:attribute name="source_bureau" type="xs:string" use="optional" />
+            <xs:attribute name="alias" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="ADDRESS_VARIATION">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="file_id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="consumer_code" type="xs:string" use="optional" />
+            <xs:attribute name="source_bureau" type="xs:string" use="optional" />
+            <xs:attribute name="streetdirection" type="xs:string" use="optional" />
+            <xs:attribute name="streetnumber" type="xs:string" use="optional" />
+            <xs:attribute name="streetname" type="xs:string" use="optional" />
+            <xs:attribute name="streettype" type="xs:string" use="optional" />
+            <xs:attribute name="aptnumber" type="xs:string" use="optional" />
+            <xs:attribute name="city" type="xs:string" use="optional" />
+            <xs:attribute name="state" type="xs:string" use="optional" />
+            <xs:attribute name="zip" type="xs:string" use="optional" />
+            <xs:attribute name="address" type="xs:string" use="optional" />
+            <xs:attribute name="since" type="xs:string" use="optional" />
+            <xs:attribute name="reported" type="xs:string" use="optional" />
+            <xs:attribute name="address_type" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="FRAUD_PRODUCT">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="FRAUD_INDICATOR">
+                <xs:complexType>
+                  <xs:attribute name="code" type="xs:string" use="optional" />
+                  <xs:attribute name="text" type="xs:string" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="file_id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="consumer_code" type="xs:string" use="optional" />
+            <xs:attribute name="source_bureau" type="xs:string" use="optional" />
+            <xs:attribute name="remark" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="SAFE_SCAN">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:string" use="optional" />
+            <xs:attribute name="file_id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="consumer_code" type="xs:string" use="optional" />
+            <xs:attribute name="source_bureau" type="xs:string" use="optional" />
+            <xs:attribute name="safe_scan_text" type="xs:string" use="optional" />
+            <xs:attribute name="indicator_code" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="ALERT">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="id" type="xs:unsignedInt"  />
+              <xs:element name="hide" type="xs:string"  />
+              <xs:element name="last_modified" type="xs:string"  />
+              <xs:element name="modified_by" type="xs:string"  />
+              <xs:element name="file_id" type="xs:unsignedInt"  />
+              <xs:element name="type" type="xs:string"  />
+              <xs:element name="code" type="xs:string"  />
+              <xs:element name="consumer_code" type="xs:string"  />
+              <xs:element name="source_bureau" type="xs:string"  />
+             <xs:element name="remark_text">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="4000"/>
+                    <xs:maxLength value="9000"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="REMARK">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="id" type="xs:unsignedInt"  />
+              <xs:element name="file_id" type="xs:unsignedInt"  />
+              <xs:element name="consumer_code" type="xs:string"  />
+              <xs:element name="source_bureau" type="xs:string"  />
+              <xs:element name="remark_text">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="9000"/>
+                    <xs:maxLength value="10000"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="hide" type="xs:string"  />
+              <xs:element name="last_modified" type="xs:string"  />
+              <xs:element name="modified_by" type="xs:string"  />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="CONSUMER_REFERRAL">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="file_id" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="consumer_code" type="xs:string" use="optional" />
+            <xs:attribute name="source_bureau" type="xs:string" use="optional" />
+            <xs:attribute name="name" type="xs:string" use="optional" />
+            <xs:attribute name="address" type="xs:string" use="optional" />
+            <xs:attribute name="citystatezip" type="xs:string" use="optional" />
+            <xs:attribute name="phone" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="TRADE_SUMMARY">
+          <xs:complexType>
+            <xs:attribute name="day_30" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="day_60" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="day_90" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="trade_satisfactory_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="trade_chargeoff_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="trade_current_adverse_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="trade_previous_adverse_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="trade_oldest_date" type="xs:string" use="optional" />
+            <xs:attribute name="mortgage_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="mortgage_balance" type="xs:string" use="optional" />
+            <xs:attribute name="mortgage_payment" type="xs:string" use="optional" />
+            <xs:attribute name="mortgage_pastdue" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="installment_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="installment_balance" type="xs:string" use="optional" />
+            <xs:attribute name="installment_payment" type="xs:string" use="optional" />
+            <xs:attribute name="installment_pastdue" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="secure_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="secure_balance" type="xs:string" use="optional" />
+            <xs:attribute name="secure_payment" type="xs:string" use="optional" />
+            <xs:attribute name="secure_pastdue" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="secure_no_mortgage_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="secure_no_mortgage_balance" type="xs:string" use="optional" />
+            <xs:attribute name="secure_no_mortgage_payment" type="xs:string" use="optional" />
+            <xs:attribute name="secure_no_mortgage_pastdue" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="unsecure_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="unsecure_balance" type="xs:string" use="optional" />
+            <xs:attribute name="unsecure_payment" type="xs:string" use="optional" />
+            <xs:attribute name="unsecure_pastdue" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="original_unsecure_balance" type="xs:string" use="optional" />
+            <xs:attribute name="open_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="open_balance" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="open_payment" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="open_pastdue" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="revolving_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="revolving_balance" type="xs:string" use="optional" />
+            <xs:attribute name="revolving_payment" type="xs:string" use="optional" />
+            <xs:attribute name="revolving_pastdue" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="unknown_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="unknown_balance" type="xs:string" use="optional" />
+            <xs:attribute name="unknown_payment" type="xs:string" use="optional" />
+            <xs:attribute name="unknown_pastdue" type="xs:unsignedInt" use="optional" />
+            <xs:attribute name="bankruptcy_trade_count_pc" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="bankruptcy_trade_count_sc" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="bankruptcy_public_record_count_pc" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="bankruptcy_public_record_count_sc" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="total_trade_count" type="xs:unsignedByte" use="optional" />
+            <xs:attribute name="total_trade_balance" type="xs:string" use="optional" />
+            <xs:attribute name="total_trade_payment" type="xs:string" use="optional" />
+            <xs:attribute name="total_trade_pastdue" type="xs:unsignedInt" use="optional" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
