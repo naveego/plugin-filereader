@@ -14,6 +14,7 @@ namespace PluginFileReaderTest.Helper
         [Fact]
         public void VerboseTest()
         {
+            Directory.CreateDirectory(_logDirectory);
             var files = Directory.GetFiles(_logDirectory);
             
             // setup
@@ -53,6 +54,7 @@ namespace PluginFileReaderTest.Helper
         [Fact]
         public void DebugTest()
         {
+            Directory.CreateDirectory(_logDirectory);
             var files = Directory.GetFiles(_logDirectory);
             
             // setup
@@ -92,6 +94,7 @@ namespace PluginFileReaderTest.Helper
         [Fact]
         public void InfoTest()
         {
+            Directory.CreateDirectory(_logDirectory);
             var files = Directory.GetFiles(_logDirectory);
             
             // setup
@@ -131,6 +134,7 @@ namespace PluginFileReaderTest.Helper
         [Fact]
         public void ErrorTest()
         {
+            Directory.CreateDirectory(_logDirectory);
             var files = Directory.GetFiles(_logDirectory);
             
             // setup
@@ -170,8 +174,10 @@ namespace PluginFileReaderTest.Helper
         [Fact]
         public void ConfigureTest()
         {
+            Directory.CreateDirectory(_logDirectory);
             var files = Directory.GetFiles(_logDirectory);
             var newLogsPath = "newlogs";
+            Directory.CreateDirectory(newLogsPath);
             var newFiles = Directory.GetFiles(newLogsPath);
             
             // setup

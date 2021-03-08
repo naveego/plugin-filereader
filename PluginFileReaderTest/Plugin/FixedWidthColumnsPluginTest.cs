@@ -501,7 +501,7 @@ namespace PluginFileReaderTest.Plugin
             var schema = response.Schemas[0];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
             Assert.Equal("ReadDirectory", schema.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            Assert.Equal($"", schema.Query);
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
@@ -557,7 +557,7 @@ namespace PluginFileReaderTest.Plugin
             var schema = response.Schemas[0];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
             Assert.Equal("ReadDirectory", schema.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            Assert.Equal($"", schema.Query);
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
@@ -574,7 +574,7 @@ namespace PluginFileReaderTest.Plugin
             var schema2 = response.Schemas[1];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectoryDifferent]", schema2.Id);
             Assert.Equal("ReadDirectoryDifferent", schema2.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectoryDifferent]", schema2.Query);
+            Assert.Equal($"", schema2.Query);
             // Assert.Equal(Count.Types.Kind.Exact, schema2.Count.Kind);
             // Assert.Equal(1000, schema2.Count.Value);
             Assert.Equal(10, schema2.Sample.Count);

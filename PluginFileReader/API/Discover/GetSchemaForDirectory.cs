@@ -34,11 +34,7 @@ namespace PluginFileReader.API.Discover
             var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
                 ? new DirectoryInfo(rootPath.RootPath).Name
                 : rootPath.Name;
-            var publisherMetaJson = new SchemaPublisherMetaJson
-            {
-                RootPath = rootPath
-            };
-            
+
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
             Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths, sampleSize, 1);
@@ -55,13 +51,11 @@ namespace PluginFileReader.API.Discover
                     Id = tableNameId,
                     Name = table.TableName,
                     DataFlowDirection = Schema.Types.DataFlowDirection.Read,
-                    Query = $"SELECT * FROM {tableNameId}",
                     Properties = {},
                 };
 
                 schema = GetSchemaForQuery(schema, sampleSize, rootPath?.ModeSettings?.FixedWidthSettings?.Columns);
-                schema.PublisherMetaJson = JsonConvert.SerializeObject(publisherMetaJson);
-                
+
                 schemas.Add(schema);
             }
 

@@ -17,12 +17,19 @@ namespace PluginFileReader.API.Read
         /// <returns>Records from the file</returns>
         public static IEnumerable<Record> ReadRecords(Schema schema, string dbFilePrefix)
         {
+            var query = schema.Query;
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                query = Utility.Utility.GetDefaultQuery(schema);
+            }
+            
             var conn = Utility.Utility.GetSqlConnection(dbFilePrefix);
 
             var cmd = new SqlDatabaseCommand
             {
                 Connection = conn,
-                CommandText = schema.Query
+                CommandText = query
             };
 
             SqlDatabaseDataReader reader;

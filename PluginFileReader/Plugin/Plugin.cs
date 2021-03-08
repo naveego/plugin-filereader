@@ -256,13 +256,11 @@ namespace PluginFileReader.Plugin
                 var conn = Utility.GetSqlConnection(jobId);
                 var filesByRootPath = _server.Settings.GetAllFilesByRootPath();
 
-                if (schema.PublisherMetaJson != "")
+                if (string.IsNullOrWhiteSpace(schema.Query))
                 {
                     // schema is not query based so we can stream each file as it is loaded
-                    var schemaMetaJson =
-                        JsonConvert.DeserializeObject<SchemaPublisherMetaJson>(schema.PublisherMetaJson);
-                    var rootPath =
-                        _server.Settings.RootPaths.First(r => r.RootPath == schemaMetaJson.RootPath.RootPath);
+                    var rootPaths = _server.Settings.GetRootPathsFromQuery(Utility.GetDefaultQuery(schema));
+                    var rootPath = rootPaths.First();
                     var files = filesByRootPath[rootPath.RootPathName()];
                     var schemaName = Constants.SchemaName;
                     var tableName = string.IsNullOrWhiteSpace(rootPath.Name)

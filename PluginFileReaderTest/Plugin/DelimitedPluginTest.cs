@@ -324,10 +324,10 @@ namespace PluginFileReaderTest.Plugin
             var schema = response.Schemas[0];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
             Assert.Equal("ReadDirectory", schema.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            Assert.Equal($"", schema.Query);
             Assert.Equal(10, schema.Sample.Count);
             Assert.Equal(6, schema.Properties.Count);
-            Assert.True(schema.PublisherMetaJson != "");
+            Assert.Equal("", schema.PublisherMetaJson);
 
             var property = schema.Properties[0];
             Assert.Equal("id", property.Id);
@@ -382,10 +382,10 @@ namespace PluginFileReaderTest.Plugin
             var schema = response.Schemas[0];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
             Assert.Equal("ReadDirectory", schema.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            Assert.Equal($"", schema.Query);
             Assert.Equal(10, schema.Sample.Count);
             Assert.Equal(6, schema.Properties.Count);
-            Assert.True(schema.PublisherMetaJson != "");
+            Assert.Equal("", schema.PublisherMetaJson);
 
             var property = schema.Properties[0];
             Assert.Equal("id", property.Id);
@@ -475,10 +475,10 @@ namespace PluginFileReaderTest.Plugin
             var schema = response.Schemas[0];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
             Assert.Equal("ReadDirectory", schema.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            Assert.Equal($"", schema.Query);
             Assert.Equal(5, schema.Sample.Count);
             Assert.Equal(6, schema.Properties.Count);
-            Assert.True(schema.PublisherMetaJson != "");
+            Assert.Equal("", schema.PublisherMetaJson);
 
             var property = schema.Properties[0];
             Assert.Equal("id", property.Id);
@@ -491,10 +491,10 @@ namespace PluginFileReaderTest.Plugin
             var schema2 = response.Schemas[1];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectoryDifferent]", schema2.Id);
             Assert.Equal("ReadDirectoryDifferent", schema2.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectoryDifferent]", schema2.Query);
+            Assert.Equal($"", schema2.Query);
             Assert.Equal(5, schema2.Sample.Count);
             Assert.Equal(4, schema2.Properties.Count);
-            Assert.True(schema.PublisherMetaJson != "");
+            Assert.Equal("", schema.PublisherMetaJson);
 
             var property2 = schema2.Properties[0];
             Assert.Equal("id", property2.Id);
@@ -660,7 +660,14 @@ namespace PluginFileReaderTest.Plugin
             var request = new DiscoverSchemasRequest
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
-                ToRefresh = {GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]")},
+                ToRefresh =
+                {
+                    new Schema
+                    {
+                        Id = $"[{Constants.SchemaName}].[ReadDirectory]",
+                        Name = "ReadDirectory",
+                    }
+                },
             };
 
             // act
@@ -671,6 +678,22 @@ namespace PluginFileReaderTest.Plugin
             // assert
             Assert.IsType<DiscoverSchemasResponse>(response);
             Assert.Single(response.Schemas);
+            
+            var schema = response.Schemas[0];
+            Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
+            Assert.Equal("ReadDirectory", schema.Name);
+            Assert.Equal($"", schema.Query);
+            Assert.Equal(5, schema.Sample.Count);
+            Assert.Equal(6, schema.Properties.Count);
+            Assert.Equal("", schema.PublisherMetaJson);
+
+            var property = schema.Properties[0];
+            Assert.Equal("id", property.Id);
+            Assert.Equal("id", property.Name);
+            Assert.Equal("", property.Description);
+            Assert.Equal(PropertyType.String, property.Type);
+            Assert.False(property.IsKey);
+            Assert.True(property.IsNullable);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -1507,7 +1530,7 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReplicationWriteFtpTest()
         {
@@ -1525,7 +1548,7 @@ on a.id = b.id"),
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
+
             var configureRequest = new ConfigureRequest
             {
                 TemporaryDirectory = "../../../Temp",
@@ -1678,7 +1701,7 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ConfigureWriteFtpTest()
         {
@@ -1696,7 +1719,7 @@ on a.id = b.id"),
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
+
             var configureRequest = new ConfigureRequest
             {
                 TemporaryDirectory = "../../../Temp",
@@ -1767,7 +1790,6 @@ on a.id = b.id"),
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
 
 
             var request = new ConfigureReplicationRequest
@@ -1802,7 +1824,7 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ConfigureReplicationFtpTest()
         {
@@ -1820,7 +1842,7 @@ on a.id = b.id"),
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
+
             var configureRequest = new ConfigureRequest
             {
                 TemporaryDirectory = "../../../Temp",
@@ -2062,7 +2084,7 @@ on a.id = b.id"),
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task WritebackFtpTest()
         {
@@ -2080,7 +2102,7 @@ on a.id = b.id"),
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings();
-            
+
             var configureRequest = new ConfigureRequest
             {
                 TemporaryDirectory = "../../../Temp",

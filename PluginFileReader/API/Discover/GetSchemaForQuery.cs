@@ -18,6 +18,8 @@ namespace PluginFileReader.API.Discover
             try
             {
                 Logger.Debug(JsonConvert.SerializeObject(schema, Formatting.Indented));
+
+                var query = schema.Query;
                 
                 if (schema.DataFlowDirection == Schema.Types.DataFlowDirection.Write)
                 {
@@ -25,7 +27,7 @@ namespace PluginFileReader.API.Discover
                     return schema;
                 }
 
-                if (string.IsNullOrWhiteSpace(schema.Query))
+                if (string.IsNullOrWhiteSpace(query))
                 {
                     if (!string.IsNullOrWhiteSpace(schema.PublisherMetaJson))
                     {
@@ -34,17 +36,19 @@ namespace PluginFileReader.API.Discover
                         schema.DataFlowDirection = Schema.Types.DataFlowDirection.Write;
                         return schema;
                     }
-                    
-                    Logger.Info("Returning null schema for null query");
-                    return null;
+
+                    query = Utility.Utility.GetDefaultQuery(schema);
+
+                    // Logger.Info("Returning null schema for null query");
+                    // return null;
                 }
-                
+
                 var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
                 var cmd = new SqlDatabaseCommand
                 {
                     Connection = conn,
-                    CommandText = schema.Query
+                    CommandText = query
                 };
 
                 var reader = cmd.ExecuteReader();
@@ -113,6 +117,9 @@ namespace PluginFileReader.API.Discover
 
                 var records = Read.Read.ReadRecords(schema, Constants.DiscoverDbPrefix).Take(sampleSize);
                 schema.Sample.AddRange(records);
+                
+                // purge publisher meta json
+                schema.PublisherMetaJson = null;
 
                 return schema;
             }

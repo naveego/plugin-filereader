@@ -7,12 +7,19 @@ namespace PluginFileReader.API.Read
     {
         public static Count GetCountOfRecords(Schema schema, string dbFilePrefix)
         {
+            var query = schema.Query;
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                query = Utility.Utility.GetDefaultQuery(schema);
+            }
+            
             var conn = Utility.Utility.GetSqlConnection(dbFilePrefix);
 
             var cmd = new SqlDatabaseCommand
             {
                 Connection = conn,
-                CommandText = $"SELECT COUNT(*) AS count FROM ({schema.Query}) AS Q"
+                CommandText = $"SELECT COUNT(*) AS count FROM ({query}) AS Q"
             };
 
             var reader = cmd.ExecuteReader();

@@ -324,7 +324,7 @@ namespace PluginFileReaderTest.Plugin
             var schema = response.Schemas[0];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory_HEADER]", schema.Id);
             Assert.Equal("ReadDirectory_HEADER", schema.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory_HEADER]", schema.Query);
+            Assert.Equal($"", schema.Query);
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(1, schema.Sample.Count);
@@ -591,7 +591,7 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             }
 
             // assert
-            Assert.Equal( 3, records.Count);
+            Assert.Equal( 28, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             Assert.Equal("5164", record["ssn"]);

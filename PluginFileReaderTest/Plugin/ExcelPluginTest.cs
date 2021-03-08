@@ -266,7 +266,7 @@ namespace PluginFileReaderTest.Plugin
             var schema = response.Schemas[0];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
             Assert.Equal("ReadDirectory", schema.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            Assert.Equal($"", schema.Query);
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
@@ -383,7 +383,7 @@ namespace PluginFileReaderTest.Plugin
             var schema = response.Schemas[0];
             Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory]", schema.Id);
             Assert.Equal("ReadDirectory", schema.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]", schema.Query);
+            Assert.Equal($"", schema.Query);
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
