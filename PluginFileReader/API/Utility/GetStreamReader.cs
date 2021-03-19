@@ -7,7 +7,7 @@ using Renci.SshNet;
 
 namespace PluginFileReader.API.Utility
 {
-    public class StreamWrapper
+    public class StreamWrapper: IDisposable
     {
         public FtpClient FtpClient { get; set; } = null;
         public SftpClient SftpClient { get; set; } = null;
@@ -35,6 +35,11 @@ namespace PluginFileReader.API.Utility
             SftpClient?.Disconnect();
             StreamReader?.Close();
             Stream?.Close();
+        }
+
+        public void Dispose()
+        {
+            Close();
         }
     }
     

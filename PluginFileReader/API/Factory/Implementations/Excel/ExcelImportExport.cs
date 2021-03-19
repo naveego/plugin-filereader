@@ -63,9 +63,11 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
             List<ExcelCell> orderedExcelCells = rootPath.ModeSettings.ExcelModeSettings.GetOrderedExcelCells();
             Dictionary<string, object> excelCellsValues = new Dictionary<string, object>();
 
-            using (var stream = File.OpenRead(filePathAndName))
+            if (orderedExcelCells.Count > 0)
             {
-                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                var cellsStreamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
+            
+                using (var reader = ExcelReaderFactory.CreateReader(cellsStreamWrapper.Stream))
                 {
                     var currentRow = 0;
                     foreach (var cell in orderedExcelCells)
@@ -85,8 +87,11 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                         currentRow++;
                     }
                 }
+                
+                // close down stream
+                cellsStreamWrapper.Close();
             }
-
+            
             var streamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
 
             using (var reader = ExcelReaderFactory.CreateReader(streamWrapper.Stream))
