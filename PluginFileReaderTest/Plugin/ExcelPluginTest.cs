@@ -74,16 +74,20 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, string excelColumns = null, List<ExcelCell> excelCells = null)
+            string filter = null, bool multiRoot = false, string excelColumns = null, List<ExcelCell> excelCells = null, bool sftp = false)
         {
             return new Settings
             {
+                FtpHostname = "",
+                FtpPort = 2222,
+                FtpUsername = "",
+                FtpPassword = "",
                 RootPaths = multiRoot
                     ? new List<RootPathObject>
                     {
                         new RootPathObject
                         {
-                            RootPath = ReadPath,
+                            RootPath = sftp ? "/sftp/exceltest" : ReadPath,
                             Filter = filter ?? DefaultFilter,
                             Mode = ExcelMode,
                             SkipLines = skipLines,
@@ -91,11 +95,12 @@ namespace PluginFileReaderTest.Plugin
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
                             ExcelColumns = excelColumns,
-                            ExcelCells = excelCells
+                            ExcelCells = excelCells,
+                            FileReadMode = sftp ? Constants.FileModeSftp : Constants.FileModeLocal
                         },
                         new RootPathObject
                         {
-                            RootPath = ReadDifferentPath,
+                            RootPath = sftp ? "/sftp/exceltest" : ReadDifferentPath,
                             Filter = filter ?? DefaultFilter,
                             Mode = ExcelMode,
                             SkipLines = skipLines,
@@ -103,14 +108,15 @@ namespace PluginFileReaderTest.Plugin
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
                             ExcelColumns = excelColumns,
-                            ExcelCells = excelCells
+                            ExcelCells = excelCells,
+                            FileReadMode = sftp ? Constants.FileModeSftp : Constants.FileModeLocal
                         }
                     }
                     : new List<RootPathObject>
                     {
                         new RootPathObject
                         {
-                            RootPath = ReadPath,
+                            RootPath = sftp ? "/sftp/exceltest" : ReadPath,
                             Filter = filter ?? DefaultFilter,
                             SkipLines = skipLines,
                             Mode = ExcelMode,
@@ -118,7 +124,8 @@ namespace PluginFileReaderTest.Plugin
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
                             ExcelColumns = excelColumns,
-                            ExcelCells = excelCells
+                            ExcelCells = excelCells,
+                            FileReadMode = sftp ? Constants.FileModeSftp : Constants.FileModeLocal
                         }
                     }
             };
@@ -126,7 +133,7 @@ namespace PluginFileReaderTest.Plugin
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, int skipLines = 0,
             string filter = null, bool multiRoot = false, bool empty = false, string excelColumns = null,
-            List<ExcelCell> excelCells = null)
+            List<ExcelCell> excelCells = null, bool sftp = false)
         {
             if (empty)
             {
@@ -140,7 +147,7 @@ namespace PluginFileReaderTest.Plugin
                 };
             }
 
-            var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, excelColumns, excelCells);
+            var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, excelColumns, excelCells, sftp);
 
             return new ConnectRequest
             {
@@ -420,6 +427,76 @@ namespace PluginFileReaderTest.Plugin
             var client = new Publisher.PublisherClient(channel);
 
             var connectRequest = GetConnectSettings(null, 8);
+
+            var schemaRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+
+            var settings = GetSettings();
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson
+            {
+                RootPath = settings.RootPaths.First()
+            });
+
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(schemaRequest);
+            request.Schema = schemasResponse.Schemas[0];
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(616, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal("90371", record["HCPCS Code"]);
+            Assert.Equal("Hep b ig im", record["Short Description"]);
+            Assert.Equal("1 ML", record["HCPCS Code Dosage"]);
+            Assert.Equal("115.892", record["Payment Limit"]);
+            Assert.Equal("", record["Vaccine AWP%"]);
+            Assert.Equal("", record["Vaccine Limit"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamSftpTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings(null, 8, "*.xls", false, false, null, null, true);
 
             var schemaRequest = new DiscoverSchemasRequest
             {
