@@ -304,6 +304,8 @@ namespace PluginFileReader.Plugin
                     Logger.Info(
                         $"Query root paths {JsonConvert.SerializeObject(rootPaths.Select(r => r.RootPath).ToList(), Formatting.Indented)}");
 
+                    Logger.Info($"Begin loading all files.");
+                    
                     // schema is query based so everything in query needs to be loaded first
                     foreach (var rootPath in rootPaths)
                     {
@@ -323,6 +325,8 @@ namespace PluginFileReader.Plugin
                             Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
                         }
                     }
+                    
+                    Logger.Info("Completed loading all files.");
 
                     var records = Read.ReadRecords(context, schema, jobId);
 
@@ -331,6 +335,7 @@ namespace PluginFileReader.Plugin
                         // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
                         if ((limitFlag && recordsCount == limit) || !_server.Connected)
                         {
+                            Logger.Info($"Stopping read - limit reached: {limitFlag && recordsCount == limit}, server disconnected: {!_server.Connected}");
                             break;
                         }
 

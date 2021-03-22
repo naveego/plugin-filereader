@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using PluginFileReader.API.Factory;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
@@ -14,6 +15,8 @@ namespace PluginFileReader.API.Utility
             string tableName, string schemaName, List<string> paths, long recordLimit = long.MaxValue, int fileLimit = int.MaxValue
             )
         {
+            Logger.Info($"Loading files:\n {JsonConvert.SerializeObject(paths, Formatting.Indented)}");
+            
             DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
 
             foreach (var path in paths.Take(fileLimit))
