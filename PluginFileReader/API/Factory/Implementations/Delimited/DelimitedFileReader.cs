@@ -83,10 +83,10 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         /// </summary>
         /// <param name="path">The name of the CSV file to read from</param>
         /// <param name="rootPath">The root path object/param>
-        public DelimitedFileReader(string path, RootPathObject rootPath)
+        public DelimitedFileReader(string path, RootPathObject rootPath, bool downloadToLocal)
         {
             InitCsvReader();
-            _streamWrapper = Utility.Utility.GetStream(path, rootPath.FileReadMode);
+            _streamWrapper = Utility.Utility.GetStream(path, rootPath.FileReadMode, downloadToLocal);
             _reader = _streamWrapper.StreamReader;
         }
 

@@ -10,12 +10,12 @@ namespace PluginFileReader.API.Utility
     {
         private static long ImportRecordsForPath(IImportExportFactory factory, SqlDatabaseConnection conn,
             RootPathObject rootPath,
-            string tableName, string schemaName, string path, long limit = long.MaxValue)
+            string tableName, string schemaName, string path, bool downloadToLocal = false, long limit = long.MaxValue)
         {
             Logger.Info($"Preparing to load file: {path} from {rootPath.FileReadMode}");
             var importExportFile = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName);
             Logger.Info($"Begin loading file: {path} from {rootPath.FileReadMode}");
-            var rowsWritten = importExportFile.ImportTable(path, rootPath, limit);
+            var rowsWritten = importExportFile.ImportTable(path, rootPath, downloadToLocal, limit);
             Logger.Info($"Loaded file {path} with {rowsWritten} rows from {rootPath.FileReadMode}");
 
             return rowsWritten;

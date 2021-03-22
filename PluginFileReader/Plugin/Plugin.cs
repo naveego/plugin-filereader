@@ -209,7 +209,7 @@ namespace PluginFileReader.Plugin
 
                     Utility.LoadDirectoryFilesIntoDb(
                         Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
-                        tableName, schemaName, files[rootPath.RootPathName()], sampleSize, 1);
+                        tableName, schemaName, files[rootPath.RootPathName()], false, sampleSize, 1);
                 }
 
                 var schemas = refreshSchemas.Select(s => Discover.GetSchemaForQuery(context, s, sampleSize))
@@ -273,7 +273,7 @@ namespace PluginFileReader.Plugin
                         {
                             Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn,
                                 rootPath,
-                                tableName, schemaName, new List<string> {file});
+                                tableName, schemaName, new List<string> {file}, true);
 
                             var records = Read.ReadRecords(context, schema, jobId);
 
@@ -293,7 +293,7 @@ namespace PluginFileReader.Plugin
                     }
                     else
                     {
-                        Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
+                        Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName, Utility.GetImportExportFactory(rootPath.Mode), rootPath, files);
                     }
                 }
                 else
@@ -302,11 +302,12 @@ namespace PluginFileReader.Plugin
                     var rootPaths = _server.Settings.GetRootPathsFromQuery(schema.Query);
 
                     Logger.Info(
-                        $"Query root paths {JsonConvert.SerializeObject(rootPaths.Select(r => r.RootPath).ToList(), Formatting.Indented)}");
+                        $"Query root paths {JsonConvert.SerializeObject(rootPaths.Select(r => r.RootPathName()).ToList(), Formatting.Indented)}");
 
                     Logger.Info($"Begin loading all files.");
                     
                     // schema is query based so everything in query needs to be loaded first
+                    var hasRecords = true;
                     foreach (var rootPath in rootPaths)
                     {
                         var files = filesByRootPath[rootPath.RootPathName()];
@@ -318,30 +319,34 @@ namespace PluginFileReader.Plugin
                         {
                             Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn,
                                 rootPath,
-                                tableName, schemaName, files);
+                                tableName, schemaName, files, true);
                         }
                         else
                         {
-                            Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
+                            hasRecords = false;
+                            Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName, Utility.GetImportExportFactory(rootPath.Mode), rootPath, files);
                         }
                     }
                     
                     Logger.Info("Completed loading all files.");
 
-                    var records = Read.ReadRecords(context, schema, jobId);
-
-                    foreach (var record in records)
+                    if (hasRecords)
                     {
-                        // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
-                        if ((limitFlag && recordsCount == limit) || !_server.Connected)
-                        {
-                            Logger.Info($"Stopping read - limit reached: {limitFlag && recordsCount == limit}, server disconnected: {!_server.Connected}");
-                            break;
-                        }
+                        var records = Read.ReadRecords(context, schema, jobId);
 
-                        // publish record
-                        await responseStream.WriteAsync(record);
-                        recordsCount++;
+                        foreach (var record in records)
+                        {
+                            // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
+                            if ((limitFlag && recordsCount == limit) || !_server.Connected)
+                            {
+                                Logger.Info($"Stopping read - limit reached: {limitFlag && recordsCount == limit}, server disconnected: {!_server.Connected}");
+                                break;
+                            }
+
+                            // publish record
+                            await responseStream.WriteAsync(record);
+                            recordsCount++;
+                        }
                     }
                 }
 
@@ -371,14 +376,14 @@ namespace PluginFileReader.Plugin
                     }
 
                     // clean up local files pulled from remote
-                    if (rootPath.FileReadMode != Constants.FileModeLocal)
-                    {
-                        foreach (var file in files)
-                        {
-                            Logger.Info($"Source file is not local, deleting local file {file}");
-                            Utility.DeleteFileAtPath(file, rootPath, _server.Settings, false);
-                        }
-                    }
+                    // if (rootPath.FileReadMode != Constants.FileModeLocal)
+                    // {
+                    //     foreach (var file in files)
+                    //     {
+                    //         Logger.Info($"Source file is not local, deleting local file {file}");
+                    //         Utility.DeleteFileAtPath(file, rootPath, _server.Settings, false);
+                    //     }
+                    // }
                 }
             }
             catch (Exception e)

@@ -37,7 +37,8 @@ namespace PluginFileReader.API.Read
             SqlDatabaseDataReader reader;
             try
             {
-                Logger.Info($"Executing query:\n {query}");
+                Logger.Info($"Executing query.");
+                Logger.Debug(query);
                 
                 reader = cmd.ExecuteReader();
             }

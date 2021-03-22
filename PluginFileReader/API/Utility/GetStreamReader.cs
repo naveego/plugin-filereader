@@ -9,6 +9,7 @@ namespace PluginFileReader.API.Utility
 {
     public class StreamWrapper
     {
+        public string TempFilePath { get; set; } = null;
         public FtpClient FtpClient { get; set; } = null;
         public SftpClient SftpClient { get; set; } = null;
         public Stream Stream { get; set; }
@@ -33,23 +34,34 @@ namespace PluginFileReader.API.Utility
         {
             FtpClient?.Disconnect();
             SftpClient?.Disconnect();
-            StreamReader?.Close();
+            try
+            {
+                StreamReader.Close();
+            }
+            catch 
+            {
+            }
             Stream?.Close();
+
+            if (!string.IsNullOrWhiteSpace(TempFilePath))
+            {
+                try
+                {
+                    File.Delete(TempFilePath);
+                }
+                catch (Exception e)
+                {
+                   Logger.Error(e, e.StackTrace);
+                }
+            }
         }
     }
     
     public static partial class Utility
     {
         public static string TempDirectory = "";
-        // private static FtpClient _ftpClient;
-        // private static SftpClient _sftpClient;
 
-        // public static StreamReader GetStreamReader(string filePathAndName, string fileMode)
-        // {
-        //     return new StreamReader(GetStream(filePathAndName, fileMode));
-        // }
-
-        public static StreamWrapper GetStream(string filePathAndName, string fileMode)
+        public static StreamWrapper GetStream(string filePathAndName, string fileMode, bool downloadToLocal)
         {
             try
             {
@@ -64,16 +76,35 @@ namespace PluginFileReader.API.Utility
                         {
                             ftpClient.Connect();
                         }
-                    
-                        var ftpStream = ftpClient.OpenRead(filePathAndName);
-                    
-                        Logger.Info($"Opened FTP stream for file: {filePathAndName} from {fileMode}");
 
-                        return new StreamWrapper
+                        if (downloadToLocal)
                         {
-                            FtpClient = ftpClient,
-                            Stream = ftpStream
-                        };
+                            var tempFile = GetTempFilePath(filePathAndName);
+                            var tempDirectory = Path.GetDirectoryName(tempFile);
+                            Directory.CreateDirectory(tempDirectory);
+
+                            ftpClient.DownloadFile(filePathAndName, tempFile);
+                            
+                            return new StreamWrapper
+                            {
+                                FtpClient = ftpClient,
+                                TempFilePath = tempFile,
+                                Stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                            };
+                        }
+                        else
+                        {
+                            var ftpStream = ftpClient.OpenRead(filePathAndName);
+                    
+                            Logger.Info($"Opened FTP stream for file: {filePathAndName} from {fileMode}");
+
+                            return new StreamWrapper
+                            {
+                                FtpClient = ftpClient,
+                                Stream = ftpStream
+                            };
+                        }
+
                     case Constants.FileModeSftp:
                         var sftpClient = GetSftpClient();
 
@@ -81,16 +112,37 @@ namespace PluginFileReader.API.Utility
                         {
                             sftpClient.Connect();
                         }
-                        
-                        var sftpStream = sftpClient.OpenRead(filePathAndName);
-                    
-                        Logger.Info($"Opened SFTP stream for file: {filePathAndName} from {fileMode}");
 
-                        return new StreamWrapper
+                        if (downloadToLocal)
                         {
-                            SftpClient = sftpClient,
-                            Stream = sftpStream
-                        };
+                            var tempFile = GetTempFilePath(filePathAndName);
+                            var tempDirectory = Path.GetDirectoryName(tempFile);
+                            Directory.CreateDirectory(tempDirectory);
+
+                            using (var stream = File.Create(tempFile))
+                            {
+                                sftpClient.DownloadFile(filePathAndName, stream);
+                            }
+
+                            return new StreamWrapper
+                            {
+                                SftpClient = sftpClient,
+                                TempFilePath = tempFile,
+                                Stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                            };
+                        }
+                        else
+                        {
+                            var sftpStream = sftpClient.OpenRead(filePathAndName);
+                    
+                            Logger.Info($"Opened SFTP stream for file: {filePathAndName} from {fileMode}");
+
+                            return new StreamWrapper
+                            {
+                                SftpClient = sftpClient,
+                                Stream = sftpStream
+                            };
+                        }
                     case Constants.FileModeLocal:
                     default:
                         Logger.Info($"Opened Local stream for file: {filePathAndName} from {fileMode}");

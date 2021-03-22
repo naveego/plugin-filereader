@@ -13,24 +13,25 @@ namespace PluginFileReader.API.Discover
 {
     public static partial class Discover
     {
-        public static IEnumerable<Schema> GetSchemasForDirectory(ServerCallContext context, IImportExportFactory factory, RootPathObject rootPath, List<string> paths,
+        public static IEnumerable<Schema> GetSchemasForDirectory(ServerCallContext context,
+            IImportExportFactory factory, RootPathObject rootPath, List<string> paths,
             int sampleSize = 5)
         {
             if (paths.Count == 0)
             {
                 return new List<Schema>();
             }
-            
+
             if (sampleSize == 0)
             {
                 sampleSize = 5;
             }
-            
+
             if (factory.CustomDiscover)
             {
                 return factory.MakeDiscoverer().DiscoverSchemas(context, factory, rootPath, paths, sampleSize);
             }
-            
+
             var schemaName = Constants.SchemaName;
             var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
                 ? new DirectoryInfo(rootPath.RootPath).Name
@@ -38,12 +39,14 @@ namespace PluginFileReader.API.Discover
 
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
-            Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths, sampleSize, 1);
+            Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName, paths, false, sampleSize,
+                1);
 
-            var tableNames = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName).GetAllTableNames(paths.FirstOrDefault());
+            var tableNames = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName)
+                .GetAllTableNames(paths.FirstOrDefault());
 
             var schemas = new List<Schema>();
-            
+
             foreach (var table in tableNames)
             {
                 var tableNameId = $"[{table.SchemaName}].[{table.TableName}]";
@@ -52,10 +55,11 @@ namespace PluginFileReader.API.Discover
                     Id = tableNameId,
                     Name = table.TableName,
                     DataFlowDirection = Schema.Types.DataFlowDirection.Read,
-                    Properties = {},
+                    Properties = { },
                 };
 
-                schema = GetSchemaForQuery(context, schema, sampleSize, rootPath?.ModeSettings?.FixedWidthSettings?.Columns);
+                schema = GetSchemaForQuery(context, schema, sampleSize,
+                    rootPath?.ModeSettings?.FixedWidthSettings?.Columns);
 
                 schemas.Add(schema);
             }

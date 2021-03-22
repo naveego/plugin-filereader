@@ -379,7 +379,7 @@ namespace PluginFileReaderTest.Plugin
             var schema = response.Schemas[0];
             Assert.Equal($"[{Constants.SchemaName}].[xmltest_HEADER]", schema.Id);
             Assert.Equal("xmltest_HEADER", schema.Name);
-            Assert.Equal($"SELECT * FROM [{Constants.SchemaName}].[xmltest_HEADER]", schema.Query);
+            Assert.Equal($"", schema.Query);
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(1, schema.Sample.Count);
@@ -591,7 +591,7 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             }
 
             // assert
-            Assert.Equal( 28, records.Count);
+            Assert.Equal( 7, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             Assert.Equal("5164", record["ssn"]);
@@ -618,6 +618,15 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
 
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
 
             var connectRequest = GetConnectSettings(null, 0, null, false, false, true);
             
@@ -649,6 +658,7 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             };
 
             // act
+            client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
             request.Schema = schemasResponse.Schemas[0];
@@ -663,7 +673,7 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             }
 
             // assert
-            Assert.Equal( 4, records.Count);
+            Assert.Equal( 7, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             Assert.Equal("6075", record["ssn"]);

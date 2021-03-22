@@ -495,6 +495,15 @@ namespace PluginFileReaderTest.Plugin
 
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
 
             var connectRequest = GetConnectSettings(null, 8, "*.xls", false, false, null, null, true);
 
@@ -520,6 +529,7 @@ namespace PluginFileReaderTest.Plugin
             };
 
             // act
+            client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(schemaRequest);
             request.Schema = schemasResponse.Schemas[0];
@@ -534,7 +544,7 @@ namespace PluginFileReaderTest.Plugin
             }
 
             // assert
-            Assert.Equal(616, records.Count);
+            Assert.Equal(618, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             Assert.Equal("90371", record["HCPCS Code"]);

@@ -40,7 +40,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
             throw new System.NotImplementedException();
         }
 
-        public List<SchemaTable> GetAllTableNames(string filePathAndName)
+        public List<SchemaTable> GetAllTableNames(string filePathAndName, bool downloadToLocal = false)
         {
             return new List<SchemaTable>
             {
@@ -54,7 +54,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
             };
         }
 
-        public long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = -1)
+        public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = -1)
         {
             var rowsRead = 0;
             var rowsSkipped = 0;
@@ -65,7 +65,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
 
             if (orderedExcelCells.Count > 0)
             {
-                var cellsStreamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
+                var cellsStreamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode, downloadToLocal);
 
                 using (var memoryStream = new MemoryStream())
                 {
@@ -98,7 +98,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                 cellsStreamWrapper.Close();
             }
 
-            var streamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
+            var streamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode, downloadToLocal);
 
             using (var memoryStream = new MemoryStream())
             {
@@ -271,7 +271,6 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                     }
                 }
             }
-
 
             return rowsRead;
         }

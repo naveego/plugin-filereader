@@ -80,7 +80,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             throw new NotImplementedException();
         }
 
-        public List<SchemaTable> GetAllTableNames(string filePathAndName)
+        public List<SchemaTable> GetAllTableNames(string filePathAndName, bool downloadToLocal = false)
         {
             return new List<SchemaTable>
             {
@@ -153,12 +153,12 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             return rowCount;
         }
 
-        public long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = long.MaxValue)
+        public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = long.MaxValue)
         {
             var rowCount = 0;
             List<string> headerColumns = new List<string>();
 
-            using (DelimitedReader = new DelimitedFileReader(filePathAndName, rootPath))
+            using (DelimitedReader = new DelimitedFileReader(filePathAndName, rootPath, false))
             {
                 DelimitedReader.Delimiter = Delimiter;
                 DelimitedReader.OnEmptyLine = BlankLine.SkipEntireLine;
@@ -252,7 +252,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 Logger.Debug($"Reading delimited file {filePathAndName}");
                 
                 //Read CSV once insert statement has been created.
-                using (DelimitedReader = new DelimitedFileReader(filePathAndName, rootPath))
+                using (DelimitedReader = new DelimitedFileReader(filePathAndName, rootPath, downloadToLocal))
                 {
                     DelimitedReader.Delimiter = Delimiter;
                     DelimitedReader.OnEmptyLine = BlankLine.SkipEntireLine;

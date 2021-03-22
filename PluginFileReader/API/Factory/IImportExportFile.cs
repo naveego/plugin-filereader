@@ -18,9 +18,10 @@ namespace PluginFileReader.API.Factory
         /// </summary>
         /// <param name="filePathAndName"></param>
         /// <param name="rootPath"></param>
+        /// <param name="downloadToLocal"></param>
         /// <param name="limit"></param>
         /// <returns>Number of rows written</returns>
-        long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = -1);
+        long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal, long limit = -1);
 
         /// <summary>
         /// Writes a line to a file
@@ -37,7 +38,7 @@ namespace PluginFileReader.API.Factory
         /// Gets all table names
         /// </summary>
         /// <returns></returns>
-        List<SchemaTable> GetAllTableNames(string filePathAndName);
+        List<SchemaTable> GetAllTableNames(string filePathAndName, bool includeHeader = false);
     }
 
     public class SchemaTable

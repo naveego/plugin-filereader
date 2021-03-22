@@ -65,12 +65,12 @@ namespace PluginFileReader.API.Replication
                                 try
                                 {
                                     var goldenFileStream =
-                                        Utility.Utility.GetStream(localGoldenFileName, Constants.FileModeLocal);
+                                        Utility.Utility.GetStream(localGoldenFileName, Constants.FileModeLocal, true);
                                     client.UploadFile(goldenFileStream.Stream, remoteGoldenFileName);
                                     goldenFileStream.Close();
 
                                     var versionFileStream =
-                                        Utility.Utility.GetStream(localVersionFileName, Constants.FileModeLocal);
+                                        Utility.Utility.GetStream(localVersionFileName, Constants.FileModeLocal, true);
                                     client.UploadFile(versionFileStream.Stream, remoteVersionFileName);
                                     versionFileStream.Close();
                                 }

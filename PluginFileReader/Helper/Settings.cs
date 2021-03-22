@@ -629,7 +629,7 @@ namespace PluginFileReader.Helper
                                     {
                                         try
                                         {
-                                            var fileStream = Utility.GetStream(localTestFileName, Constants.FileModeLocal);
+                                            var fileStream = Utility.GetStream(localTestFileName, Constants.FileModeLocal, true);
                                             client.UploadFile(fileStream.Stream, remoteTestFileName);
                                             fileStream.Close();
                                             Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);

@@ -12,16 +12,16 @@ namespace PluginFileReader.API.Utility
     {
         public static void LoadDirectoryFilesIntoDb(
             IImportExportFactory factory, SqlDatabaseConnection conn, RootPathObject rootPath,
-            string tableName, string schemaName, List<string> paths, long recordLimit = long.MaxValue, int fileLimit = int.MaxValue
+            string tableName, string schemaName, List<string> paths, bool downloadToLocal, long recordLimit = long.MaxValue, int fileLimit = int.MaxValue
             )
         {
             Logger.Info($"Loading files:\n {JsonConvert.SerializeObject(paths, Formatting.Indented)}");
             
-            DeleteDirectoryFilesFromDb(conn, tableName, schemaName);
+            DeleteDirectoryFilesFromDb(conn, tableName, schemaName, factory, rootPath, paths);
 
             foreach (var path in paths.Take(fileLimit))
             {
-                ImportRecordsForPath(factory, conn, rootPath, tableName, schemaName, path,
+                ImportRecordsForPath(factory, conn, rootPath, tableName, schemaName, path, downloadToLocal,
                     recordLimit);
             }
         }

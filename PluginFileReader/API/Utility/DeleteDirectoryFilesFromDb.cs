@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using PluginFileReader.API.Factory;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -6,19 +9,27 @@ namespace PluginFileReader.API.Utility
 {
     public static partial class Utility
     {
-        public static void DeleteDirectoryFilesFromDb(SqlDatabaseConnection conn, string tableName, string schemaName)
+        public static void DeleteDirectoryFilesFromDb(SqlDatabaseConnection conn, string tableName, string schemaName,
+            IImportExportFactory factory, RootPathObject rootPath, List<string> paths)
         {
             try
             {
-                Logger.Info($"Purging table: [{schemaName}].[{tableName}]");
-                var cmd = new SqlDatabaseCommand
+                var tableNames = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName)
+                    .GetAllTableNames(paths.FirstOrDefault());
+                
+                foreach (var table in tableNames)
                 {
-                    Connection = conn,
-                    CommandText =
-                        $@"DROP TABLE IF EXISTS [{schemaName}].[{tableName}]"
-                };
-            
-                cmd.ExecuteNonQuery();
+                    var tableNameId = $"[{table.SchemaName}].[{table.TableName}]";
+                    Logger.Info($"Purging table: {tableNameId}");
+                    var cmd = new SqlDatabaseCommand
+                    {
+                        Connection = conn,
+                        CommandText =
+                            $@"DROP TABLE IF EXISTS {tableNameId}"
+                    };
+
+                    cmd.ExecuteNonQuery();
+                }
             }
             catch (Exception e)
             {

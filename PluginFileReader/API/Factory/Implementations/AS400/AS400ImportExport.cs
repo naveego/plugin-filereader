@@ -27,7 +27,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             throw new NotImplementedException();
         }
 
-        public long ImportTable(string filePathAndName, RootPathObject rootPath, long limit = long.MaxValue)
+        public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = long.MaxValue)
         {
             var formatCmdDictionary = new Dictionary<string, SqlDatabaseCommand>();
             var recordGlobalHeaderMap = new Dictionary<string,string>();
@@ -77,7 +77,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             }
 
             // read file into db
-            var streamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode);
+            var streamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode, downloadToLocal);
             var file = streamWrapper.StreamReader;
             string line;
             var recordsInserted = 0;
@@ -259,7 +259,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             throw new NotImplementedException();
         }
 
-        public List<SchemaTable> GetAllTableNames(string filePathAndName)
+        public List<SchemaTable> GetAllTableNames(string filePathAndName, bool downloadToLocal = false)
         {
             return new List<SchemaTable>
             {

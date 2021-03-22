@@ -24,9 +24,10 @@ namespace PluginFileReader.API.Utility
                         {
                             try
                             {
-                                var localFileStream = GetStream(path, rootPath.FileReadMode);
-                                client.Upload(localFileStream.Stream, archiveFileName);
-                                localFileStream.Close();
+                                // var localFileStream = GetStream(path, rootPath.FileReadMode, true);
+                                // client.Upload(localFileStream.Stream, archiveFileName);
+                                // localFileStream.Close();
+                                client.MoveFile(path, archiveFileName);
                                 DeleteFileAtPath(path, rootPath, settings, true);
                             }
                             finally
@@ -41,9 +42,11 @@ namespace PluginFileReader.API.Utility
                         {
                             try
                             {
-                                var localFileStream = GetStream(path, rootPath.FileReadMode);
-                                client.UploadFile(localFileStream.Stream, archiveFileName);
-                                localFileStream.Close();
+                                // var localFileStream = GetStream(path, rootPath.FileReadMode, true);
+                                // client.UploadFile(localFileStream.Stream, archiveFileName);
+                                // localFileStream.Close();
+                                var file = client.Get(path);
+                                file.MoveTo(archiveFileName);
                                 DeleteFileAtPath(path, rootPath, settings, true);
                             }
                             finally

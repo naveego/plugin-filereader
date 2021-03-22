@@ -23,7 +23,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
             
             Utility.Utility.LoadDirectoryFilesIntoDb(factory, conn, rootPath, tableName, schemaName,
-                paths, sampleSize, 1);
+                paths, false, sampleSize, 1);
 
             var schemas = new List<Schema>();
             
