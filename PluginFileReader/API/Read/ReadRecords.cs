@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Grpc.Core;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginFileReader.Helper;
@@ -12,10 +13,11 @@ namespace PluginFileReader.API.Read
         /// <summary>
         /// Reads records for schema
         /// </summary>
+        /// <param name="context"></param>
         /// <param name="schema"></param>
         /// <param name="dbFilePrefix"></param>
         /// <returns>Records from the file</returns>
-        public static IEnumerable<Record> ReadRecords(Schema schema, string dbFilePrefix)
+        public static IEnumerable<Record> ReadRecords(ServerCallContext context, Schema schema, string dbFilePrefix)
         {
             var query = schema.Query;
 
@@ -39,8 +41,8 @@ namespace PluginFileReader.API.Read
             }
             catch (Exception e)
             {
-                Logger.Error(e, e.Message);
-                yield break;
+                Logger.Error(e, e.Message, context);
+                throw;
             }
             
             if (reader.HasRows)

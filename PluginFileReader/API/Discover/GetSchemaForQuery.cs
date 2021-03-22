@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Grpc.Core;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginFileReader.API.Utility;
@@ -13,7 +14,7 @@ namespace PluginFileReader.API.Discover
 {
     public static partial class Discover
     {
-        public static Schema GetSchemaForQuery(Schema schema, int sampleSize = 5, List<Column> columns = null)
+        public static Schema GetSchemaForQuery(ServerCallContext context, Schema schema, int sampleSize = 5, List<Column> columns = null)
         {
             try
             {
@@ -38,9 +39,6 @@ namespace PluginFileReader.API.Discover
                     }
 
                     query = Utility.Utility.GetDefaultQuery(schema);
-
-                    // Logger.Info("Returning null schema for null query");
-                    // return null;
                 }
 
                 var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
@@ -115,7 +113,7 @@ namespace PluginFileReader.API.Discover
                 schema.Properties.Clear();
                 schema.Properties.AddRange(properties);
 
-                var records = Read.Read.ReadRecords(schema, Constants.DiscoverDbPrefix).Take(sampleSize);
+                var records = Read.Read.ReadRecords(context, schema, Constants.DiscoverDbPrefix).Take(sampleSize);
                 schema.Sample.AddRange(records);
                 
                 // purge publisher meta json

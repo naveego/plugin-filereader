@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Grpc.Core;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginFileReader.API.Factory;
@@ -12,7 +13,7 @@ namespace PluginFileReader.API.Discover
 {
     public static partial class Discover
     {
-        public static IEnumerable<Schema> GetSchemasForDirectory(IImportExportFactory factory, RootPathObject rootPath, List<string> paths,
+        public static IEnumerable<Schema> GetSchemasForDirectory(ServerCallContext context, IImportExportFactory factory, RootPathObject rootPath, List<string> paths,
             int sampleSize = 5)
         {
             if (paths.Count == 0)
@@ -27,7 +28,7 @@ namespace PluginFileReader.API.Discover
             
             if (factory.CustomDiscover)
             {
-                return factory.MakeDiscoverer().DiscoverSchemas(factory, rootPath, paths, sampleSize);
+                return factory.MakeDiscoverer().DiscoverSchemas(context, factory, rootPath, paths, sampleSize);
             }
             
             var schemaName = Constants.SchemaName;
@@ -54,7 +55,7 @@ namespace PluginFileReader.API.Discover
                     Properties = {},
                 };
 
-                schema = GetSchemaForQuery(schema, sampleSize, rootPath?.ModeSettings?.FixedWidthSettings?.Columns);
+                schema = GetSchemaForQuery(context, schema, sampleSize, rootPath?.ModeSettings?.FixedWidthSettings?.Columns);
 
                 schemas.Add(schema);
             }

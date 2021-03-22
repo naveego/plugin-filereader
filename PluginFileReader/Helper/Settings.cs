@@ -69,7 +69,7 @@ namespace PluginFileReader.Helper
         /// Gets all files from location defined by RootPath and Filters and returns in a dictionary by directory
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string, List<string>> GetAllFilesByRootPath(int limitPerRootPath = -1)
+        public Dictionary<string, List<string>> GetAllFilesByRootPath()
         {
             var filesByRootPath = new Dictionary<string, List<string>>();
             foreach (var rootPath in RootPaths)

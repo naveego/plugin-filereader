@@ -158,11 +158,11 @@ namespace PluginFileReader.Plugin
                 {
                     await DiscoverSemaphoreSlim.WaitAsync();
 
-                    var files = _server.Settings.GetAllFilesByRootPath(1);
+                    var files = _server.Settings.GetAllFilesByRootPath();
                     Logger.Info($"Files attempted: {files.Count}");
 
                     var schemas = _server.Settings.RootPaths.Select(p =>
-                            Discover.GetSchemasForDirectory(Utility.GetImportExportFactory(p.Mode), p,
+                            Discover.GetSchemasForDirectory(context, Utility.GetImportExportFactory(p.Mode), p,
                                 files[p.RootPathName()],
                                 sampleSize))
                         .ToList();
@@ -192,7 +192,7 @@ namespace PluginFileReader.Plugin
 
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
 
-                var files = _server.Settings.GetAllFilesByRootPath(1);
+                var files = _server.Settings.GetAllFilesByRootPath();
                 var conn = Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
 
                 if (sampleSize == 0)
@@ -212,7 +212,7 @@ namespace PluginFileReader.Plugin
                         tableName, schemaName, files[rootPath.RootPathName()], sampleSize, 1);
                 }
 
-                var schemas = refreshSchemas.Select(s => Discover.GetSchemaForQuery(s, sampleSize))
+                var schemas = refreshSchemas.Select(s => Discover.GetSchemaForQuery(context, s, sampleSize))
                     .ToArray();
 
                 discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
@@ -275,7 +275,7 @@ namespace PluginFileReader.Plugin
                                 rootPath,
                                 tableName, schemaName, new List<string> {file});
 
-                            var records = Read.ReadRecords(schema, jobId);
+                            var records = Read.ReadRecords(context, schema, jobId);
 
                             foreach (var record in records)
                             {
@@ -324,7 +324,7 @@ namespace PluginFileReader.Plugin
                         }
                     }
 
-                    var records = Read.ReadRecords(schema, jobId);
+                    var records = Read.ReadRecords(context, schema, jobId);
 
                     foreach (var record in records)
                     {
