@@ -65,7 +65,7 @@ namespace PluginFileReader.API.Utility
         {
             try
             {
-                Logger.Info($"Getting stream for file: {filePathAndName} from {fileMode}");
+                Logger.Debug($"Getting stream for file: {filePathAndName} from {fileMode}");
             
                 switch (fileMode)
                 {
@@ -96,7 +96,7 @@ namespace PluginFileReader.API.Utility
                         {
                             var ftpStream = ftpClient.OpenRead(filePathAndName);
                     
-                            Logger.Info($"Opened FTP stream for file: {filePathAndName} from {fileMode}");
+                            Logger.Debug($"Opened FTP stream for file: {filePathAndName} from {fileMode}");
 
                             return new StreamWrapper
                             {
@@ -135,7 +135,7 @@ namespace PluginFileReader.API.Utility
                         {
                             var sftpStream = sftpClient.OpenRead(filePathAndName);
                     
-                            Logger.Info($"Opened SFTP stream for file: {filePathAndName} from {fileMode}");
+                            Logger.Debug($"Opened SFTP stream for file: {filePathAndName} from {fileMode}");
 
                             return new StreamWrapper
                             {
@@ -145,7 +145,7 @@ namespace PluginFileReader.API.Utility
                         }
                     case Constants.FileModeLocal:
                     default:
-                        Logger.Info($"Opened Local stream for file: {filePathAndName} from {fileMode}");
+                        Logger.Debug($"Opened Local stream for file: {filePathAndName} from {fileMode}");
                     
                         return new StreamWrapper
                         {

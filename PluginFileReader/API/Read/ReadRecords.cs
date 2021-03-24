@@ -44,14 +44,14 @@ namespace PluginFileReader.API.Read
             }
             catch (Exception e)
             {
+                Logger.Error(e,$"Failed to execute query");
+                Logger.Debug(query);
                 Logger.Error(e, e.Message, context);
                 throw;
             }
             
             if (reader.HasRows)
             {
-                Logger.Info($"Executed query, got {reader?.RecordsAffected} results");
-                
                 while (reader.Read())
                 {
                     var recordMap = new Dictionary<string, object>();
@@ -72,8 +72,7 @@ namespace PluginFileReader.API.Read
                         }
                         catch (Exception e)
                         {
-                            Logger.Error(e, $"No column with property Id: {property.Id}");
-                            Logger.Error(e, e.Message);
+                            Logger.Debug($"No column with property Id: {property.Id}\n{e.Message}\n{e.StackTrace}");
                             recordMap[property.Id] = "";
                         }
                     }
