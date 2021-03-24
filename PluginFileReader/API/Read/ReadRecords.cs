@@ -37,7 +37,7 @@ namespace PluginFileReader.API.Read
             SqlDatabaseDataReader reader;
             try
             {
-                Logger.Info($"Executing query.");
+                Logger.Info($"Executing query");
                 Logger.Debug(query);
                 
                 reader = cmd.ExecuteReader();
@@ -50,8 +50,12 @@ namespace PluginFileReader.API.Read
                 throw;
             }
             
+            Logger.Info("Executed query successfully");
+            
             if (reader.HasRows)
             {
+                Logger.Info("Results set has rows. Reading...");
+                
                 while (reader.Read())
                 {
                     var recordMap = new Dictionary<string, object>();

@@ -113,11 +113,18 @@ namespace PluginFileReader.API.Discover
                 schema.Properties.Clear();
                 schema.Properties.AddRange(properties);
 
-                var records = Read.Read.ReadRecords(context, schema, Constants.DiscoverDbPrefix).Take(sampleSize);
-                schema.Sample.AddRange(records);
+                try
+                {
+                    var records = Read.Read.ReadRecords(context, schema, Constants.DiscoverDbPrefix).Take(sampleSize);
+                    schema.Sample.AddRange(records);
+                }
+                catch
+                {
+                    Logger.Info("Could not add records");
+                }
                 
                 // purge publisher meta json
-                schema.PublisherMetaJson = null;
+                schema.PublisherMetaJson = "";
 
                 return schema;
             }

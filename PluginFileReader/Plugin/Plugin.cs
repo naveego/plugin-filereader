@@ -164,7 +164,7 @@ namespace PluginFileReader.Plugin
                     var schemas = _server.Settings.RootPaths.Select(p =>
                             Discover.GetSchemasForDirectory(context, Utility.GetImportExportFactory(p.Mode), p,
                                 files[p.RootPathName()],
-                                sampleSize))
+                                sampleSize)).Select(l => l.Where(s => s != null))
                         .ToList();
 
                     discoverSchemasResponse.Schemas.AddRange(schemas.SelectMany(s => s));

@@ -810,15 +810,15 @@ namespace PluginFileReaderTest.Plugin
 
             var discoverAllRequest = new DiscoverSchemasRequest
             {
-                Mode = DiscoverSchemasRequest.Types.Mode.All,
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                ToRefresh = { GetTestSchema($@"select a.id, a.first_name, a.last_name, b.car_make
+from ReadDirectory as a
+inner join ReadDirectoryDifferent as b
+on a.id = b.id")}
             };
 
             var request = new ReadRequest()
             {
-                Schema = GetTestSchema($@"select a.id, a.first_name, a.last_name, b.car_make
-from ReadDirectory as a
-inner join ReadDirectoryDifferent as b
-on a.id = b.id"),
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
@@ -828,7 +828,8 @@ on a.id = b.id"),
 
             // act
             client.Connect(connectRequest);
-            client.DiscoverSchemas(discoverAllRequest);
+            var discoverResponse =client.DiscoverSchemas(discoverAllRequest);
+            request.Schema = discoverResponse.Schemas[0];
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
             var records = new List<Record>();
