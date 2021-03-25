@@ -388,7 +388,7 @@ namespace PluginFileReader.Plugin
             }
             catch (Exception e)
             {
-                Logger.Error(e, e.StackTrace, context);
+                Logger.Error(e, e.Message, context);
             }
         }
 
