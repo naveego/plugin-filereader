@@ -83,6 +83,17 @@ namespace PluginFileReaderTest.Plugin
                 FtpPort = 2222,
                 FtpUsername = "",
                 FtpPassword = "",
+                Indexes = new List<IndexObject>
+                {
+                    new IndexObject
+                    {
+                        TableName = "ReadDirectory",
+                        IndexColumns = new List<string>()
+                        {
+                            "id"
+                        }
+                    }
+                },
                 RootPaths = multiRoot
                     ? new List<RootPathObject>
                     {

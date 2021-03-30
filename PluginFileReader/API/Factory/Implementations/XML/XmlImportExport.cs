@@ -39,14 +39,9 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             throw new System.NotImplementedException();
         }
         
-        public List<SchemaTable> GetAllTableNames(string filePathAndName, bool downloadToLocal)
+        public List<SchemaTable> GetAllTableNames(bool downloadToLocal)
         {
             var tableNamesList = new List<SchemaTable>();
-
-            if (string.IsNullOrWhiteSpace(filePathAndName))
-            {
-                return tableNamesList;
-            }
             
             // parse xml into multiple tables
             DataSet dataSet = new DataSet();

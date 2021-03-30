@@ -43,7 +43,7 @@ namespace PluginFileReader.API.Discover
                 1);
 
             var tableNames = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName)
-                .GetAllTableNames(paths.FirstOrDefault());
+                .GetAllTableNames();
 
             var schemas = new List<Schema>();
 

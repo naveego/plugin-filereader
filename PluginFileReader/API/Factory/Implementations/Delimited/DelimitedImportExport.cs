@@ -80,7 +80,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             throw new NotImplementedException();
         }
 
-        public List<SchemaTable> GetAllTableNames(string filePathAndName, bool downloadToLocal = false)
+        public List<SchemaTable> GetAllTableNames(bool downloadToLocal = false)
         {
             return new List<SchemaTable>
             {
@@ -289,7 +289,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                                 trans = SQLDatabaseConnection.BeginTransaction();
                             }
                         }
-                        
+
                         // commit any pending inserts
                         trans.Commit();
                     }

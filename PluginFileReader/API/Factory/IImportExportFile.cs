@@ -38,7 +38,7 @@ namespace PluginFileReader.API.Factory
         /// Gets all table names
         /// </summary>
         /// <returns></returns>
-        List<SchemaTable> GetAllTableNames(string filePathAndName, bool includeHeader = false);
+        List<SchemaTable> GetAllTableNames(bool downloadToLocal = false);
     }
 
     public class SchemaTable

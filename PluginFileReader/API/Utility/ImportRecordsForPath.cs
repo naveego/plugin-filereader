@@ -14,8 +14,10 @@ namespace PluginFileReader.API.Utility
         {
             Logger.Info($"Preparing to load file: {path} from {rootPath.FileReadMode}");
             var importExportFile = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName);
+            
             Logger.Info($"Begin loading file: {path} from {rootPath.FileReadMode}");
             var rowsWritten = importExportFile.ImportTable(path, rootPath, downloadToLocal, limit);
+            
             Logger.Info($"Loaded file {path} with {rowsWritten} rows from {rootPath.FileReadMode}");
 
             return rowsWritten;

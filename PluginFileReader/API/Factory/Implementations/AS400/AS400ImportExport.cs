@@ -259,7 +259,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             throw new NotImplementedException();
         }
 
-        public List<SchemaTable> GetAllTableNames(string filePathAndName, bool downloadToLocal = false)
+        public List<SchemaTable> GetAllTableNames(bool downloadToLocal = false)
         {
             return new List<SchemaTable>
             {

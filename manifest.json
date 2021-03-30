@@ -40,10 +40,19 @@
         "FtpUsername",
         "FtpPassword",
         "FtpSshKey",
+        "Indexes",
         "RootPaths"
       ],
       "FtpPassword": {
         "ui:widget": "password"
+      },
+      "Indexes":{
+        "items": {
+          "ui:order": [
+            "TableName",
+            "IndexColumns"
+          ]
+        }
       },
       "RootPaths": {
         "items": {
@@ -216,6 +225,33 @@
           "title": "SFTP SSH Key",
           "description": "Path to SSH private key for any root paths using SFTP.",
           "default": ""
+        },
+        "Indexes": {
+          "title": "Indexes",
+          "description": "Indexes to add to tables.",
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "properties": {
+              "TableName": {
+                "type": "string",
+                "title": "Table Name",
+                "description": "Name of table to apply index to.",
+                "default": ""
+              },
+              "IndexColumns": {
+                "title": "Index Column Names",
+                "description": "Columns to include in this index.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "default": ""
+                }
+              }
+            }
+          }
         },
         "RootPaths": {
           "title": "Root Paths",

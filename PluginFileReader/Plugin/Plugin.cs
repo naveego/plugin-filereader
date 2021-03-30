@@ -79,6 +79,7 @@ namespace PluginFileReader.Plugin
                 _server.Settings.ReconcileColumnsConfigurationFiles();
                 _server.Settings.ReconcileAS400FormatsFiles();
                 _server.Settings.InitializeFtpSettings();
+                _server.Settings.InitializeIndexes();
                 _server.Settings.Validate();
             }
             catch (Exception e)
@@ -374,16 +375,6 @@ namespace PluginFileReader.Plugin
 
                             break;
                     }
-
-                    // clean up local files pulled from remote
-                    // if (rootPath.FileReadMode != Constants.FileModeLocal)
-                    // {
-                    //     foreach (var file in files)
-                    //     {
-                    //         Logger.Info($"Source file is not local, deleting local file {file}");
-                    //         Utility.DeleteFileAtPath(file, rootPath, _server.Settings, false);
-                    //     }
-                    // }
                 }
             }
             catch (Exception e)

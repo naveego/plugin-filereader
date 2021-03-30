@@ -21,6 +21,7 @@ namespace PluginFileReader.Helper
         public string FtpUsername { get; set; }
         public string FtpPassword { get; set; }
         public string FtpSshKey { get; set; }
+        public List<IndexObject> Indexes { get; set; }
         public List<RootPathObject> RootPaths { get; set; }
 
         /// <summary>
@@ -732,6 +733,11 @@ namespace PluginFileReader.Helper
         {
             Utility.InitializeFtpSettings(GetFtpSettings());
         }
+        
+        public void InitializeIndexes()
+        {
+            Utility.Indexes = Indexes ?? new List<IndexObject>();
+        }
 
         private FtpSettings GetFtpSettings()
         {
@@ -776,6 +782,12 @@ namespace PluginFileReader.Helper
         {
             return string.IsNullOrWhiteSpace(Name) ? RootPath : Name;
         }
+    }
+
+    public class IndexObject
+    {
+        public string TableName { get; set; }
+        public List<string> IndexColumns { get; set; }
     }
 
     public class ModeSettings

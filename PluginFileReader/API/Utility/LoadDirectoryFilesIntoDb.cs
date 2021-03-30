@@ -24,6 +24,14 @@ namespace PluginFileReader.API.Utility
                 ImportRecordsForPath(factory, conn, rootPath, tableName, schemaName, path, downloadToLocal,
                     recordLimit);
             }
+
+            if (paths.Count > 0)
+            {
+                Logger.Info($"Adding indexes for {JsonConvert.SerializeObject(paths, Formatting.Indented)}");
+                var importExportFile = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName);
+                AddIndexesToTables(importExportFile, conn);
+                Logger.Info($"Added indexes for {JsonConvert.SerializeObject(paths, Formatting.Indented)}");
+            }
         }
     }
 }

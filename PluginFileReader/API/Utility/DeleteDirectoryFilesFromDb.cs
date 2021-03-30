@@ -15,7 +15,7 @@ namespace PluginFileReader.API.Utility
             try
             {
                 var tableNames = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName)
-                    .GetAllTableNames(paths.FirstOrDefault());
+                    .GetAllTableNames();
                 
                 foreach (var table in tableNames)
                 {

@@ -40,7 +40,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
             throw new System.NotImplementedException();
         }
 
-        public List<SchemaTable> GetAllTableNames(string filePathAndName, bool downloadToLocal = false)
+        public List<SchemaTable> GetAllTableNames(bool downloadToLocal = false)
         {
             return new List<SchemaTable>
             {
