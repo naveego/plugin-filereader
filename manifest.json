@@ -237,7 +237,7 @@
               "TableName": {
                 "type": "string",
                 "title": "Table Name",
-                "description": "Name of table to apply index to.",
+                "description": "Name of table to apply the index to.",
                 "default": ""
               },
               "IndexColumns": {
