@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using PluginFileReader.API.Factory;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
@@ -45,7 +46,7 @@ namespace PluginFileReader.API.Utility
 
                     var query = querySb.ToString();
 
-                    Logger.Debug($"Create table query: {query}");
+                    Logger.Debug($"Create index query: {query}");
 
                     var cmd = new SqlDatabaseCommand
                     {
@@ -55,6 +56,8 @@ namespace PluginFileReader.API.Utility
 
                     // execute create index command
                     cmd.ExecuteNonQuery();
+                    
+                    Logger.Info($"Added index {indexId} to {index.TableName} for columns {JsonConvert.SerializeObject(index.IndexColumns)}");
                 }   
             }
         }
