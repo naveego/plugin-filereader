@@ -57,6 +57,17 @@ namespace PluginFileReader.API.Utility
                     // execute create index command
                     cmd.ExecuteNonQuery();
                     
+                    // rebuild the index
+                    query = $"ReIndex {indexId}";
+                    
+                    cmd = new SqlDatabaseCommand
+                    {
+                        Connection = conn,
+                        CommandText = query
+                    };
+                    
+                    cmd.ExecuteNonQuery();
+                    
                     Logger.Info($"Added index {indexId} to {index.TableName} for columns {JsonConvert.SerializeObject(index.IndexColumns)}");
                 }   
             }
