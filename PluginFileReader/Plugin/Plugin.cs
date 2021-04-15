@@ -195,22 +195,39 @@ namespace PluginFileReader.Plugin
 
                 var files = _server.Settings.GetAllFilesByRootPath();
                 var conn = Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
-
+                
                 if (sampleSize == 0)
                 {
                     sampleSize = 5;
                 }
 
-                foreach (var rootPath in _server.Settings.RootPaths)
+                if (Discover.ShouldLoadAll(refreshSchemas.ToList()))
                 {
-                    var schemaName = Constants.SchemaName;
-                    var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
-                        ? new DirectoryInfo(rootPath.RootPath).Name
-                        : rootPath.Name;
+                    foreach (var rootPath in _server.Settings.RootPaths)
+                    {
+                        var schemaName = Constants.SchemaName;
+                        var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                            ? new DirectoryInfo(rootPath.RootPath).Name
+                            : rootPath.Name;
 
-                    Utility.LoadDirectoryFilesIntoDb(
-                        Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
-                        tableName, schemaName, files[rootPath.RootPathName()], false, sampleSize, 1);
+                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn,
+                            rootPath,
+                            tableName, schemaName, files[rootPath.RootPathName()], true);
+                    }
+                }
+                else
+                {
+                    foreach (var rootPath in _server.Settings.RootPaths)
+                    {
+                        var schemaName = Constants.SchemaName;
+                        var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                            ? new DirectoryInfo(rootPath.RootPath).Name
+                            : rootPath.Name;
+
+                        Utility.LoadDirectoryFilesIntoDb(
+                            Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
+                            tableName, schemaName, files[rootPath.RootPathName()], false, sampleSize, 1);
+                    }
                 }
 
                 var schemas = refreshSchemas.Select(s => Discover.GetSchemaForQuery(context, s, sampleSize))
@@ -247,7 +264,7 @@ namespace PluginFileReader.Plugin
             var limit = request.Limit;
             var limitFlag = request.Limit != 0;
             var jobId = request.JobId;
-            var recordsCount = 0;
+            long recordsCount = 0;
 
             Logger.SetLogPrefix(request.JobId);
             Logger.Info($"Publishing records for schema: {schema.Name}");

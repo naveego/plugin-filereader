@@ -641,8 +641,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-
-
+        
         [Fact]
         public async Task DiscoverSchemasRefreshTest()
         {
@@ -794,6 +793,70 @@ namespace PluginFileReaderTest.Plugin
                 Assert.IsType<RpcException>(e);
                 Assert.Contains("syntax error", e.Message);
             }
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task DiscoverSchemasCountRefreshTest()
+        {
+            // setup
+            PrepareTestEnvironment();
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var discoverAllRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+                SampleSize = 10
+            };
+
+            var request = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                ToRefresh =
+                {
+                    GetTestSchema($@"select count(*) as c from ReadDirectory")
+                },
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverAllRequest);
+            var response = client.DiscoverSchemas(request);
+
+            // assert
+            Assert.IsType<DiscoverSchemasResponse>(response);
+            Assert.Single(response.Schemas);
+            
+            var schema = response.Schemas[0];
+            Assert.Equal($"test", schema.Id);
+            Assert.Equal("test", schema.Name);
+            Assert.Equal($"select count(*) as c from ReadDirectory", schema.Query);
+            Assert.Equal(1, schema.Sample.Count);
+            Assert.Equal(1, schema.Properties.Count);
+            Assert.Equal("", schema.PublisherMetaJson);
+
+            var property = schema.Properties[0];
+            Assert.Equal("c", property.Id);
+            Assert.Equal("c", property.Name);
+            Assert.Equal("", property.Description);
+            Assert.Equal(PropertyType.String, property.Type);
+            Assert.False(property.IsKey);
+            Assert.True(property.IsNullable);
 
             // cleanup
             await channel.ShutdownAsync();
