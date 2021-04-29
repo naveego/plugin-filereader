@@ -16,7 +16,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         private SqlDatabaseConnection SQLDatabaseConnection { get; set; }
         private string TableName { get; set; }
         private string SchemaName { get; set; }
-        private char Delimiter { get; set; }
+        private string Delimiter { get; set; }
         private SqlDatabaseTransaction SQLDatabaseTransaction { get; set; } = null;
         private ConfigureReplicationFormData ReplicationFormData { get; set; } = new ConfigureReplicationFormData();
         

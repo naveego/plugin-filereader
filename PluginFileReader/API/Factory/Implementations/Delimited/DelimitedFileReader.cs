@@ -30,7 +30,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         public string[] Fields => _columns.ToArray();
 
         public string[] CommentLines => _comments.ToArray();
-        public char Delimiter { get; set; } = Convert.ToChar(",");
+        public string Delimiter { get; set; } = ",";
         public char QuoteChar { get; set; } = Convert.ToChar('"');
         public string CommentLineStartsWith { get; set; } = "";
 
@@ -115,7 +115,6 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 int rowsSkipped = 0;
                 while (!_isHeaderSkipped)
                 {
-                    //_Reader.ReadLine();
                     ReadNextLine();
                     rowsSkipped++;
                     if (rowsSkipped >= SkipLines)
@@ -128,9 +127,10 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
 
             // Read next line from the file
             if ((_currentLineText = ReadNextLine()) == null)
+            {
                 return false;
-
-
+            }
+            
             _isLineEmtpy = false;
 
             _currentPosition = 0;
@@ -156,39 +156,11 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             }
 
             // Parse line            
-            int columnCount = 0;
-            while (true)
+            var columns = _currentLineText.Split(Delimiter);
+
+            foreach (var column in columns)
             {
-                string column;
-
-                // Read next column
-                if (_currentPosition < _currentLineText.Length && _currentLineText[_currentPosition] == QuoteChar)
-                    column = ReadQuotedColumn();
-                else
-                    column = ReadUnquotedColumn();
-
-                if (_columnIndexes.Count > 0)
-                {
-                    if (_columnIndexes.Contains(columnCount))
-                    {
-                        _columns.Add(column);
-                        if (_columns.Count == _columnIndexes.Count)
-                            break;
-                    }
-                }
-                else
-                {
-                    _columns.Add(column);
-                }
-
-                columnCount++;
-
-                // Break if we reached the end of the line
-                if (_currentLineText == null || _currentPosition == _currentLineText.Length)
-                    break;
-                // Otherwise skip delimiter
-                if (_currentLineText[_currentPosition].Equals(Delimiter))
-                    _currentPosition++;
+                _columns.Add(column.Trim(QuoteChar));
             }
 
             // Indicate success

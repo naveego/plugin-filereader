@@ -13,7 +13,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         private readonly StreamWriter _writer;
         private readonly List<string> _fields = new List<string>();
 
-        public char Delimiter { get; set; } = ',';
+        public string Delimiter { get; set; } = ",";
         public char QuoteChar { get; set; } = '"';
         public string CommentLineStartsWith { get; set; } = "#";
         public int NumberOfFields { get; set; } = 0;

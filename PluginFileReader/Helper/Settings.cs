@@ -814,14 +814,14 @@ namespace PluginFileReader.Helper
         public bool HasHeader { get; set; }
         public string Delimiter { get; set; }
 
-        public char GetDelimiter()
+        public string GetDelimiter()
         {
             switch (Delimiter)
             {
                 case "\\t":
-                    return '\t';
+                    return "\t";
                 default:
-                    return char.Parse(Delimiter);
+                    return Delimiter;
             }
         }
     }

@@ -17,14 +17,14 @@ namespace PluginFileReader.DataContracts
         public string NullValue { get; set; }
         public string CustomHeader { get; set; }
         
-        public char GetDelimiter()
+        public string GetDelimiter()
         {
             switch (Delimiter)
             {
                 case "\\t":
-                    return '\t';
+                    return "\t";
                 default:
-                    return char.Parse(Delimiter);
+                    return Delimiter;
             }
         }
 
