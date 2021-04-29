@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentFTP;
+using Naveego.Sdk.Logging;
 using Newtonsoft.Json;
 using PluginFileReader.API.Utility;
 using PluginFileReader.DataContracts;

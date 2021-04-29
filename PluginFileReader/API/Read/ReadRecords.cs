@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Grpc.Core;
+using Naveego.Sdk.Logging;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginFileReader.Helper;

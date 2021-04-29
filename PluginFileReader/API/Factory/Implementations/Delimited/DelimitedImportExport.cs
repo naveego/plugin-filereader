@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using Naveego.Sdk.Logging;
 using Newtonsoft.Json;
 using PluginFileReader.API.Utility;
 using PluginFileReader.DataContracts;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic;
+using Naveego.Sdk.Logging;
 using Newtonsoft.Json;
 using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;

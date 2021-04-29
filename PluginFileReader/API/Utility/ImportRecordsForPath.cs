@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Naveego.Sdk.Logging;
 using PluginFileReader.API.Factory;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;

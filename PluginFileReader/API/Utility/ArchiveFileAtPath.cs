@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using Naveego.Sdk.Logging;
 using PluginFileReader.Helper;
 
 namespace PluginFileReader.API.Utility

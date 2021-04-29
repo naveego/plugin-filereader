@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Naveego.Sdk.Logging;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
