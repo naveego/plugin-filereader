@@ -205,7 +205,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 // cmd.CommandText = $"DROP TABLE IF EXISTS [{SchemaName}].[{TableName}]";
                 // cmd.ExecuteNonQuery();
                 
-                cmd.CommandText = $"CREATE TABLE IF NOT EXISTS [{SchemaName}].[{TableName}] (";
+                cmd.CommandText = $"CREATE TABLE IF NOT EXISTS [{SchemaName}].[{TableName}] ([{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT,";
                 foreach (var columnName in headerColumns)
                 {
                     cmd.CommandText +=
@@ -221,32 +221,34 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 var dt = SQLDatabaseConnection.GetSchema("Columns", new string[] {$"[{SchemaName}].[{TableName}]"});
                 
                 // Sanity check if number of columns in CSV and table are equal
-                if (dt.Rows.Count != headerColumns.Count)
+                if (dt.Rows.Count - 1 != headerColumns.Count)
                     throw new Exception("Number of columns in CSV should be same as number of columns in the table");
 
                 // Start of code block to generate INSERT statement.
-                cmd.CommandText = $"INSERT INTO {SchemaName}.[{TableName}] VALUES (";
-                int paramCount = 0;
+                var querySb = new StringBuilder($"INSERT INTO [{SchemaName}].[{TableName}] (");
                 foreach (string columnName in headerColumns)
                 {
-                    paramCount++;
-                    cmd.CommandText +=
-                        $"@param{paramCount},"; //The DataType none is used since we do not know if all rows have same datatype                        
+                    querySb.Append($"[{columnName}],");
                 }
-
-                cmd.CommandText = cmd.CommandText.Substring(0, cmd.CommandText.Length - 1); //Remove the last comma
-                cmd.CommandText += ");";
                 
-                Logger.Debug($"Insert Row SQL: {cmd.CommandText}");
-
-                // Add parameters
-                paramCount = 0;
+                querySb.Length--;
+                querySb.Append(") VALUES (");
+                
                 foreach (string columnName in headerColumns)
                 {
-                    paramCount++;
-                    cmd.Parameters.Add(
-                        $"@param{paramCount}"); //The DataType none is used since we do not know if all rows have same datatype                        
+                    var paramName = $"@param{headerColumns.IndexOf(columnName)}";
+                    querySb.Append($"{paramName},");
+                    cmd.Parameters.Add(paramName);
                 }
+
+                querySb.Length--;
+                querySb.Append(");");
+
+                var query = querySb.ToString();
+            
+                Logger.Debug($"Insert record query: {query}");
+
+                cmd.CommandText = query;
 
                 // End of code block to generate INSERT statement.
 
@@ -272,12 +274,12 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                             int csvColumnCount = 0;
                             foreach (string fieldValue in DelimitedReader.Fields)
                             {
-                                csvColumnCount++;
                                 if (cmd.Parameters.IndexOf("@param" + csvColumnCount) != -1)
                                 {
                                     cmd.Parameters["@param" + csvColumnCount].Value =
                                         fieldValue; //Assign File Column to parameter
                                 }
+                                csvColumnCount++;
                             }
 
                             cmd.ExecuteNonQuery();
@@ -301,6 +303,16 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                         throw;
                     }
                 }
+                
+                // add unique key to table
+                // try
+                // {
+                //     cmd.CommandText = $"ALTER TABLE [{SchemaName}].[{TableName}] ADD AUTO_ROW_NUM BIGINT AUTO_INCREMENT PRIMARY KEY;";
+                // }
+                // catch (Exception e)
+                // {
+                //     Logger.Debug(e.Message);
+                // }
             }
 
             return rowCount;

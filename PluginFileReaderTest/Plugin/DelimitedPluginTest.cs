@@ -337,10 +337,10 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal("ReadDirectory", schema.Name);
             Assert.Equal($"", schema.Query);
             Assert.Equal(10, schema.Sample.Count);
-            Assert.Equal(6, schema.Properties.Count);
+            Assert.Equal(7, schema.Properties.Count);
             Assert.Equal("", schema.PublisherMetaJson);
 
-            var property = schema.Properties[0];
+            var property = schema.Properties[1];
             Assert.Equal("id", property.Id);
             Assert.Equal("id", property.Name);
             Assert.Equal("", property.Description);
@@ -395,10 +395,10 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal("ReadDirectory", schema.Name);
             Assert.Equal($"", schema.Query);
             Assert.Equal(10, schema.Sample.Count);
-            Assert.Equal(6, schema.Properties.Count);
+            Assert.Equal(7, schema.Properties.Count);
             Assert.Equal("", schema.PublisherMetaJson);
 
-            var property = schema.Properties[0];
+            var property = schema.Properties[1];
             Assert.Equal("id", property.Id);
             Assert.Equal("id", property.Name);
             Assert.Equal("", property.Description);
@@ -488,10 +488,10 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal("ReadDirectory", schema.Name);
             Assert.Equal($"", schema.Query);
             Assert.Equal(5, schema.Sample.Count);
-            Assert.Equal(6, schema.Properties.Count);
+            Assert.Equal(7, schema.Properties.Count);
             Assert.Equal("", schema.PublisherMetaJson);
 
-            var property = schema.Properties[0];
+            var property = schema.Properties[1];
             Assert.Equal("id", property.Id);
             Assert.Equal("id", property.Name);
             Assert.Equal("", property.Description);
@@ -504,10 +504,10 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal("ReadDirectoryDifferent", schema2.Name);
             Assert.Equal($"", schema2.Query);
             Assert.Equal(5, schema2.Sample.Count);
-            Assert.Equal(4, schema2.Properties.Count);
+            Assert.Equal(5, schema2.Properties.Count);
             Assert.Equal("", schema.PublisherMetaJson);
 
-            var property2 = schema2.Properties[0];
+            var property2 = schema2.Properties[1];
             Assert.Equal("id", property2.Id);
             Assert.Equal("id", property2.Name);
             Assert.Equal("", property2.Description);
@@ -667,11 +667,11 @@ namespace PluginFileReaderTest.Plugin
             Assert.IsType<DiscoverSchemasResponse>(response);
             Assert.Single(response.Schemas);
 
-            var property = response.Schemas[0].Properties[0];
+            var property = response.Schemas[0].Properties[1];
             Assert.Equal("id", property.Id);
             Assert.Equal("id", property.Name);
 
-            var propertyDupe = response.Schemas[0].Properties[3];
+            var propertyDupe = response.Schemas[0].Properties[4];
             Assert.Equal("id_DUPLICATE_4", propertyDupe.Id);
             Assert.Equal("id_DUPLICATE_4", propertyDupe.Name);
 
@@ -732,10 +732,10 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal("ReadDirectory", schema.Name);
             Assert.Equal($"", schema.Query);
             Assert.Equal(5, schema.Sample.Count);
-            Assert.Equal(6, schema.Properties.Count);
+            Assert.Equal(7, schema.Properties.Count);
             Assert.Equal("", schema.PublisherMetaJson);
 
-            var property = schema.Properties[0];
+            var property = schema.Properties[1];
             Assert.Equal("id", property.Id);
             Assert.Equal("id", property.Name);
             Assert.Equal("", property.Description);

@@ -6,6 +6,8 @@ namespace PluginFileReader.API.Utility
     public static class Constants
     {
         public static string SchemaName = "dbo";
+
+        public static string AutoRowNum = "AUTO_ROW_NUM";
         
         public static string DbFolder = "db";
         public static string DbFile = "plugin-filereader.db";

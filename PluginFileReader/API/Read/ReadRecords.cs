@@ -81,7 +81,7 @@ namespace PluginFileReader.API.Read
                             recordMap[property.Id] = "";
                         }
                     }
-                    
+
                     var record = new Record
                     {
                         Action = Record.Types.Action.Upsert,

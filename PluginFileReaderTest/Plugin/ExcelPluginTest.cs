@@ -277,9 +277,9 @@ namespace PluginFileReaderTest.Plugin
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
-            Assert.Equal(10, schema.Properties.Count);
+            Assert.Equal(11, schema.Properties.Count);
 
-            var property = schema.Properties[0];
+            var property = schema.Properties[1];
             Assert.Equal("HCPCS Code", property.Id);
             Assert.Equal("HCPCS Code", property.Name);
             Assert.Equal("", property.Description);
@@ -339,9 +339,9 @@ namespace PluginFileReaderTest.Plugin
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(5, schema.Sample.Count);
-            Assert.Equal(10, schema.Properties.Count);
+            Assert.Equal(11, schema.Properties.Count);
 
-            var property = schema.Properties[0];
+            var property = schema.Properties[1];
             Assert.Equal("HCPCS Code", property.Id);
             Assert.Equal("HCPCS Code", property.Name);
             Assert.Equal("", property.Description);
@@ -394,9 +394,9 @@ namespace PluginFileReaderTest.Plugin
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
-            Assert.Equal(5, schema.Properties.Count);
+            Assert.Equal(6, schema.Properties.Count);
 
-            var property = schema.Properties[0];
+            var property = schema.Properties[1];
             Assert.Equal("HCPCS Code", property.Id);
             Assert.Equal("HCPCS Code", property.Name);
             Assert.Equal("", property.Description);

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using ExcelDataReader;
 using Naveego.Sdk.Logging;
+using PluginFileReader.API.Utility;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -157,7 +158,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                     }
 
                     // setup db table
-                    var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (");
+                    var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] ([{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT,");
 
                     foreach (var column in headerColumns)
                     {

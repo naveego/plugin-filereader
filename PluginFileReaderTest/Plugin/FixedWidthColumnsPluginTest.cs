@@ -505,9 +505,9 @@ namespace PluginFileReaderTest.Plugin
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
-            Assert.Equal(6, schema.Properties.Count);
+            Assert.Equal(7, schema.Properties.Count);
 
-            var property = schema.Properties[0];
+            var property = schema.Properties[1];
             Assert.Equal("id", property.Id);
             Assert.Equal("id", property.Name);
             Assert.Equal("", property.Description);
@@ -561,9 +561,9 @@ namespace PluginFileReaderTest.Plugin
             // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
             // Assert.Equal(1000, schema.Count.Value);
             Assert.Equal(10, schema.Sample.Count);
-            Assert.Equal(6, schema.Properties.Count);
+            Assert.Equal(7, schema.Properties.Count);
 
-            var property = schema.Properties[0];
+            var property = schema.Properties[1];
             Assert.Equal("id", property.Id);
             Assert.Equal("id", property.Name);
             Assert.Equal("", property.Description);
@@ -578,9 +578,9 @@ namespace PluginFileReaderTest.Plugin
             // Assert.Equal(Count.Types.Kind.Exact, schema2.Count.Kind);
             // Assert.Equal(1000, schema2.Count.Value);
             Assert.Equal(10, schema2.Sample.Count);
-            Assert.Equal(3, schema2.Properties.Count);
+            Assert.Equal(4, schema2.Properties.Count);
 
-            var property2 = schema2.Properties[0];
+            var property2 = schema2.Properties[1];
             Assert.Equal("id", property2.Id);
             Assert.Equal("id", property2.Name);
             Assert.Equal("", property2.Description);

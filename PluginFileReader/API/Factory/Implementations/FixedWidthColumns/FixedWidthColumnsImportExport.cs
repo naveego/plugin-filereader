@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Naveego.Sdk.Logging;
+using PluginFileReader.API.Utility;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -49,31 +50,16 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
         public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = long.MaxValue)
         {
             // setup db table
-            var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (");
-            var primaryKeySb = new StringBuilder("PRIMARY KEY (");
-            var hasPrimaryKey = false;
+            var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] ([{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT,");
+
             foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
             {
                 querySb.Append(
                     $"[{column.ColumnName}] VARCHAR({int.MaxValue}){(column.IsKey ? " NOT NULL UNIQUE" : "")},");
-                if (column.IsKey)
-                {
-                    primaryKeySb.Append($"[{column.ColumnName}],");
-                    hasPrimaryKey = true;
-                }
             }
 
-            if (hasPrimaryKey)
-            {
-                primaryKeySb.Length--;
-                primaryKeySb.Append(")");
-                querySb.Append($"{primaryKeySb});");
-            }
-            else
-            {
-                querySb.Length--;
-                querySb.Append(");");
-            }
+            querySb.Length--;
+            querySb.Append(");");
 
             var query = querySb.ToString();
             
