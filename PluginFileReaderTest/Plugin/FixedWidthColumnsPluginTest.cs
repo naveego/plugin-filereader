@@ -63,7 +63,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false)
+            string filter = null, bool multiRoot = false, bool autoRowGen = true)
         {
             return new Settings
             {
@@ -79,49 +79,56 @@ namespace PluginFileReaderTest.Plugin
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
-                            Columns = new List<Column>
+                            ModeSettings = new ModeSettings
                             {
-                                new Column()
+                                FixedWidthSettings = new FixedWidthSettings
                                 {
-                                    ColumnName = "id",
-                                    ColumnStart = 0,
-                                    ColumnEnd = 40,
-                                    IsKey = true
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "data1",
-                                    ColumnStart = 44,
-                                    ColumnEnd = 46,
-                                    IsKey = false
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "date1",
-                                    ColumnStart = 47,
-                                    ColumnEnd = 56,
-                                    IsKey = false
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "date2",
-                                    ColumnStart = 57,
-                                    ColumnEnd = 66,
-                                    IsKey = false
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "data2",
-                                    ColumnStart = 67,
-                                    ColumnEnd = 76,
-                                    IsKey = false
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "data3",
-                                    ColumnStart = 276,
-                                    ColumnEnd = 297,
-                                    IsKey = false
+                                    AutoGenRowNumber = autoRowGen,
+                                    Columns = new List<Column>
+                                    {
+                                        new Column()
+                                        {
+                                            ColumnName = "id",
+                                            ColumnStart = 0,
+                                            ColumnEnd = 40,
+                                            IsKey = true
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "data1",
+                                            ColumnStart = 44,
+                                            ColumnEnd = 46,
+                                            IsKey = false
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "date1",
+                                            ColumnStart = 47,
+                                            ColumnEnd = 56,
+                                            IsKey = false
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "date2",
+                                            ColumnStart = 57,
+                                            ColumnEnd = 66,
+                                            IsKey = false
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "data2",
+                                            ColumnStart = 67,
+                                            ColumnEnd = 76,
+                                            IsKey = false
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "data3",
+                                            ColumnStart = 276,
+                                            ColumnEnd = 297,
+                                            IsKey = false
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -134,28 +141,35 @@ namespace PluginFileReaderTest.Plugin
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
-                            Columns = new List<Column>
+                            ModeSettings = new ModeSettings
                             {
-                                new Column()
+                                FixedWidthSettings = new FixedWidthSettings
                                 {
-                                    ColumnName = "id",
-                                    ColumnStart = 0,
-                                    ColumnEnd = 34,
-                                    IsKey = true
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "data1",
-                                    ColumnStart = 36,
-                                    ColumnEnd = 46,
-                                    IsKey = false
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "date1",
-                                    ColumnStart = 47,
-                                    ColumnEnd = 56,
-                                    IsKey = false
+                                    AutoGenRowNumber = autoRowGen,
+                                    Columns = new List<Column>
+                                    {
+                                        new Column()
+                                        {
+                                            ColumnName = "id",
+                                            ColumnStart = 0,
+                                            ColumnEnd = 34,
+                                            IsKey = true
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "data1",
+                                            ColumnStart = 36,
+                                            ColumnEnd = 46,
+                                            IsKey = false
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "date1",
+                                            ColumnStart = 47,
+                                            ColumnEnd = 56,
+                                            IsKey = false
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -171,52 +185,59 @@ namespace PluginFileReaderTest.Plugin
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = ArchivePath,
-                            Columns = new List<Column>
+                            ModeSettings = new ModeSettings
                             {
-                                new Column()
+                                FixedWidthSettings = new FixedWidthSettings
                                 {
-                                    ColumnName = "id",
-                                    ColumnStart = 0,
-                                    ColumnEnd = 43,
-                                    IsKey = true,
-                                    TrimWhitespace = true
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "data1",
-                                    ColumnStart = 44,
-                                    ColumnEnd = 45,
-                                    IsKey = false
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "date1",
-                                    ColumnStart = 46,
-                                    ColumnEnd = 55,
-                                    IsKey = false
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "date2",
-                                    ColumnStart = 56,
-                                    ColumnEnd = 65,
-                                    IsKey = false
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "data2",
-                                    ColumnStart = 66,
-                                    ColumnEnd = 79,
-                                    IsKey = false,
-                                    TrimWhitespace = true
-                                },
-                                new Column()
-                                {
-                                    ColumnName = "data3",
-                                    ColumnStart = 293,
-                                    ColumnEnd = 317,
-                                    IsKey = false,
-                                    TrimWhitespace = false
+                                    AutoGenRowNumber = autoRowGen,
+                                    Columns = new List<Column>
+                                    {
+                                        new Column()
+                                        {
+                                            ColumnName = "id",
+                                            ColumnStart = 0,
+                                            ColumnEnd = 43,
+                                            IsKey = true,
+                                            TrimWhitespace = true
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "data1",
+                                            ColumnStart = 44,
+                                            ColumnEnd = 45,
+                                            IsKey = false
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "date1",
+                                            ColumnStart = 46,
+                                            ColumnEnd = 55,
+                                            IsKey = false
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "date2",
+                                            ColumnStart = 56,
+                                            ColumnEnd = 65,
+                                            IsKey = false
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "data2",
+                                            ColumnStart = 66,
+                                            ColumnEnd = 79,
+                                            IsKey = false,
+                                            TrimWhitespace = true
+                                        },
+                                        new Column()
+                                        {
+                                            ColumnName = "data3",
+                                            ColumnStart = 293,
+                                            ColumnEnd = 317,
+                                            IsKey = false,
+                                            TrimWhitespace = false
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -225,7 +246,8 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false, bool fromConfigFile = false, bool fromGlobalConfigFile = false, bool withName = false)
+            string filter = null, bool multiRoot = false, bool fromConfigFile = false,
+            bool fromGlobalConfigFile = false, bool withName = false)
         {
             var settings = GetSettings(cleanupAction, delimiter, filter, multiRoot);
 
@@ -340,7 +362,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ConnectConfigurationFileTest()
         {
@@ -371,7 +393,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ConnectGlobalConfigurationFileTest()
         {
@@ -402,7 +424,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ConnectGlobalConfigurationFileWithNameTest()
         {
@@ -433,7 +455,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ConnectGlobalAndLocalConfigurationFileTest()
         {
@@ -464,7 +486,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasAllTest()
         {
@@ -519,7 +541,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasMultipleAllTest()
         {
@@ -592,7 +614,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task DiscoverSchemasRefreshTest()
         {
@@ -637,7 +659,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamTest()
         {
@@ -682,7 +704,7 @@ namespace PluginFileReaderTest.Plugin
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(schemaRequest);
             request.Schema = schemasResponse.Schemas[0];
-            
+
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
             var records = new List<Record>();
@@ -707,7 +729,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamLimitTest()
         {
@@ -731,7 +753,7 @@ namespace PluginFileReaderTest.Plugin
             {
                 Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
-            
+
             var settings = GetSettings();
             var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
             schema.PublisherMetaJson = JsonConvert.SerializeObject(new SchemaPublisherMetaJson

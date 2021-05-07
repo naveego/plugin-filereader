@@ -156,6 +156,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
 
         public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = long.MaxValue)
         {
+            var autoGenRow = rootPath.ModeSettings.DelimitedSettings.AutoGenRowNumber;
             var rowCount = 0;
             List<string> headerColumns = new List<string>();
 
@@ -205,7 +206,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 // cmd.CommandText = $"DROP TABLE IF EXISTS [{SchemaName}].[{TableName}]";
                 // cmd.ExecuteNonQuery();
                 
-                cmd.CommandText = $"CREATE TABLE IF NOT EXISTS [{SchemaName}].[{TableName}] ([{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT,";
+                cmd.CommandText = $"CREATE TABLE IF NOT EXISTS [{SchemaName}].[{TableName}] ({(autoGenRow ? $"[{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT," : "")}";
                 foreach (var columnName in headerColumns)
                 {
                     cmd.CommandText +=
@@ -221,7 +222,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 var dt = SQLDatabaseConnection.GetSchema("Columns", new string[] {$"[{SchemaName}].[{TableName}]"});
                 
                 // Sanity check if number of columns in CSV and table are equal
-                if (dt.Rows.Count - 1 != headerColumns.Count)
+                if ((autoGenRow && dt.Rows.Count - 1 != headerColumns.Count) || (!autoGenRow && dt.Rows.Count != headerColumns.Count))
                     throw new Exception("Number of columns in CSV should be same as number of columns in the table");
 
                 // Start of code block to generate INSERT statement.

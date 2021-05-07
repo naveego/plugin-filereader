@@ -74,7 +74,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, string excelColumns = null, List<ExcelCell> excelCells = null, bool sftp = false)
+            string filter = null, bool multiRoot = false, string excelColumns = null, List<ExcelCell> excelCells = null, bool sftp = false, bool autoGenRow = true)
         {
             return new Settings
             {
@@ -96,7 +96,17 @@ namespace PluginFileReaderTest.Plugin
                             ArchivePath = ArchivePath,
                             ExcelColumns = excelColumns,
                             ExcelCells = excelCells,
-                            FileReadMode = sftp ? Constants.FileModeSftp : Constants.FileModeLocal
+                            FileReadMode = sftp ? Constants.FileModeSftp : Constants.FileModeLocal,
+                            ModeSettings = new ModeSettings
+                            {
+                                ExcelModeSettings = new ExcelModeSettings
+                                {
+                                    AutoGenRowNumber = autoGenRow,
+                                    HasHeader = true,
+                                    ExcelCells = excelCells,
+                                    ExcelColumns = excelColumns
+                                }
+                            }
                         },
                         new RootPathObject
                         {
@@ -109,7 +119,17 @@ namespace PluginFileReaderTest.Plugin
                             ArchivePath = ArchivePath,
                             ExcelColumns = excelColumns,
                             ExcelCells = excelCells,
-                            FileReadMode = sftp ? Constants.FileModeSftp : Constants.FileModeLocal
+                            FileReadMode = sftp ? Constants.FileModeSftp : Constants.FileModeLocal,
+                            ModeSettings = new ModeSettings
+                            {
+                                ExcelModeSettings = new ExcelModeSettings
+                                {
+                                    AutoGenRowNumber = autoGenRow,
+                                    HasHeader = true,
+                                    ExcelCells = excelCells,
+                                    ExcelColumns = excelColumns
+                                }
+                            }
                         }
                     }
                     : new List<RootPathObject>
@@ -125,7 +145,17 @@ namespace PluginFileReaderTest.Plugin
                             ArchivePath = ArchivePath,
                             ExcelColumns = excelColumns,
                             ExcelCells = excelCells,
-                            FileReadMode = sftp ? Constants.FileModeSftp : Constants.FileModeLocal
+                            FileReadMode = sftp ? Constants.FileModeSftp : Constants.FileModeLocal,
+                            ModeSettings = new ModeSettings
+                            {
+                                ExcelModeSettings = new ExcelModeSettings
+                                {
+                                    AutoGenRowNumber = autoGenRow,
+                                    HasHeader = true,
+                                    ExcelCells = excelCells,
+                                    ExcelColumns = excelColumns
+                                }
+                            }
                         }
                     }
             };

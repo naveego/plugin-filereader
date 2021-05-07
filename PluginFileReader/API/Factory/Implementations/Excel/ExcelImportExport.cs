@@ -58,6 +58,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
 
         public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = -1)
         {
+            var autoGenRow = rootPath.ModeSettings.ExcelModeSettings.AutoGenRowNumber;
             var rowsRead = 0;
             var rowsSkipped = 0;
             List<string> headerColumns = new List<string>();
@@ -158,7 +159,7 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                     }
 
                     // setup db table
-                    var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] ([{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT,");
+                    var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] ({(autoGenRow ? $"[{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT," : "")}");
 
                     foreach (var column in headerColumns)
                     {

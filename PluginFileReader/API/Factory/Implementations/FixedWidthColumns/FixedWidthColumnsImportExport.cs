@@ -49,8 +49,10 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
 
         public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = long.MaxValue)
         {
+            var autoGenRow = rootPath.ModeSettings.FixedWidthSettings.AutoGenRowNumber;
+            
             // setup db table
-            var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] ([{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT,");
+            var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] ({(autoGenRow ? $"[{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT," : "")}");
 
             foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
             {

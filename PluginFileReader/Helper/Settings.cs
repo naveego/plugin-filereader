@@ -811,6 +811,7 @@ namespace PluginFileReader.Helper
 
     public class DelimitedSettings
     {
+        public bool AutoGenRowNumber { get; set; }
         public bool HasHeader { get; set; }
         public string Delimiter { get; set; }
 
@@ -828,12 +829,14 @@ namespace PluginFileReader.Helper
 
     public class FixedWidthSettings
     {
+        public bool AutoGenRowNumber { get; set; }
         public string ColumnsConfigurationFile { get; set; }
         public List<Column> Columns { get; set; }
     }
 
     public class ExcelModeSettings
     {
+        public bool AutoGenRowNumber { get; set; }
         public bool HasHeader { get; set; }
         public string ExcelColumns { get; set; }
         public List<ExcelCell> ExcelCells { get; set; }

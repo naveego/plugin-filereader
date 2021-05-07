@@ -75,7 +75,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false, bool sftp = false)
+            string filter = null, bool multiRoot = false, bool sftp = false, bool autoGenRow = true)
         {
             return new Settings
             {
@@ -106,7 +106,16 @@ namespace PluginFileReaderTest.Plugin
                             Delimiter = delimiter,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = sftp ? "/CSV/Archive" : ArchivePath
+                            ArchivePath = sftp ? "/CSV/Archive" : ArchivePath,
+                            ModeSettings = new ModeSettings
+                            {
+                                DelimitedSettings = new DelimitedSettings
+                                {
+                                    AutoGenRowNumber = autoGenRow,
+                                    HasHeader = true,
+                                    Delimiter = delimiter
+                                }
+                            }
                         },
                         new RootPathObject
                         {
@@ -117,7 +126,16 @@ namespace PluginFileReaderTest.Plugin
                             Delimiter = delimiter,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = sftp ? "/CSV/Archive" : ArchivePath
+                            ArchivePath = sftp ? "/CSV/Archive" : ArchivePath,
+                            ModeSettings = new ModeSettings
+                            {
+                                DelimitedSettings = new DelimitedSettings
+                                {
+                                    AutoGenRowNumber = autoGenRow,
+                                    HasHeader = true,
+                                    Delimiter = delimiter
+                                }
+                            }
                         }
                     }
                     : new List<RootPathObject>
@@ -131,7 +149,16 @@ namespace PluginFileReaderTest.Plugin
                             FileReadMode = sftp ? "SFTP" : "Local",
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = sftp ? "/CSV/Archive" : ArchivePath
+                            ArchivePath = sftp ? "/CSV/Archive" : ArchivePath,
+                            ModeSettings = new ModeSettings
+                            {
+                                DelimitedSettings = new DelimitedSettings
+                                {
+                                    AutoGenRowNumber = autoGenRow,
+                                    HasHeader = true,
+                                    Delimiter = delimiter
+                                }
+                            }
                         }
                     }
             };

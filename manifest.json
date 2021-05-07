@@ -71,11 +71,13 @@
             "DelimitedSettings": {
               "ui:order": [
                 "Delimiter",
-                "HasHeader"
+                "HasHeader",
+                "AutoGenRowNumber"
               ]
             },
             "FixedWidthSettings": {
               "ui:order": [
+                "AutoGenRowNumber",
                 "ColumnsConfigurationFile",
                 "Columns"
               ],
@@ -94,6 +96,7 @@
             "ExcelModeSettings": {
               "ui:order": [
                 "HasHeader",
+                "AutoGenRowNumber",
                 "ExcelColumns",
                 "ExcelCells"
               ],
@@ -372,6 +375,15 @@
                                 "examples": [
                                   true
                                 ]
+                              },
+                              "AutoGenRowNumber": {
+                                "type": "boolean",
+                                "title": "Auto Generate Row Number",
+                                "description": "Automatically generate a row number property (AUTO_ROW_NUM)",
+                                "default": false,
+                                "examples": [
+                                  true
+                                ]
                               }
                             }
                           }
@@ -454,6 +466,15 @@
                                 "title": "Columns Configuration File",
                                 "description": "Path to the columns configuration file for fixed width files (optional)"
                               },
+                              "AutoGenRowNumber": {
+                                "type": "boolean",
+                                "title": "Auto Generate Row Number",
+                                "description": "Automatically generate a row number property (AUTO_ROW_NUM)",
+                                "default": false,
+                                "examples": [
+                                  true
+                                ]
+                              },
                               "Columns": {
                                 "readOnly": false,
                                 "type": "array",
@@ -522,6 +543,15 @@
                                 "type": "boolean",
                                 "title": "Has Header",
                                 "description": "Does the file have a header row?",
+                                "default": false,
+                                "examples": [
+                                  true
+                                ]
+                              },
+                              "AutoGenRowNumber": {
+                                "type": "boolean",
+                                "title": "Auto Generate Row Number",
+                                "description": "Automatically generate a row number property (AUTO_ROW_NUM)",
                                 "default": false,
                                 "examples": [
                                   true
