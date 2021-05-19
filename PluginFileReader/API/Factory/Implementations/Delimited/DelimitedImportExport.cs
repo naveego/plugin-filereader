@@ -203,9 +203,6 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 if (SQLDatabaseTransaction != null)
                     cmd.Transaction = SQLDatabaseTransaction;
 
-                // cmd.CommandText = $"DROP TABLE IF EXISTS [{SchemaName}].[{TableName}]";
-                // cmd.ExecuteNonQuery();
-                
                 cmd.CommandText = $"CREATE TABLE IF NOT EXISTS [{SchemaName}].[{TableName}] ({(autoGenRow ? $"[{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT," : "")}";
                 foreach (var columnName in headerColumns)
                 {
@@ -304,16 +301,6 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                         throw;
                     }
                 }
-                
-                // add unique key to table
-                // try
-                // {
-                //     cmd.CommandText = $"ALTER TABLE [{SchemaName}].[{TableName}] ADD AUTO_ROW_NUM BIGINT AUTO_INCREMENT PRIMARY KEY;";
-                // }
-                // catch (Exception e)
-                // {
-                //     Logger.Debug(e.Message);
-                // }
             }
 
             return rowCount;

@@ -158,9 +158,20 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             // Parse line            
             var columns = _currentLineText.Split(Delimiter);
 
+            var previous = "";
             foreach (var column in columns)
             {
-                _columns.Add(column.Trim(QuoteChar));
+                if (previous.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar))
+                {
+                    _columns.Remove(previous.Trim(QuoteChar));
+                    _columns.Add($"{previous}{column}".Trim(QuoteChar));
+                }
+                else
+                {
+                    _columns.Add(column.Trim(QuoteChar));
+                }
+                
+                previous = column;
             }
 
             // Indicate success
