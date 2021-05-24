@@ -279,7 +279,8 @@ namespace PluginFileReader.Helper
             var rootPaths = new List<RootPathObject>();
             foreach (var selectSplit in fromSplits.Skip(1))
             {
-                var selectTableSplit = selectSplit.Split(' ').Skip(1).First();
+                // var selectTableSplit = selectSplit.Split(' ').Skip(1).First();
+                var selectTableSplit = selectSplit.Trim().Split('.').Skip(1).First();
 
                 if (selectTableSplit.Contains('\n'))
                 {
