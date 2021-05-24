@@ -287,7 +287,7 @@ namespace PluginFileReader.Plugin
                         : rootPath.Name;
                     if (files.Count > 0)
                     {
-                        // load file and then stream file one by one
+                        // load file and then stream files one by one
                         foreach (var file in files)
                         {
                             Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn,
