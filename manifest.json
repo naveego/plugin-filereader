@@ -490,13 +490,13 @@
                                 "default": false,
                                 "examples": [true]
                               }
-                            }
+                            },
+                            "required":[
+                              "TargetFileMode",
+                              "TargetDirectoryPath"
+                            ]
                           }
-                        },
-                        "required":[
-                          "TargetFileMode",
-                          "TargetDirectoryPath"
-                        ]
+                        }
                       }
                     }
                   },
