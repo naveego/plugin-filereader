@@ -45,5 +45,36 @@ namespace PluginFileReader.API.Utility
 
             return client;
         }
+        
+        public static SftpClient GetSftpClient(FtpSettings ftpSettings)
+        {
+            SftpClient client = null;
+            
+            if (!string.IsNullOrWhiteSpace(ftpSettings.FtpPassword))
+            {
+                client = new SftpClient(ftpSettings.FtpHostname, ftpSettings.FtpPort.Value, ftpSettings.FtpUsername, ftpSettings.FtpPassword);
+            }
+
+            if (!string.IsNullOrWhiteSpace(ftpSettings.FtpSshKey))
+            {
+                var privateKeyFiles = new []
+                {
+                    new PrivateKeyFile(ftpSettings.FtpSshKey)
+                };
+
+                client = new SftpClient(ftpSettings.FtpHostname, ftpSettings.FtpPort.Value, ftpSettings.FtpUsername, privateKeyFiles);
+            }
+
+            if (client != null)
+            {
+                client.Connect();
+            }
+            else
+            {
+                throw new Exception("SFTP Client could not be initialized.");
+            }
+
+            return client;
+        }
     }
 }

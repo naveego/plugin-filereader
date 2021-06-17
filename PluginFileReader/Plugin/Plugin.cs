@@ -380,7 +380,7 @@ namespace PluginFileReader.Plugin
                             foreach (var file in files)
                             {
                                 Logger.Info($"Deleting file {file}");
-                                Utility.DeleteFileAtPath(file, rootPath, _server.Settings, true);
+                                Utility.DeleteFileAtPath(file, rootPath, true);
                             }
 
                             break;
@@ -388,7 +388,7 @@ namespace PluginFileReader.Plugin
                             foreach (var file in files)
                             {
                                 Logger.Info($"Archiving file {file} to {rootPath.ArchivePath}");
-                                Utility.ArchiveFileAtPath(file, rootPath, _server.Settings);
+                                Utility.ArchiveFileAtPath(file, rootPath);
                             }
 
                             break;

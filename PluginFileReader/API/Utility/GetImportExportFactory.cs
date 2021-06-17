@@ -2,6 +2,7 @@ using PluginFileReader.API.Factory;
 using PluginFileReader.API.Factory.Implementations.AS400;
 using PluginFileReader.API.Factory.Implementations.Delimited;
 using PluginFileReader.API.Factory.Implementations.Excel;
+using PluginFileReader.API.Factory.Implementations.FileCopy;
 using PluginFileReader.API.Factory.Implementations.XML;
 using PluginFileReader.API.Factory.Implementations.FixedWidthColumns;
 
@@ -28,6 +29,8 @@ namespace PluginFileReader.API.Utility
                     return new AS400ImportExportFactory();
                 case Constants.ModeXML:
                     return new XmlImportExportFactory();
+                case Constants.ModeFileCopy:
+                    return new FileCopyFactory();
                 default:
                     return null;
             }

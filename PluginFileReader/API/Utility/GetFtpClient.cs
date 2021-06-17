@@ -17,5 +17,16 @@ namespace PluginFileReader.API.Utility
 
             return client;
         }
+        
+        public static FtpClient GetFtpClient(FtpSettings ftpSettings)
+        {
+            var client = new FtpClient(ftpSettings.FtpHostname);
+            client.Credentials = new NetworkCredential(ftpSettings.FtpUsername, ftpSettings.FtpPassword);
+            client.Port = ftpSettings.FtpPort.Value;
+
+            client.Connect();
+
+            return client;
+        }
     }
 }

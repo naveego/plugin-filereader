@@ -185,6 +185,18 @@
                   ]
                 }
               }
+            },
+            "FileCopySettings": {
+              "ui:order": [
+                "FtpHostname",
+                "FtpPort",
+                "FtpUsername",
+                "FtpPassword",
+                "FtpSshKey",
+                "TargetFileMode",
+                "TargetDirectoryPath",
+                "OverwriteTarget"
+              ]
             }
           }
         }
@@ -284,23 +296,15 @@
                 "title": "Cleanup Action",
                 "description": "Action taken to clean up after reading.",
                 "default": "Nothing",
-                "examples": [
-                  "string"
-                ],
-                "enum": [
-                  "Nothing",
-                  "Delete",
-                  "Archive"
-                ]
+                "examples": ["string"],
+                "enum": ["Nothing", "Delete", "Archive"]
               },
               "ArchivePath": {
                 "type": "string",
                 "title": "Archive Folder",
                 "description": "The folder to move files to after processing, if cleanup action is \"archive\".",
                 "default": "",
-                "examples": [
-                  "string"
-                ]
+                "examples": ["string"]
               },
               "SkipLines": {
                 "title": "Skip Lines",
@@ -313,11 +317,7 @@
                 "title": "File Read Mode",
                 "description": "Mode to access target files.",
                 "default": "Local",
-                "enum": [
-                  "Local",
-                  "FTP",
-                  "SFTP"
-                ]
+                "enum": ["Local", "FTP", "SFTP"]
               },
               "Mode": {
                 "type": "string",
@@ -329,24 +329,19 @@
                   "Fixed Width Columns",
                   "Excel",
                   "XML",
-                  "AS400"
+                  "AS400",
+                  "File Copy"
                 ]
               }
             },
-            "required": [
-              "RootPath",
-              "Filter",
-              "Mode"
-            ],
+            "required": ["RootPath", "Filter", "Mode"],
             "dependencies": {
               "Mode": {
                 "oneOf": [
                   {
                     "properties": {
                       "Mode": {
-                        "enum": [
-                          "Delimited"
-                        ]
+                        "enum": ["Delimited"]
                       },
                       "ModeSettings": {
                         "type": "object",
@@ -361,10 +356,7 @@
                                 "title": "Delimiter",
                                 "description": "The delimiter for delimited files.",
                                 "default": ",",
-                                "examples": [
-                                  ",",
-                                  "|"
-                                ],
+                                "examples": [",", "|"],
                                 "pattern": ""
                               },
                               "HasHeader": {
@@ -372,18 +364,14 @@
                                 "title": "Has Header",
                                 "description": "Does the file have a header row?",
                                 "default": false,
-                                "examples": [
-                                  true
-                                ]
+                                "examples": [true]
                               },
                               "AutoGenRowNumber": {
                                 "type": "boolean",
                                 "title": "Auto Generate Row Number",
                                 "description": "Automatically generate a row number property (AUTO_ROW_NUM)",
                                 "default": false,
-                                "examples": [
-                                  true
-                                ]
+                                "examples": [true]
                               }
                             }
                           }
@@ -394,9 +382,7 @@
                   {
                     "properties": {
                       "Mode": {
-                        "enum": [
-                          "XML"
-                        ]
+                        "enum": ["XML"]
                       },
                       "ModeSettings": {
                         "type": "object",
@@ -426,9 +412,7 @@
                                       "type": "string"
                                     }
                                   },
-                                  "required": [
-                                    "ElementId"
-                                  ]
+                                  "required": ["ElementId"]
                                 }
                               },
                               "XsdFilePathAndName": {
@@ -437,10 +421,7 @@
                                 "type": "string"
                               }
                             },
-                            "required": [
-                              "XmlKeys",
-                              "XsdFilePathAndName"
-                            ]
+                            "required": ["XmlKeys", "XsdFilePathAndName"]
                           }
                         }
                       }
@@ -449,9 +430,80 @@
                   {
                     "properties": {
                       "Mode": {
-                        "enum": [
-                          "Fixed Width Columns"
+                        "enum": ["File Copy"]
+                      },
+                      "ModeSettings": {
+                        "type": "object",
+                        "title": "",
+                        "properties": {
+                          "FileCopySettings": {
+                            "type": "object",
+                            "title": "File Copy Settings",
+                            "properties": {
+                              "FtpHostname": {
+                                "type": "string",
+                                "title": "Target FTP Hostname",
+                                "description": "Hostname for Target FTP/SFTP.",
+                                "default": ""
+                              },
+                              "FtpPort": {
+                                "type": "number",
+                                "title": "Target FTP Port",
+                                "description": "Port for Target using FTP/SFTP.",
+                                "default": 22
+                              },
+                              "FtpUsername": {
+                                "type": "string",
+                                "title": "Target FTP Username",
+                                "description": "Username for Target using FTP/SFTP.",
+                                "default": ""
+                              },
+                              "FtpPassword": {
+                                "type": "string",
+                                "title": "Target FTP Password",
+                                "description": "Password for Target using FTP/SFTP.",
+                                "default": ""
+                              },
+                              "FtpSshKey": {
+                                "type": "string",
+                                "title": "Target SFTP SSH Key",
+                                "description": "Path to SSH private key for Target using SFTP.",
+                                "default": ""
+                              },
+                              "TargetFileMode": {
+                                "type": "string",
+                                "title": "Target File Write Mode",
+                                "description": "Mode to write target files.",
+                                "default": "Local",
+                                "enum": ["Local", "FTP", "SFTP"]
+                              },
+                              "TargetDirectoryPath": {
+                                "type": "string",
+                                "title": "Target Directory Path",
+                                "description": "Path to Target directory.",
+                                "default": ""
+                              },
+                              "OverwriteTarget": {
+                                "type": "boolean",
+                                "title": "Overwrite Target",
+                                "description": "Should source files overwrite target files?",
+                                "default": false,
+                                "examples": [true]
+                              }
+                            }
+                          }
+                        },
+                        "required":[
+                          "TargetFileMode",
+                          "TargetDirectoryPath"
                         ]
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "Mode": {
+                        "enum": ["Fixed Width Columns"]
                       },
                       "ModeSettings": {
                         "type": "object",
@@ -471,9 +523,7 @@
                                 "title": "Auto Generate Row Number",
                                 "description": "Automatically generate a row number property (AUTO_ROW_NUM)",
                                 "default": false,
-                                "examples": [
-                                  true
-                                ]
+                                "examples": [true]
                               },
                               "Columns": {
                                 "readOnly": false,
@@ -527,9 +577,7 @@
                   {
                     "properties": {
                       "Mode": {
-                        "enum": [
-                          "Excel"
-                        ]
+                        "enum": ["Excel"]
                       },
                       "ModeSettings": {
                         "type": "object",
@@ -544,18 +592,14 @@
                                 "title": "Has Header",
                                 "description": "Does the file have a header row?",
                                 "default": false,
-                                "examples": [
-                                  true
-                                ]
+                                "examples": [true]
                               },
                               "AutoGenRowNumber": {
                                 "type": "boolean",
                                 "title": "Auto Generate Row Number",
                                 "description": "Automatically generate a row number property (AUTO_ROW_NUM)",
                                 "default": false,
-                                "examples": [
-                                  true
-                                ]
+                                "examples": [true]
                               },
                               "ExcelColumns": {
                                 "type": "string",
@@ -604,9 +648,7 @@
                   {
                     "properties": {
                       "Mode": {
-                        "enum": [
-                          "AS400"
-                        ]
+                        "enum": ["AS400"]
                       },
                       "ModeSettings": {
                         "type": "object",
@@ -641,18 +683,14 @@
                                       "title": "Single Record Per Line",
                                       "description": "Is this format contained on a single line?",
                                       "default": false,
-                                      "examples": [
-                                        true
-                                      ]
+                                      "examples": [true]
                                     },
                                     "IsGlobalHeader": {
                                       "type": "boolean",
                                       "title": "Is Global Header",
                                       "description": "Is this format part of the global header information?",
                                       "default": false,
-                                      "examples": [
-                                        true
-                                      ]
+                                      "examples": [true]
                                     },
                                     "Columns": {
                                       "readOnly": false,
@@ -694,18 +732,14 @@
                                             "title": "Is Global Header",
                                             "description": "Is this column part of the global header information?",
                                             "default": false,
-                                            "examples": [
-                                              true
-                                            ]
+                                            "examples": [true]
                                           },
                                           "IsHeader": {
                                             "type": "boolean",
                                             "title": "Is Header",
                                             "description": "Is this column part of the header information?",
                                             "default": false,
-                                            "examples": [
-                                              true
-                                            ]
+                                            "examples": [true]
                                           }
                                         },
                                         "required": [
@@ -816,18 +850,14 @@
                                             "title": "Is Global Header",
                                             "description": "Is this column part of the global header information?",
                                             "default": false,
-                                            "examples": [
-                                              true
-                                            ]
+                                            "examples": [true]
                                           },
                                           "IsHeader": {
                                             "type": "boolean",
                                             "title": "Is Header",
                                             "description": "Is this column part of the header information?",
                                             "default": false,
-                                            "examples": [
-                                              true
-                                            ]
+                                            "examples": [true]
                                           }
                                         },
                                         "required": [
@@ -852,9 +882,7 @@
           }
         }
       },
-      "required": [
-        "RootPaths"
-      ]
+      "required": ["RootPaths"]
     }
   }
 }

@@ -8,7 +8,7 @@ namespace PluginFileReader.API.Utility
 {
     public static partial class Utility 
     {
-        public static void ArchiveFileAtPath(string path, RootPathObject rootPath, Settings settings)
+        public static void ArchiveFileAtPath(string path, RootPathObject rootPath)
         {
             try
             {
@@ -18,7 +18,7 @@ namespace PluginFileReader.API.Utility
                     case Constants.FileModeLocal:
                         var archiveFilePath = GetUniqueFilePath(archiveFileName);
                         File.Copy(path, archiveFilePath, false);
-                        DeleteFileAtPath(path, rootPath, settings, false);
+                        DeleteFileAtPath(path, rootPath,  false);
                         break;
                     case Constants.FileModeFtp:
                         using (var client = GetFtpClient())
@@ -29,7 +29,7 @@ namespace PluginFileReader.API.Utility
                                 // client.Upload(localFileStream.Stream, archiveFileName);
                                 // localFileStream.Close();
                                 client.MoveFile(path, archiveFileName);
-                                DeleteFileAtPath(path, rootPath, settings, true);
+                                DeleteFileAtPath(path, rootPath,  true);
                             }
                             finally
                             {
@@ -48,7 +48,7 @@ namespace PluginFileReader.API.Utility
                                 // localFileStream.Close();
                                 var file = client.Get(path);
                                 file.MoveTo(archiveFileName);
-                                DeleteFileAtPath(path, rootPath, settings, true);
+                                DeleteFileAtPath(path, rootPath,  true);
                             }
                             finally
                             {

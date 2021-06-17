@@ -94,7 +94,7 @@ namespace PluginFileReader.API.Replication
                                     }
                                 }
                                 
-                                Utility.Utility.DeleteFileAtPath(localGoldenTestFileName, data, settings, true);
+                                Utility.Utility.DeleteFileAtPath(localGoldenTestFileName, data, true);
 
                                 if (!client.DirectoryExists(remoteVersionDirectory))
                                 {
@@ -110,7 +110,7 @@ namespace PluginFileReader.API.Replication
                                     }
                                 }
 
-                                Utility.Utility.DeleteFileAtPath(localVersionTestFileName, data, settings, true);
+                                Utility.Utility.DeleteFileAtPath(localVersionTestFileName, data, true);
                             }
                             finally
                             {
@@ -135,7 +135,7 @@ namespace PluginFileReader.API.Replication
                                         var fileStream = Utility.Utility.GetStream(localGoldenTestFileName, Constants.FileModeLocal, true);
                                         client.UploadFile(fileStream.Stream, remoteGoldenTestFileName);
                                         fileStream.Close();
-                                        Utility.Utility.DeleteFileAtPath(localGoldenTestFileName, data, settings, true);
+                                        Utility.Utility.DeleteFileAtPath(localGoldenTestFileName, data, true);
                                     }
                                 }
                                 catch
@@ -154,7 +154,7 @@ namespace PluginFileReader.API.Replication
                                         var fileStream = Utility.Utility.GetStream(localVersionTestFileName, Constants.FileModeLocal, true);
                                         client.UploadFile(fileStream.Stream, remoteVersionTestFileName);
                                         fileStream.Close();
-                                        Utility.Utility.DeleteFileAtPath(localVersionTestFileName, data, settings, true);
+                                        Utility.Utility.DeleteFileAtPath(localVersionTestFileName, data, true);
                                     }
                                 }
                                 catch

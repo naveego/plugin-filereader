@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="API\CleanUp" />
       <Folder Include="API\Factory\Implementations\AS400" />
       <Folder Include="Helper" />
     </ItemGroup>

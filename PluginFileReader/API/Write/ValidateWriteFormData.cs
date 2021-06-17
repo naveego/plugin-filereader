@@ -72,7 +72,7 @@ namespace PluginFileReader.API.Write
                                     }
                                 }
 
-                                Utility.Utility.DeleteFileAtPath(localTestFileName, data, settings, true);
+                                Utility.Utility.DeleteFileAtPath(localTestFileName, data, true);
                             }
                             finally
                             {
@@ -97,7 +97,7 @@ namespace PluginFileReader.API.Write
                                         var fileStream = Utility.Utility.GetStream(localTestFileName, Constants.FileModeLocal, true);
                                         client.UploadFile(fileStream.Stream, remoteTargetTestFileName);
                                         fileStream.Close();
-                                        Utility.Utility.DeleteFileAtPath(localTestFileName, data, settings, true);
+                                        Utility.Utility.DeleteFileAtPath(localTestFileName, data, true);
                                     }
                                 }
                                 catch

@@ -8,22 +8,22 @@ namespace PluginFileReader.API.Utility
 {
     public static partial class Utility 
     {
-        public static void DeleteFileAtPath(string path, RootPathObject rootPath, Settings settings, bool deleteRemote)
+        public static void DeleteFileAtPath(string path, RootPathObject rootPath, bool deleteRemote)
         {
-            DeleteFileAtPath(path, rootPath.FileReadMode, settings, deleteRemote);
+            DeleteFileAtPath(path, rootPath.FileReadMode, deleteRemote);
         }
         
-        public static void DeleteFileAtPath(string path, ConfigureReplicationFormData config, Settings settings, bool deleteRemote)
+        public static void DeleteFileAtPath(string path, ConfigureReplicationFormData config,  bool deleteRemote)
         {
-            DeleteFileAtPath(path, config.FileWriteMode, settings, deleteRemote);
+            DeleteFileAtPath(path, config.FileWriteMode, deleteRemote);
         }
         
-        public static void DeleteFileAtPath(string path, ConfigureWriteFormData config, Settings settings, bool deleteRemote)
+        public static void DeleteFileAtPath(string path, ConfigureWriteFormData config, bool deleteRemote)
         {
-            DeleteFileAtPath(path, config.FileWriteMode, settings, deleteRemote);
+            DeleteFileAtPath(path, config.FileWriteMode,  deleteRemote);
         }
         
-        private static void DeleteFileAtPath(string path, string mode, Settings settings, bool deleteRemote)
+        private static void DeleteFileAtPath(string path, string mode, bool deleteRemote)
         {
             try
             {

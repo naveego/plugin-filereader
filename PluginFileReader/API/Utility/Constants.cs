@@ -38,6 +38,7 @@ namespace PluginFileReader.API.Utility
         public const string ModeExcel = "Excel";
         public const string ModeAS400 = "AS400";
         public const string ModeXML = "XML";
+        public const string ModeFileCopy = "File Copy";
 
         // File Mode options
         public const string FileModeLocal = "Local";

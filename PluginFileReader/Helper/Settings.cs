@@ -684,7 +684,7 @@ namespace PluginFileReader.Helper
                                                     $"Could not write to archive directory {rootPath.ArchivePath}");
                                             }
 
-                                            Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);
+                                            Utility.DeleteFileAtPath(localTestFileName, rootPath, true);
                                         }
                                         finally
                                         {
@@ -702,7 +702,7 @@ namespace PluginFileReader.Helper
                                                 Constants.FileModeLocal, true);
                                             client.UploadFile(fileStream.Stream, remoteTestFileName);
                                             fileStream.Close();
-                                            Utility.DeleteFileAtPath(localTestFileName, rootPath, this, true);
+                                            Utility.DeleteFileAtPath(localTestFileName, rootPath, true);
                                         }
                                         catch
                                         {
@@ -808,6 +808,9 @@ namespace PluginFileReader.Helper
 
         // XML MODE SETTINGS
         public XmlSettings XMLSettings { get; set; }
+        
+        // FILE COPY MODE SETTINGS
+        public FileCopySettings FileCopySettings { get; set; }
     }
 
     public class DelimitedSettings
@@ -869,6 +872,18 @@ namespace PluginFileReader.Helper
         public string AS400FormatsConfigurationFile { get; set; }
         public int KeyValueWidth { get; set; }
         public List<AS400Format> Formats { get; set; }
+    }
+
+    public class FileCopySettings
+    {
+        public string FtpHostname { get; set; }
+        public int? FtpPort { get; set; } = 22;
+        public string FtpUsername { get; set; }
+        public string FtpPassword { get; set; }
+        public string FtpSshKey { get; set; }
+        public string TargetFileMode { get; set; }
+        public string TargetDirectoryPath { get; set; }
+        public bool OverwriteTarget { get; set; }
     }
 
     public class Column
