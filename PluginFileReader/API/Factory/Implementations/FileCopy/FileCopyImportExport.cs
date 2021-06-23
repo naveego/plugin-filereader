@@ -210,7 +210,7 @@ INSERT INTO [{_schemaName}].[{_tableName}] (
                 // set params
                 // RUN_ID
                 cmd.Parameters.Add("@param0");
-                cmd.Parameters[$"@param0"].Value = new Guid().ToString();
+                cmd.Parameters[$"@param0"].Value = Guid.NewGuid();
                 // RUN_START_TIMESTAMP
                 cmd.Parameters.Add("@param1");
                 cmd.Parameters[$"@param1"].Value = runStartTimestamp;
