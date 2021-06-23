@@ -60,6 +60,7 @@ namespace PluginFileReader.API.Factory.Implementations.FileCopy
             var runSuccess = true;
             var runSourceFile = filePathAndName;
             var runTargetFile = "";
+            var runFileSize = "";
             var runError = "";
 
             var query = @$"
@@ -70,6 +71,7 @@ CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (
 [RUN_SUCCESS] VARCHAR({int.MaxValue}),
 [RUN_SOURCE_FILE] VARCHAR({int.MaxValue}),
 [RUN_TARGET_FILE] VARCHAR({int.MaxValue}),
+[RUN_FILE_SIZE] VARCHAR({int.MaxValue}),
 [RUN_ERROR] VARCHAR({int.MaxValue})
 );";
 
@@ -174,6 +176,25 @@ CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (
                 }
                 finally
                 {
+                    // calculate file size
+                    var totalBytes = streamWrapper.Stream.Length;
+                    var suffixes = new List<string>
+                    {
+                        "B", "KB", "MB", "GB", "TB", "PB", "EB"
+                    };
+                    
+                    if (totalBytes == 0)
+                    {
+                        runFileSize = "0 B";
+                    }
+                    else
+                    {
+                        var bytes = Math.Abs(totalBytes);
+                        var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
+                        var num = Math.Round(bytes / Math.Pow(1024, place), 1);
+                        runFileSize = $"{Math.Sign(totalBytes) * num}{suffixes[place]}";
+                    }
+                    
                     // close input file stream
                     streamWrapper.Close();
                 }
@@ -188,6 +209,7 @@ INSERT INTO [{_schemaName}].[{_tableName}] (
 [RUN_SUCCESS],
 [RUN_SOURCE_FILE],
 [RUN_TARGET_FILE],
+[RUN_FILE_SIZE],
 [RUN_ERROR]
 ) VALUES (
 @param0,
@@ -196,7 +218,8 @@ INSERT INTO [{_schemaName}].[{_tableName}] (
 @param3,
 @param4,
 @param5,
-@param6
+@param6,
+@param7
 );";
 
             Logger.Debug($"Insert record query: {query}");
@@ -226,9 +249,12 @@ INSERT INTO [{_schemaName}].[{_tableName}] (
                 // RUN_TARGET_FILE
                 cmd.Parameters.Add("@param5");
                 cmd.Parameters[$"@param5"].Value = runTargetFile;
-                // RUN_ERROR
+                // RUN_FILE_SIZE
                 cmd.Parameters.Add("@param6");
-                cmd.Parameters[$"@param6"].Value = runError;
+                cmd.Parameters[$"@param6"].Value = runFileSize;
+                // RUN_ERROR
+                cmd.Parameters.Add("@param7");
+                cmd.Parameters[$"@param7"].Value = runError;
                 
                 cmd.ExecuteNonQuery();
                 
