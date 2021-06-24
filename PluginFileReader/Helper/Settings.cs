@@ -280,7 +280,10 @@ namespace PluginFileReader.Helper
             foreach (var selectSplit in fromSplits.Skip(1))
             {
                 // var selectTableSplit = selectSplit.Split(' ').Skip(1).First();
-                var selectTableSplit = selectSplit.Trim().Split('.').Skip(1).First();
+                var selectTableSplitList = selectSplit.Trim().Split('.');
+                var selectTableSplit = selectTableSplitList.Length > 1
+                    ? selectTableSplitList.Skip(1).First()
+                    : selectTableSplitList.First();
 
                 if (selectTableSplit.Contains('\n'))
                 {
@@ -294,7 +297,11 @@ namespace PluginFileReader.Helper
 
             foreach (var joinSplit in joinSplits.Skip(1))
             {
-                var joinTableSplit = joinSplit.Split(' ').Skip(1).First();
+                // var joinTableSplit = joinSplit.Split(' ').Skip(1).First();
+                var joinTableSplitList = joinSplit.Trim().Split('.');
+                var joinTableSplit = joinTableSplitList.Length > 1
+                    ? joinTableSplitList.Skip(1).First()
+                    : joinTableSplitList.First();
 
                 if (joinTableSplit.Contains('\n'))
                 {
