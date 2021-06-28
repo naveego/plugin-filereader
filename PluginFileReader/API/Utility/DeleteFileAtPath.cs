@@ -54,7 +54,6 @@ namespace PluginFileReader.API.Utility
                             {
                                 try
                                 {
-                                    
                                     client.DeleteFile(remoteFilePath);
                                 }
                                 finally

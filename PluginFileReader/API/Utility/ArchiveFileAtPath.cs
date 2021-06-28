@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using FluentFTP;
 using Naveego.Sdk.Logging;
 using PluginFileReader.Helper;
 
@@ -10,9 +11,14 @@ namespace PluginFileReader.API.Utility
     {
         public static void ArchiveFileAtPath(string path, RootPathObject rootPath)
         {
+            var archiveFileName = Path.Join(rootPath.ArchivePath, Path.GetFileName(path));
+            if (!archiveFileName.Contains("\\\\") && archiveFileName.Contains("\\"))
+            {
+                archiveFileName = archiveFileName.Replace('\\', '/');
+            }
+            
             try
             {
-                var archiveFileName = Path.Join(rootPath.ArchivePath, Path.GetFileName(path));
                 switch (rootPath.FileReadMode)
                 {
                     case Constants.FileModeLocal:
@@ -28,7 +34,7 @@ namespace PluginFileReader.API.Utility
                                 // var localFileStream = GetStream(path, rootPath.FileReadMode, true);
                                 // client.Upload(localFileStream.Stream, archiveFileName);
                                 // localFileStream.Close();
-                                client.MoveFile(path, archiveFileName);
+                                client.MoveFile(path, archiveFileName, FtpRemoteExists.Overwrite);
                                 DeleteFileAtPath(path, rootPath,  true);
                             }
                             finally
@@ -46,6 +52,10 @@ namespace PluginFileReader.API.Utility
                                 // var localFileStream = GetStream(path, rootPath.FileReadMode, true);
                                 // client.UploadFile(localFileStream.Stream, archiveFileName);
                                 // localFileStream.Close();
+                                if (client.Exists(archiveFileName))
+                                {
+                                    client.DeleteFile(archiveFileName);
+                                }
                                 var file = client.Get(path);
                                 file.MoveTo(archiveFileName);
                                 DeleteFileAtPath(path, rootPath,  true);
@@ -62,7 +72,7 @@ namespace PluginFileReader.API.Utility
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Unable to archive file {path}");
+                Logger.Error(e, $"Unable to archive file {path} to {archiveFileName}");
                 Logger.Error(e, e.Message);
             }
         }
