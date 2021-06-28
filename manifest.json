@@ -196,7 +196,10 @@
                 "TargetFileMode",
                 "TargetDirectoryPath",
                 "OverwriteTarget"
-              ]
+              ],
+              "FtpPassword": {
+                "ui:widget": "password"
+              }
             }
           }
         }
