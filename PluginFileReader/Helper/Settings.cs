@@ -280,10 +280,12 @@ namespace PluginFileReader.Helper
             foreach (var selectSplit in fromSplits.Skip(1))
             {
                 // var selectTableSplit = selectSplit.Split(' ').Skip(1).First();
-                var selectTableSplitList = selectSplit.Trim().Split('.');
-                var selectTableSplit = selectTableSplitList.Length > 1
-                    ? selectTableSplitList.Skip(1).First()
-                    : selectTableSplitList.First();
+                var selectTableSplitList = selectSplit.TrimStart().Split(' ');
+                // var selectTableSplitList = selectSplit.Trim().Split('.');
+                var selectTableNameSplitList = selectTableSplitList.First().Split('.');
+                var selectTableSplit = selectTableNameSplitList.Length > 1
+                    ? selectTableNameSplitList.Skip(1).First()
+                    : selectTableNameSplitList.First();
 
                 if (selectTableSplit.Contains('\n'))
                 {
@@ -297,11 +299,11 @@ namespace PluginFileReader.Helper
 
             foreach (var joinSplit in joinSplits.Skip(1))
             {
-                // var joinTableSplit = joinSplit.Split(' ').Skip(1).First();
-                var joinTableSplitList = joinSplit.Trim().Split('.');
-                var joinTableSplit = joinTableSplitList.Length > 1
-                    ? joinTableSplitList.Skip(1).First()
-                    : joinTableSplitList.First();
+                var joinTableSplitList = joinSplit.TrimStart().Split(' ');
+                var joinTableNameSplitList = joinTableSplitList.First().Split('.');
+                var joinTableSplit = joinTableNameSplitList.Length > 1
+                    ? joinTableNameSplitList.Skip(1).First()
+                    : joinTableNameSplitList.First();
 
                 if (joinTableSplit.Contains('\n'))
                 {
