@@ -164,14 +164,19 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 if (previous.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar))
                 {
                     _columns.Remove(previous.Trim(QuoteChar));
-                    _columns.Add($"{previous}{column}".Trim(QuoteChar));
+                    _columns.Add($"{previous}{Delimiter}{column}".Trim(QuoteChar));
+                    previous = "";
+                }
+                else if (previous.Trim().StartsWith(QuoteChar) && !column.Trim().EndsWith(QuoteChar))
+                {
+                    _columns.Remove(previous.Trim(QuoteChar));
+                    previous = $"{previous}{Delimiter}{column}";
                 }
                 else
                 {
                     _columns.Add(column.Trim(QuoteChar));
+                    previous = column;
                 }
-                
-                previous = column;
             }
 
             // Indicate success
