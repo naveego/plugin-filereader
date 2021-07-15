@@ -161,7 +161,12 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             var previous = "";
             foreach (var column in columns)
             {
-                if (previous.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar))
+                if (column.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar))
+                {
+                    _columns.Add(column.Trim(QuoteChar));
+                    previous = "";
+                }
+                else if (previous.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar))
                 {
                     _columns.Remove(previous.Trim(QuoteChar));
                     _columns.Add($"{previous}{Delimiter}{column}".Trim(QuoteChar));
