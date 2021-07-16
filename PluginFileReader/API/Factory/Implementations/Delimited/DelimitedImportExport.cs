@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Text;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Naveego.Sdk.Logging;
 using Newtonsoft.Json;
 using PluginFileReader.API.Utility;
@@ -13,108 +16,70 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
 {
     public class DelimitedImportExport : IImportExportFile
     {
-        private SqlDatabaseConnection SQLDatabaseConnection { get; set; }
-        private string TableName { get; set; }
-        private string SchemaName { get; set; }
-        private string Delimiter { get; set; }
-        private SqlDatabaseTransaction SQLDatabaseTransaction { get; set; } = null;
-        private ConfigureReplicationFormData ReplicationFormData { get; set; } = new ConfigureReplicationFormData();
-        
-        private DelimitedFileReader DelimitedReader { get; set; }
-        private DelimitedFileWriter DelimitedWriter { get; set; }
+        private readonly SqlDatabaseConnection _conn;
+        private readonly RootPathObject _rootPath;
+        private readonly ConfigureReplicationFormData _replicationFormData;
+        private readonly string _tableName;
+        private readonly string _schemaName;
 
-        public DelimitedImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, RootPathObject rootPath)
+        public DelimitedImportExport(SqlDatabaseConnection sqlDatabaseConnection, RootPathObject rootPath,
+            string tableName, string schemaName)
+        {
+            _conn = sqlDatabaseConnection;
+            _rootPath = rootPath;
+            _tableName = tableName;
+            _schemaName = schemaName;
+        }
+
+        public DelimitedImportExport(SqlDatabaseConnection sqlDatabaseConnection,
+            ConfigureReplicationFormData replicationFormData, string tableName, string schemaName)
         {
             if (string.IsNullOrWhiteSpace(tableName))
                 throw new Exception("TableName parameter is required.");
-            
+
             if (string.IsNullOrWhiteSpace(schemaName))
                 throw new Exception("SchemaName parameter is required.");
 
-            if (sqlDatabaseConnection.State == System.Data.ConnectionState.Closed)
-                sqlDatabaseConnection.Open();
-
-            SQLDatabaseConnection = sqlDatabaseConnection;
-            TableName = tableName;
-            SchemaName = schemaName;
-            Delimiter = rootPath.ModeSettings.DelimitedSettings.GetDelimiter();
+            _conn = sqlDatabaseConnection;
+            _tableName = tableName;
+            _schemaName = schemaName;
+            _replicationFormData = replicationFormData;
         }
-        
-        public DelimitedImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, ConfigureReplicationFormData replicationFormData)
+
+        public DelimitedImportExport(SqlDatabaseConnection sqlDatabaseConnection, ConfigureWriteFormData writeFormData,
+            string tableName, string schemaName)
         {
             if (string.IsNullOrWhiteSpace(tableName))
                 throw new Exception("TableName parameter is required.");
-            
+
             if (string.IsNullOrWhiteSpace(schemaName))
                 throw new Exception("SchemaName parameter is required.");
 
-            if (sqlDatabaseConnection.State == System.Data.ConnectionState.Closed)
-                sqlDatabaseConnection.Open();
-
-            SQLDatabaseConnection = sqlDatabaseConnection;
-            TableName = tableName;
-            SchemaName = schemaName;
-            Delimiter = replicationFormData.GetDelimiter();
-            ReplicationFormData = replicationFormData;
-        }
-        
-        public DelimitedImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, ConfigureWriteFormData writeFormData)
-        {
-            if (string.IsNullOrWhiteSpace(tableName))
-                throw new Exception("TableName parameter is required.");
-            
-            if (string.IsNullOrWhiteSpace(schemaName))
-                throw new Exception("SchemaName parameter is required.");
-
-            if (sqlDatabaseConnection.State == System.Data.ConnectionState.Closed)
-                sqlDatabaseConnection.Open();
-
-            SQLDatabaseConnection = sqlDatabaseConnection;
-            TableName = tableName;
-            SchemaName = schemaName;
-            Delimiter = writeFormData.GetDelimiter();
-            ReplicationFormData = writeFormData.GetReplicationFormData();
-        }
-        
-        public long WriteLineToFile(string filePathAndName, Dictionary<string, object> recordMap, bool includeHeader = false, long lineNumber = -1)
-        {
-            throw new NotImplementedException();
+            _conn = sqlDatabaseConnection;
+            _tableName = tableName;
+            _schemaName = schemaName;
+            _replicationFormData = writeFormData.GetReplicationFormData();
         }
 
-        public List<SchemaTable> GetAllTableNames(bool downloadToLocal = false)
-        {
-            return new List<SchemaTable>
-            {
-                {new SchemaTable
-                {
-                    SchemaName = SchemaName,
-                    TableName = TableName
-                }}
-            };
-        }
-        
         public long ExportTable(string filePathAndName, bool appendToFile = false)
         {
-            SQLDatabaseConnection.Open();
+            _conn.Open();
             long rowCount = 0;
 
-            using (SqlDatabaseCommand cmd = new SqlDatabaseCommand(SQLDatabaseConnection))
+            using (SqlDatabaseCommand cmd = new SqlDatabaseCommand(_conn))
             {
-                if (SQLDatabaseTransaction != null)
-                    cmd.Transaction = SQLDatabaseTransaction;
-
-                cmd.CommandText = $@"SELECT * FROM [{SchemaName}].[{TableName}]";
-                using (DelimitedWriter = new DelimitedFileWriter(filePathAndName, appendToFile, Encoding.UTF8))
+                cmd.CommandText = $@"SELECT * FROM [{_schemaName}].[{_tableName}]";
+                using (var delimitedWriter = new DelimitedFileWriter(filePathAndName, appendToFile, Encoding.UTF8))
                 {
                     // set variables
-                    DelimitedWriter.Delimiter = Delimiter;
-                    DelimitedWriter.QuoteWrap = ReplicationFormData.QuoteWrap;
-                    DelimitedWriter.NullValue = ReplicationFormData.NullValue;
+                    delimitedWriter.Delimiter = _replicationFormData.GetDelimiter();
+                    delimitedWriter.QuoteWrap = _replicationFormData.QuoteWrap;
+                    delimitedWriter.NullValue = _replicationFormData.NullValue;
                     
                     // write custom header to file if not empty
-                    if (!string.IsNullOrWhiteSpace(ReplicationFormData.CustomHeader))
+                    if (!string.IsNullOrWhiteSpace(_replicationFormData.CustomHeader))
                     {
-                        DelimitedWriter.WriteLineToFile(ReplicationFormData.CustomHeader);
+                        delimitedWriter.WriteLineToFile(_replicationFormData.CustomHeader);
                     }
                     
                     SqlDatabaseDataReader dataReader = cmd.ExecuteReader();
@@ -129,23 +94,23 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                             && name != Constants.ReplicationVersionRecordId) // BLOB will not be written
                         {
                             columnNames.Add(name); //maintain columns in the same order as the header line.
-                            DelimitedWriter.AddField(name);
+                            delimitedWriter.AddField(name);
                         }
                     }
 
-                    DelimitedWriter.SaveAndCommitLine();
+                    delimitedWriter.SaveAndCommitLine();
                     // Write data i.e. rows.                    
                     while (dataReader.Read())
                     {
                         foreach (string columnName in columnNames)
                         {
-                            DelimitedWriter.AddField(
+                            delimitedWriter.AddField(
                                 dataReader.GetString(
                                     dataReader.GetOrdinal(
                                         columnName))); //dataReader.GetOrdinal(ColumnName) provides the position.
                         }
 
-                        DelimitedWriter.SaveAndCommitLine();
+                        delimitedWriter.SaveAndCommitLine();
                         rowCount++; //Increase row count to track number of rows written.
                     }
                 }
@@ -154,87 +119,126 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             return rowCount;
         }
 
-        public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = long.MaxValue)
+
+        public long WriteLineToFile(string filePathAndName, Dictionary<string, object> recordMap,
+            bool includeHeader = false, long lineNumber = -1)
         {
-            var autoGenRow = rootPath.ModeSettings.DelimitedSettings.AutoGenRowNumber;
-            var rowCount = 0;
+            throw new System.NotImplementedException();
+        }
+
+        public List<SchemaTable> GetAllTableNames(bool downloadToLocal = false)
+        {
+            return new List<SchemaTable>
+            {
+                {
+                    new SchemaTable
+                    {
+                        SchemaName = _schemaName,
+                        TableName = _tableName
+                    }
+                }
+            };
+        }
+
+        public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false,
+            long limit = -1)
+        {
+            var delimitedSettings = rootPath.ModeSettings.DelimitedSettings;
+            var autoGenRow = delimitedSettings.AutoGenRowNumber;
+            var rowsRead = 0;
+            var rowsSkipped = 0;
             List<string> headerColumns = new List<string>();
 
-            using (DelimitedReader = new DelimitedFileReader(filePathAndName, rootPath, false))
+            var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
+            csvConfiguration.Delimiter = delimitedSettings.Delimiter;
+            csvConfiguration.HasHeaderRecord = delimitedSettings.HasHeader;
+            csvConfiguration.DetectColumnCountChanges = true;
+
+            var streamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode, downloadToLocal);
+
+            using (var csvReader = new CsvReader(streamWrapper.StreamReader, csvConfiguration))
             {
-                DelimitedReader.Delimiter = Delimiter;
-                DelimitedReader.OnEmptyLine = BlankLine.SkipEntireLine;
-                DelimitedReader.MaximumLines = 1; //Just read one line to get the header info and/or number of columns.
-                while (DelimitedReader.ReadLine())
+                // skip lines
+                if (rootPath.SkipLines > 0)
                 {
-                    int columnCount = 0;
-                    foreach (string field in DelimitedReader.Fields)
+                    while (csvReader.Read() && rowsSkipped < rootPath.SkipLines)
                     {
-                        columnCount++;
-                        if (rootPath.ModeSettings.DelimitedSettings.HasHeader)
+                        rowsSkipped++;
+                    }
+                }
+
+                if (delimitedSettings.HasHeader)
+                {
+                    csvReader.Read();
+                    csvReader.ReadHeader();
+                }
+
+                // get column names
+                for (var i = 0; i < csvReader.ColumnCount; i++)
+                {
+                    if (delimitedSettings.HasHeader)
+                    {
+                        var field = csvReader.HeaderRecord[i];
+
+                        if (string.IsNullOrWhiteSpace(field))
                         {
-                            if (headerColumns.Contains(field))
-                            {
-                                headerColumns.Add($"{field}_DUPLICATE_{columnCount}");
-                            }
-                            else
-                            {
-                                headerColumns.Add(field);
-                            }
+                            field = $"NO_HEADER_COLUMN_{i}";
+                        }
+
+                        if (headerColumns.Contains(field))
+                        {
+                            headerColumns.Add($"{field}_DUPLICATE_{i}");
                         }
                         else
-                            headerColumns.Add("Column" + columnCount);
+                        {
+                            headerColumns.Add(field);
+                        }
                     }
-
-                    break;
+                    else
+                    {
+                        headerColumns.Add($"COLUMN_{i}");
+                    }
                 }
-            }
 
-            if (headerColumns.Count == 0)
-                throw new Exception("Columns are required, check the function parameters.");
-            
-            Logger.Debug($"Headers: {JsonConvert.SerializeObject(headerColumns, Formatting.Indented)}");
+                // setup db table
+                var querySb =
+                    new StringBuilder(
+                        $"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] ({(autoGenRow ? $"[{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT," : "")}");
 
-            if (SQLDatabaseConnection.State != ConnectionState.Open)
-                throw new Exception("A valid and open connection is required.");
-
-            using (SqlDatabaseCommand cmd = new SqlDatabaseCommand(SQLDatabaseConnection))
-            {
-                if (SQLDatabaseTransaction != null)
-                    cmd.Transaction = SQLDatabaseTransaction;
-
-                cmd.CommandText = $"CREATE TABLE IF NOT EXISTS [{SchemaName}].[{TableName}] ({(autoGenRow ? $"[{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT," : "")}";
-                foreach (var columnName in headerColumns)
+                foreach (var column in headerColumns)
                 {
-                    cmd.CommandText +=
-                        $"[{columnName}]" +
-                        $" VARCHAR({int.MaxValue}),"; //The DataType none is used since we do not know if all rows have same datatype                        
+                    querySb.Append(
+                        $"[{column}] VARCHAR({int.MaxValue}),");
                 }
 
-                cmd.CommandText = cmd.CommandText.Substring(0, cmd.CommandText.Length - 1); //Remove the last comma
-                cmd.CommandText += ");";
-                Logger.Debug($"Create table SQL: {cmd.CommandText}");
-                cmd.ExecuteNonQuery(); // Create table
+                querySb.Length--;
+                querySb.Append(");");
 
-                var dt = SQLDatabaseConnection.GetSchema("Columns", new string[] {$"[{SchemaName}].[{TableName}]"});
-                
-                // Sanity check if number of columns in CSV and table are equal
-                if ((autoGenRow && dt.Rows.Count - 1 != headerColumns.Count) || (!autoGenRow && dt.Rows.Count != headerColumns.Count))
-                    throw new Exception("Number of columns in CSV should be same as number of columns in the table");
+                var query = querySb.ToString();
 
-                // Start of code block to generate INSERT statement.
-                var querySb = new StringBuilder($"INSERT INTO [{SchemaName}].[{TableName}] (");
-                foreach (string columnName in headerColumns)
+                Logger.Debug($"Create table query: {query}");
+
+                var cmd = new SqlDatabaseCommand
                 {
-                    querySb.Append($"[{columnName}],");
+                    Connection = _conn,
+                    CommandText = query
+                };
+
+                cmd.ExecuteNonQuery();
+
+                // prepare insert cmd with parameters
+                querySb = new StringBuilder($"INSERT INTO [{_schemaName}].[{_tableName}] (");
+                foreach (var column in headerColumns)
+                {
+                    querySb.Append($"[{column}],");
                 }
-                
+
                 querySb.Length--;
                 querySb.Append(") VALUES (");
-                
-                foreach (string columnName in headerColumns)
+
+                foreach (var column in headerColumns)
                 {
-                    var paramName = $"@param{headerColumns.IndexOf(columnName)}";
+                    var paramName = $"@param{headerColumns.IndexOf(column)}";
                     querySb.Append($"{paramName},");
                     cmd.Parameters.Add(paramName);
                 }
@@ -242,68 +246,55 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 querySb.Length--;
                 querySb.Append(");");
 
-                var query = querySb.ToString();
-            
+                query = querySb.ToString();
+
                 Logger.Debug($"Insert record query: {query}");
 
                 cmd.CommandText = query;
 
-                // End of code block to generate INSERT statement.
+                // read records
+                var trans = _conn.BeginTransaction();
 
-                Logger.Debug($"Reading delimited file {filePathAndName}");
-                
-                //Read CSV once insert statement has been created.
-                using (DelimitedReader = new DelimitedFileReader(filePathAndName, rootPath, downloadToLocal))
+                try
                 {
-                    DelimitedReader.Delimiter = Delimiter;
-                    DelimitedReader.OnEmptyLine = BlankLine.SkipEntireLine;
-                    DelimitedReader.SkipLines = rootPath.SkipLines;
-
-                    //Skip the header line.
-                    if (rootPath.ModeSettings.DelimitedSettings.HasHeader)
-                        DelimitedReader.SkipLines += 1;
-
-                    var trans = SQLDatabaseConnection.BeginTransaction();
-                    
-                    try
+                    // csvReader.Configuration.DetectColumnCountChanges = false;
+                    // read all lines from file
+                    while (csvReader.Read() && rowsRead < limit)
                     {
-                        while (DelimitedReader.ReadLine() && rowCount < limit)
+                        foreach (var column in headerColumns)
                         {
-                            int csvColumnCount = 0;
-                            foreach (string fieldValue in DelimitedReader.Fields)
-                            {
-                                if (cmd.Parameters.IndexOf("@param" + csvColumnCount) != -1)
-                                {
-                                    cmd.Parameters["@param" + csvColumnCount].Value =
-                                        fieldValue; //Assign File Column to parameter
-                                }
-                                csvColumnCount++;
-                            }
-
-                            cmd.ExecuteNonQuery();
-                            rowCount++; // Count inserted rows.
-                            
-                            // commit every 1000 rows
-                            if (rowCount % 1000 == 0)
-                            {
-                                trans.Commit();
-                                trans = SQLDatabaseConnection.BeginTransaction();
-                            }
+                            var rawValue = csvReader[headerColumns.IndexOf(column)];
+                            cmd.Parameters[$"@param{headerColumns.IndexOf(column)}"].Value = rawValue;
                         }
 
-                        // commit any pending inserts
-                        trans.Commit();
+                        cmd.ExecuteNonQuery();
+
+                        rowsRead++;
+
+                        // commit every 1000 rows
+                        if (rowsRead % 1000 == 0)
+                        {
+                            trans.Commit();
+                            trans = _conn.BeginTransaction();
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        trans.Rollback();
-                        Logger.Error(e, e.Message);
-                        throw;
-                    }
+
+                    // commit any pending inserts
+                    trans.Commit();
+
+                    // close down stream
+                    streamWrapper.Close();
+                }
+                catch (Exception e)
+                {
+                    // rollback on error
+                    trans.Rollback();
+                    Logger.Error(e, e.Message);
+                    throw;
                 }
             }
 
-            return rowCount;
+            return rowsRead;
         }
     }
 }

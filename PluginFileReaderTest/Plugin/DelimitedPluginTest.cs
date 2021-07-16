@@ -1125,7 +1125,7 @@ on a.id = b.id")}
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings(null, ",", null, false, false, false, true, "Read Directory");
+            var connectRequest = GetConnectSettings(null, ",", null, false, false, false, true, "Read_Directory");
 
             var discoverAllRequest = new DiscoverSchemasRequest
             {
