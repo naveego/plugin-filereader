@@ -773,6 +773,7 @@ namespace PluginFileReader.Helper
         public string FileReadMode { get; set; }
         public string Mode { get; set; }
         public int SkipLines { get; set; }
+        public bool ErrorOnEmptyRootPath { get; set; }
 
         // MODE SETTINGS
         public ModeSettings ModeSettings { get; set; }
