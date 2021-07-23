@@ -63,6 +63,7 @@
             "CleanupAction",
             "ArchivePath",
             "SkipLines",
+            "ErrorOnEmptyRootPath",
             "FileReadMode",
             "Mode",
             "ModeSettings"
@@ -314,6 +315,13 @@
                 "description": "The number of lines to skip at the top of the file.",
                 "default": 0,
                 "type": "number"
+              },
+              "ErrorOnEmptyRootPath": {
+                "type": "boolean",
+                "title": "Error on Empty Root Path",
+                "description": "Should throw an error on reading an empty Root Path?",
+                "default": false,
+                "examples": [true]
               },
               "FileReadMode": {
                 "type": "string",

@@ -313,6 +313,11 @@ namespace PluginFileReader.Plugin
                     else
                     {
                         Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName, Utility.GetImportExportFactory(rootPath.Mode), rootPath, files);
+
+                        if (rootPath.ErrorOnEmptyRootPath)
+                        {
+                            throw new Exception($"Root Path {rootPath.RootPathName()} was empty");
+                        }
                     }
                 }
                 else
@@ -344,6 +349,11 @@ namespace PluginFileReader.Plugin
                         {
                             hasRecords = false;
                             Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName, Utility.GetImportExportFactory(rootPath.Mode), rootPath, files);
+                            
+                            if (rootPath.ErrorOnEmptyRootPath)
+                            {
+                                throw new Exception($"Root Path {rootPath.RootPathName()} was empty");
+                            }
                         }
                     }
                     

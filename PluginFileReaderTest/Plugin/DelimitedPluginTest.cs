@@ -75,7 +75,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false, bool sftp = false, bool autoGenRow = true, string name = null)
+            string filter = null, bool multiRoot = false, bool sftp = false, bool autoGenRow = true, string name = null, bool errorOnEmpty = false)
         {
             return new Settings
             {
@@ -108,6 +108,7 @@ namespace PluginFileReaderTest.Plugin
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = sftp ? "/CSV/Archive" : ArchivePath,
+                            ErrorOnEmptyRootPath = errorOnEmpty,
                             ModeSettings = new ModeSettings
                             {
                                 DelimitedSettings = new DelimitedSettings
@@ -129,6 +130,7 @@ namespace PluginFileReaderTest.Plugin
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = sftp ? "/CSV/Archive" : ArchivePath,
+                            ErrorOnEmptyRootPath = errorOnEmpty,
                             ModeSettings = new ModeSettings
                             {
                                 DelimitedSettings = new DelimitedSettings
@@ -153,6 +155,7 @@ namespace PluginFileReaderTest.Plugin
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
                             ArchivePath = sftp ? "/CSV/Archive" : ArchivePath,
+                            ErrorOnEmptyRootPath = errorOnEmpty,
                             ModeSettings = new ModeSettings
                             {
                                 DelimitedSettings = new DelimitedSettings
@@ -168,7 +171,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false, bool autoGenRow = true, string name = null)
+            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false, bool autoGenRow = true, string name = null, bool errorOnEmpty = false)
         {
             if (empty)
             {
@@ -182,7 +185,7 @@ namespace PluginFileReaderTest.Plugin
                 };
             }
 
-            var settings = GetSettings(cleanupAction, delimiter, filter, multiRoot, sftp, autoGenRow, name);
+            var settings = GetSettings(cleanupAction, delimiter, filter, multiRoot, sftp, autoGenRow, name, errorOnEmpty);
 
             return new ConnectRequest
             {
@@ -1224,6 +1227,71 @@ on a.id = b.id")}
 
             // assert
             Assert.Empty(records);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamEmptyDirectoryBasedSchemaThrowErrorTest()
+        {
+            // setup
+            PrepareTestEnvironment(false, false, true);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var schema = GetTestSchema($"SELECT * FROM [{Constants.SchemaName}].[ReadDirectory]");
+            schema.Properties.Add(new Property
+            {
+                Id = "testProp"
+            });
+
+            var connectRequest = GetConnectSettings(null, ",", null, false, false, false, true, null, true);
+
+            var discoverRefreshRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                ToRefresh = {schema}
+            };
+
+            var request = new ReadRequest()
+            {
+                Schema = schema,
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Connect(connectRequest);
+            client.DiscoverSchemas(discoverRefreshRequest);
+
+            // assert
+            await Assert.ThrowsAsync<RpcException>(async () =>
+            {
+                var response = client.ReadStream(request);
+                var responseStream = response.ResponseStream;
+                var records = new List<Record>();
+                
+                while (await responseStream.MoveNext())
+                {
+                    records.Add(responseStream.Current);
+                }
+                
+                Assert.Empty(records);
+            });
 
             // cleanup
             await channel.ShutdownAsync();
