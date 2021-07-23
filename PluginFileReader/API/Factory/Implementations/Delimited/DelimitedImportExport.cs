@@ -150,7 +150,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             List<string> headerColumns = new List<string>();
 
             var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
-            csvConfiguration.Delimiter = delimitedSettings.Delimiter;
+            csvConfiguration.Delimiter = delimitedSettings.GetDelimiter();
             csvConfiguration.HasHeaderRecord = delimitedSettings.HasHeader;
             csvConfiguration.DetectColumnCountChanges = true;
 
