@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using PluginFileReader.API.Utility;
 using PluginFileReader.Helper;
@@ -161,20 +162,28 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             var previous = "";
             foreach (var column in columns)
             {
-                if (column.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar))
+                if (column.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar) && column.Length > 1)
                 {
                     _columns.Add(column.Trim(QuoteChar));
                     previous = "";
                 }
                 else if (previous.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar))
                 {
-                    _columns.Remove(previous.Trim(QuoteChar));
+                    // _columns.Remove(previous.Trim(QuoteChar));
+                    if (_columns.Last() == previous.Trim(QuoteChar))
+                    {
+                        _columns.RemoveAt(_columns.LastIndexOf(_columns.Last()));
+                    }
                     _columns.Add($"{previous}{Delimiter}{column}".Trim(QuoteChar));
                     previous = "";
                 }
                 else if (previous.Trim().StartsWith(QuoteChar) && !column.Trim().EndsWith(QuoteChar))
                 {
-                    _columns.Remove(previous.Trim(QuoteChar));
+                    // _columns.Remove(previous.Trim(QuoteChar));
+                    if (_columns.Last() == previous.Trim(QuoteChar))
+                    {
+                        _columns.RemoveAt(_columns.LastIndexOf(_columns.Last()));
+                    }
                     previous = $"{previous}{Delimiter}{column}";
                 }
                 else
