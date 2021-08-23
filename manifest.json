@@ -196,7 +196,8 @@
                 "FtpSshKey",
                 "TargetFileMode",
                 "TargetDirectoryPath",
-                "OverwriteTarget"
+                "OverwriteTarget",
+                "MinimumSendDelayMS"
               ],
               "FtpPassword": {
                 "ui:widget": "password"
@@ -500,11 +501,18 @@
                                 "description": "Should source files overwrite target files?",
                                 "default": false,
                                 "examples": [true]
+                              },
+                              "MinimumSendDelayMS": {
+                                "type": "number",
+                                "title": "Minimum Send Delay MS",
+                                "description": "Minimum time between sending files in milliseconds.",
+                                "default": 0
                               }
                             },
                             "required":[
                               "TargetFileMode",
-                              "TargetDirectoryPath"
+                              "TargetDirectoryPath",
+                              "MinimumSendDelayMS"
                             ]
                           }
                         }

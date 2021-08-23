@@ -78,7 +78,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, bool sftp = false)
+            string filter = null, bool multiRoot = false, bool sftp = false, int delayMS = 0)
         {
             return new Settings
             {
@@ -110,7 +110,8 @@ namespace PluginFileReaderTest.Plugin
                                     FtpSshKey = @"",
                                     TargetFileMode = "SFTP",
                                     TargetDirectoryPath = "",
-                                    OverwriteTarget = true
+                                    OverwriteTarget = true,
+                                    MinimumSendDelayMS = delayMS
                                 }
                             }
                         },
@@ -135,7 +136,8 @@ namespace PluginFileReaderTest.Plugin
                                     FtpSshKey = @"",
                                     TargetFileMode = "SFTP",
                                     TargetDirectoryPath = "",
-                                    OverwriteTarget = true
+                                    OverwriteTarget = true,
+                                    MinimumSendDelayMS = delayMS
                                 }
                             }
                         }
@@ -161,9 +163,10 @@ namespace PluginFileReaderTest.Plugin
                                     FtpUsername = "",
                                     FtpPassword = "",
                                     FtpSshKey = @"",
-                                    TargetFileMode = "SFTP",
-                                    TargetDirectoryPath = "",
-                                    OverwriteTarget = true
+                                    TargetFileMode = sftp ? "SFTP" : "Local",
+                                    TargetDirectoryPath = sftp ? "" : ArchivePath,
+                                    OverwriteTarget = true,
+                                    MinimumSendDelayMS = delayMS
                                 }
                             }
                         }
@@ -172,7 +175,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false)
+            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false, int delayMS = 0)
         {
             if (empty)
             {
@@ -186,7 +189,7 @@ namespace PluginFileReaderTest.Plugin
                 };
             }
 
-            var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, sftp);
+            var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, sftp, delayMS);
 
             return new ConnectRequest
             {
@@ -270,6 +273,144 @@ namespace PluginFileReaderTest.Plugin
             // assert
             Assert.IsType<ConnectResponse>(response);
             Assert.Equal("", response.SettingsError);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*", false, false, false);
+
+            var discoverRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(discoverRequest);
+            request.Schema = schemasResponse.Schemas[0];
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(3, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal("True", record["RUN_SUCCESS"]);
+            Assert.Equal("", record["RUN_ERROR"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamDelayTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*", false, false, false, 5000);
+
+            var discoverRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(discoverRequest);
+            request.Schema = schemasResponse.Schemas[0];
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(3, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal("True", record["RUN_SUCCESS"]);
+            Assert.Equal("", record["RUN_ERROR"]);
 
             // cleanup
             await channel.ShutdownAsync();

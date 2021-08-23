@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using FluentFTP;
 using Naveego.Sdk.Logging;
 using PluginFileReader.API.Utility;
@@ -56,7 +57,8 @@ namespace PluginFileReader.API.Factory.Implementations.FileCopy
             long limit = long.MaxValue)
         {
             var copySettings = rootPath.ModeSettings.FileCopySettings;
-            var runStartTimestamp = DateTime.Now.ToString();
+            var runStart = DateTime.Now;
+            var runStartTimestamp = runStart.ToString();
             var runSuccess = true;
             var runSourceFile = filePathAndName;
             var runTargetFile = "";
@@ -89,6 +91,17 @@ CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (
             // copy files on full read only
             if (limit == long.MaxValue && downloadToLocal)
             {
+                // delay if configured and needed
+                if (copySettings.MinimumSendDelayMS > 0)
+                {
+                    var delayOffsetMS = Convert.ToInt32((DateTime.Now - FileCopyGlobals.LastWriteTime).TotalMilliseconds);
+
+                    if (copySettings.MinimumSendDelayMS - delayOffsetMS > 0)
+                    {
+                        Thread.Sleep(copySettings.MinimumSendDelayMS - delayOffsetMS);
+                    }
+                }
+                
                 var streamWrapper =
                     Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode, true);
                 
@@ -127,7 +140,7 @@ CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (
                                     if (status == FtpStatus.Failed)
                                     {
                                         runSuccess = false;
-                                        runError = $"Could not write file to remote {targetFilePathAndName}";
+                                        runError = $"Could not write file to remote {targetFilePathAndName}, {client.LastReply.ErrorMessage}";
                                     }
                                 }
                                 finally
@@ -144,10 +157,11 @@ CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (
                                 {
                                     client.UploadFile(inputFileStream, targetFilePathAndName, copySettings.OverwriteTarget);
                                 }
-                                catch
+                                catch(Exception e)
                                 {
                                     runSuccess = false;
-                                    runError = $"Could not write file to remote {targetFilePathAndName}";
+                                    runError = $"Could not write file to remote {targetFilePathAndName}, {e.Message}";
+                                    Logger.Error(e, e.Message);
                                 }
                                 finally
                                 {
@@ -268,6 +282,8 @@ INSERT INTO [{_schemaName}].[{_tableName}] (
                 Logger.Error(e, e.Message);
                 throw;
             }
+            
+            FileCopyGlobals.LastWriteTime = DateTime.Now;
 
             return 1;
         }
