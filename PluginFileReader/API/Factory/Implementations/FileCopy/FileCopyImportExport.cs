@@ -94,12 +94,15 @@ CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (
                 // delay if configured and needed
                 if (copySettings.MinimumSendDelayMS > 0)
                 {
-                    var delayOffsetMS = Convert.ToInt32((DateTime.Now - FileCopyGlobals.LastWriteTime).TotalMilliseconds);
-
-                    if (copySettings.MinimumSendDelayMS - delayOffsetMS > 0)
+                    var sleepDurationMS = copySettings.MinimumSendDelayMS - FileCopyGlobals.LastWriteDurationMS;
+                    
+                    if (sleepDurationMS > 0)
                     {
-                        Thread.Sleep(copySettings.MinimumSendDelayMS - delayOffsetMS);
+                        Logger.Debug($"Sleeping for {sleepDurationMS}ms of configured minimum delay {copySettings.MinimumSendDelayMS}ms, last run time {FileCopyGlobals.LastWriteDurationMS}ms");
+                        Thread.Sleep(sleepDurationMS);
                     }
+                    
+                    runStart = DateTime.Now;
                 }
                 
                 var streamWrapper =
@@ -282,8 +285,8 @@ INSERT INTO [{_schemaName}].[{_tableName}] (
                 Logger.Error(e, e.Message);
                 throw;
             }
-            
-            FileCopyGlobals.LastWriteTime = DateTime.Now;
+
+            FileCopyGlobals.LastWriteDurationMS = Convert.ToInt32((DateTime.Now - runStart).TotalMilliseconds);
 
             return 1;
         }
