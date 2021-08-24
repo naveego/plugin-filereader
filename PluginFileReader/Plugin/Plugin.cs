@@ -266,6 +266,7 @@ namespace PluginFileReader.Plugin
             var limitFlag = request.Limit != 0;
             var jobId = request.JobId;
             long recordsCount = 0;
+            var rootPaths = _server.Settings.RootPaths;
 
             Logger.SetLogPrefix(request.JobId);
             Logger.Info($"Publishing records for schema: {schema.Name}");
@@ -278,7 +279,7 @@ namespace PluginFileReader.Plugin
                 if (string.IsNullOrWhiteSpace(schema.Query))
                 {
                     // schema is not query based so we can stream each file as it is loaded
-                    var rootPaths = _server.Settings.GetRootPathsFromQuery(Utility.GetDefaultQuery(schema));
+                    rootPaths = _server.Settings.GetRootPathsFromQuery(Utility.GetDefaultQuery(schema));
                     var rootPath = rootPaths.First();
                     var files = filesByRootPath[rootPath.RootPathName()];
                     var schemaName = Constants.SchemaName;
@@ -323,7 +324,7 @@ namespace PluginFileReader.Plugin
                 else
                 {
                     // schema is query based
-                    var rootPaths = _server.Settings.GetRootPathsFromQuery(schema.Query);
+                    rootPaths = _server.Settings.GetRootPathsFromQuery(schema.Query);
 
                     Logger.Info(
                         $"Query root paths {JsonConvert.SerializeObject(rootPaths.Select(r => r.RootPathName()).ToList(), Formatting.Indented)}");
@@ -381,7 +382,7 @@ namespace PluginFileReader.Plugin
 
                 Logger.Info($"Published {recordsCount} records");
 
-                foreach (var rootPath in _server.Settings.RootPaths)
+                foreach (var rootPath in rootPaths)
                 {
                     var files = filesByRootPath[rootPath.RootPathName()];
                     switch (rootPath.CleanupAction)
