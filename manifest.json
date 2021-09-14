@@ -197,7 +197,9 @@
                 "TargetFileMode",
                 "TargetDirectoryPath",
                 "OverwriteTarget",
-                "MinimumSendDelayMS"
+                "MinimumSendDelayMS",
+                "OldRegexReplace",
+                "NewRegexReplace"
               ],
               "FtpPassword": {
                 "ui:widget": "password"
@@ -507,6 +509,18 @@
                                 "title": "Minimum Send Delay MS",
                                 "description": "Minimum time between sending files in milliseconds.",
                                 "default": 0
+                              },
+                              "OldRegexReplace": {
+                                "type": "string",
+                                "title": "Orginal File Name Regex Select",
+                                "description": "Regex expression to select values to use in the new file name ex. ^(.*)$",
+                                "default": ""
+                              },
+                              "NewRegexReplace": {
+                                "type": "string",
+                                "title": "New File Name Regex Replace",
+                                "description": "Regex expression to use as the new file name ex. part-$1",
+                                "default": ""
                               }
                             },
                             "required":[

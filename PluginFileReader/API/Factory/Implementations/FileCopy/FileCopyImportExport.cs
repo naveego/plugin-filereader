@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using FluentFTP;
 using Naveego.Sdk.Logging;
@@ -118,6 +119,19 @@ CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (
                     if (!targetFilePathAndName.Contains("\\\\") && targetFilePathAndName.Contains("\\"))
                     {
                         targetFilePathAndName = targetFilePathAndName.Replace('\\', '/');
+                    }
+
+                    // regex rename
+                    if (!string.IsNullOrWhiteSpace(copySettings.OldRegexReplace) &&
+                        !string.IsNullOrWhiteSpace(copySettings.NewRegexReplace))
+                    {
+                        var fileName = Path.GetFileName(targetFilePathAndName);
+                        var oldRegex = new Regex(copySettings.OldRegexReplace);
+
+                        fileName = oldRegex.Replace(fileName, copySettings.NewRegexReplace);
+                        
+                        targetFilePathAndName = 
+                            Path.Join(copySettings.TargetDirectoryPath, fileName);
                     }
 
                     runTargetFile = targetFilePathAndName;

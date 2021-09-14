@@ -78,7 +78,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, bool sftp = false, int delayMS = 0)
+            string filter = null, bool multiRoot = false, bool sftp = false, int delayMS = 0, string oldRegexReplace = "", string newRegexReplace = "")
         {
             return new Settings
             {
@@ -111,7 +111,9 @@ namespace PluginFileReaderTest.Plugin
                                     TargetFileMode = "SFTP",
                                     TargetDirectoryPath = "",
                                     OverwriteTarget = true,
-                                    MinimumSendDelayMS = delayMS
+                                    MinimumSendDelayMS = delayMS,
+                                    OldRegexReplace = oldRegexReplace,
+                                    NewRegexReplace = newRegexReplace
                                 }
                             }
                         },
@@ -137,7 +139,9 @@ namespace PluginFileReaderTest.Plugin
                                     TargetFileMode = "SFTP",
                                     TargetDirectoryPath = "",
                                     OverwriteTarget = true,
-                                    MinimumSendDelayMS = delayMS
+                                    MinimumSendDelayMS = delayMS,
+                                    OldRegexReplace = oldRegexReplace,
+                                    NewRegexReplace = newRegexReplace
                                 }
                             }
                         }
@@ -166,7 +170,9 @@ namespace PluginFileReaderTest.Plugin
                                     TargetFileMode = sftp ? "SFTP" : "Local",
                                     TargetDirectoryPath = sftp ? "" : ArchivePath,
                                     OverwriteTarget = true,
-                                    MinimumSendDelayMS = delayMS
+                                    MinimumSendDelayMS = delayMS,
+                                    OldRegexReplace = oldRegexReplace,
+                                    NewRegexReplace = newRegexReplace
                                 }
                             }
                         }
@@ -175,7 +181,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false, int delayMS = 0)
+            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false, int delayMS = 0, string oldRegexReplace = "", string newRegexReplace = "")
         {
             if (empty)
             {
@@ -189,7 +195,7 @@ namespace PluginFileReaderTest.Plugin
                 };
             }
 
-            var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, sftp, delayMS);
+            var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, sftp, delayMS, oldRegexReplace, newRegexReplace);
 
             return new ConnectRequest
             {
@@ -375,6 +381,75 @@ namespace PluginFileReaderTest.Plugin
             };
 
             var connectRequest = GetConnectSettings(null, 0, "*", false, false, false, 5000);
+
+            var discoverRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(discoverRequest);
+            request.Schema = schemasResponse.Schemas[0];
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(3, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal("True", record["RUN_SUCCESS"]);
+            Assert.Equal("", record["RUN_ERROR"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ReadStreamRenameTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*", false, false, false, 0, "^(.*)$", "part-$1");
 
             var discoverRequest = new DiscoverSchemasRequest
             {

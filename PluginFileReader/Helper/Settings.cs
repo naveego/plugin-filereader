@@ -895,6 +895,8 @@ namespace PluginFileReader.Helper
         public string TargetDirectoryPath { get; set; }
         public bool OverwriteTarget { get; set; }
         public int MinimumSendDelayMS { get; set; }
+        public string OldRegexReplace { get; set; }
+        public string NewRegexReplace { get; set; }
     }
 
     public class Column
