@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Naveego.Sdk.Logging;
 using PluginFileReader.API.Utility;
 using PluginFileReader.Helper;
 
@@ -105,97 +106,111 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         /// </summary>        
         public bool ReadLine()
         {
-            if (MaximumLines > 0)
+            try
             {
-                if (_lineCount >= MaximumLines)
-                    return false;
-            }
-
-            if ((!_isHeaderSkipped) && (SkipLines > 0))
-            {
-                int rowsSkipped = 0;
-                while (!_isHeaderSkipped)
+                if (MaximumLines > 0)
                 {
-                    ReadNextLine();
-                    rowsSkipped++;
-                    if (rowsSkipped >= SkipLines)
-                    {
-                        _isHeaderSkipped = true;
-                        break;
-                    }
-                }
-            }
-
-            // Read next line from the file
-            if ((_currentLineText = ReadNextLine()) == null)
-            {
-                return false;
-            }
-            
-            _isLineEmtpy = false;
-
-            _currentPosition = 0;
-
-            // Test for empty line
-            if (_currentLineText.Length == 0)
-            {
-                _isLineEmtpy = true;
-                switch (_onEmptyLine)
-                {
-                    case BlankLine.EmptySingleColumn:
-                        _columns.Clear();
-                        return true;
-                    case BlankLine.SkipEntireLine:
-                        return ReadLine();
-                    case BlankLine.EndOfFile:
+                    if (_lineCount >= MaximumLines)
                         return false;
                 }
-            }
-            else
-            {
-                _columns.Clear();
-            }
 
-            // Parse line            
-            var columns = _currentLineText.Split(Delimiter);
+                if ((!_isHeaderSkipped) && (SkipLines > 0))
+                {
+                    int rowsSkipped = 0;
+                    while (!_isHeaderSkipped)
+                    {
+                        ReadNextLine();
+                        rowsSkipped++;
+                        if (rowsSkipped >= SkipLines)
+                        {
+                            _isHeaderSkipped = true;
+                            break;
+                        }
+                    }
+                }
 
-            var previous = "";
-            foreach (var column in columns)
-            {
-                if (column.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar) && column.Length > 1)
+                // Read next line from the file
+                if ((_currentLineText = ReadNextLine()) == null)
                 {
-                    _columns.Add(column.Trim(QuoteChar));
-                    previous = "";
+                    return false;
                 }
-                else if (previous.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar))
+
+                _isLineEmtpy = false;
+
+                _currentPosition = 0;
+
+                // Test for empty line
+                if (_currentLineText.Length == 0)
                 {
-                    // _columns.Remove(previous.Trim(QuoteChar));
-                    if (_columns.Last() == previous.Trim(QuoteChar))
+                    _isLineEmtpy = true;
+                    switch (_onEmptyLine)
                     {
-                        _columns.RemoveAt(_columns.LastIndexOf(_columns.Last()));
+                        case BlankLine.EmptySingleColumn:
+                            _columns.Clear();
+                            return true;
+                        case BlankLine.SkipEntireLine:
+                            return ReadLine();
+                        case BlankLine.EndOfFile:
+                            return false;
                     }
-                    _columns.Add($"{previous}{Delimiter}{column}".Trim(QuoteChar));
-                    previous = "";
-                }
-                else if (previous.Trim().StartsWith(QuoteChar) && !column.Trim().EndsWith(QuoteChar))
-                {
-                    // _columns.Remove(previous.Trim(QuoteChar));
-                    if (_columns.Last() == previous.Trim(QuoteChar))
-                    {
-                        _columns.RemoveAt(_columns.LastIndexOf(_columns.Last()));
-                    }
-                    previous = $"{previous}{Delimiter}{column}";
                 }
                 else
                 {
-                    _columns.Add(column.Trim(QuoteChar));
-                    previous = column;
+                    _columns.Clear();
                 }
-            }
 
-            // Indicate success
-            _lineCount++;
-            return true;
+                // Parse line            
+                var columns = _currentLineText.Split(Delimiter);
+
+                var previous = "";
+                foreach (var column in columns)
+                {
+                    if (column.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar) && column.Length > 1)
+                    {
+                        _columns.Add(column.Trim(QuoteChar));
+                        previous = "";
+                    }
+                    else if (previous.Trim().StartsWith(QuoteChar) && column.Trim().EndsWith(QuoteChar))
+                    {
+                        // _columns.Remove(previous.Trim(QuoteChar));
+                        if (_columns.Count > 0 && _columns.Last() == previous.Trim(QuoteChar))
+                        {
+                            _columns.RemoveAt(_columns.LastIndexOf(_columns.Last()));
+                        }
+
+                        _columns.Add($"{previous}{Delimiter}{column}".Trim(QuoteChar));
+                        previous = "";
+                    }
+                    else if (previous.Trim().StartsWith(QuoteChar) && !column.Trim().EndsWith(QuoteChar))
+                    {
+                        // _columns.Remove(previous.Trim(QuoteChar));
+                        if (_columns.Count > 0 && _columns.Last() == previous.Trim(QuoteChar))
+                        {
+                            _columns.RemoveAt(_columns.LastIndexOf(_columns.Last()));
+                        }
+
+                        previous = $"{previous}{Delimiter}{column}";
+                    }
+                    else
+                    {
+                        _columns.Add(column.Trim(QuoteChar));
+                        previous = column;
+                    }
+                }
+
+                // Indicate success
+                _lineCount++;
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, e.Message);
+                
+                var parseException = new Exception($"Error parsing line: {_lineCount + 1}, value: {_currentLineText}");
+                Logger.Error(parseException, parseException.Message);
+                
+                throw parseException;
+            }
         }
 
 
