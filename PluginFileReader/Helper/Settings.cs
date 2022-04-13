@@ -826,6 +826,8 @@ namespace PluginFileReader.Helper
     public class DelimitedSettings
     {
         public bool AutoGenRowNumber { get; set; }
+        public bool IncludeFileNameAsField { get; set; }
+        public string SelectedRanges { get; set; }
         public bool HasHeader { get; set; }
         public string Delimiter { get; set; }
 
@@ -844,6 +846,8 @@ namespace PluginFileReader.Helper
     public class FixedWidthSettings
     {
         public bool AutoGenRowNumber { get; set; }
+        
+        public bool IncludeFileNameAsField { get; set; }
         public string ColumnsConfigurationFile { get; set; }
         public List<Column> Columns { get; set; }
     }
@@ -851,6 +855,8 @@ namespace PluginFileReader.Helper
     public class ExcelModeSettings
     {
         public bool AutoGenRowNumber { get; set; }
+        
+        public bool IncludeFileNameAsField { get; set; }
         public bool HasHeader { get; set; }
         public string ExcelColumns { get; set; }
         public List<ExcelCell> ExcelCells { get; set; }
@@ -880,6 +886,8 @@ namespace PluginFileReader.Helper
     public class AS400Settings
     {
         public string AS400FormatsConfigurationFile { get; set; }
+        
+        public bool IncludeFileNameAsField { get; set; }
         public int KeyValueWidth { get; set; }
         public List<AS400Format> Formats { get; set; }
     }
@@ -961,6 +969,8 @@ namespace PluginFileReader.Helper
     public class XmlSettings
     {
         public string XsdFilePathAndName { get; set; }
+        
+        public bool IncludeFileNameAsField { get; set; }
         public List<XmlKey> XmlKeys { get; set; }
     }
 

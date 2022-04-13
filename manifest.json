@@ -73,12 +73,15 @@
               "ui:order": [
                 "Delimiter",
                 "HasHeader",
-                "AutoGenRowNumber"
+                "AutoGenRowNumber",
+                "IncludeFileNameAsField",
+                "SelectedRanges"
               ]
             },
             "FixedWidthSettings": {
               "ui:order": [
                 "AutoGenRowNumber",
+                "IncludeFileNameAsField",
                 "ColumnsConfigurationFile",
                 "Columns"
               ],
@@ -98,6 +101,7 @@
               "ui:order": [
                 "HasHeader",
                 "AutoGenRowNumber",
+                "IncludeFileNameAsField",
                 "ExcelColumns",
                 "ExcelCells"
               ],
@@ -115,6 +119,7 @@
               "ui:order": [
                 "AS400FormatsConfigurationFile",
                 "KeyValueWidth",
+                "IncludeFileNameAsField",
                 "Formats"
               ],
               "Formats": {
@@ -176,6 +181,7 @@
             "XmlSettings": {
               "ui:order": [
                 "XsdFilePathAndName",
+                "IncludeFileNameAsField",
                 "XmlKeys"
               ],
               "XmlKeys": {
@@ -209,7 +215,7 @@
         }
       }
     },
-    "schema": {
+    "schema":{
       "type": "object",
       "properties": {
         "GlobalColumnsConfigurationFile": {
@@ -386,6 +392,20 @@
                                 "description": "Automatically generate a row number property (AUTO_ROW_NUM)",
                                 "default": false,
                                 "examples": [true]
+                              },
+                              "IncludeFileNameAsField": {
+                                "type": "boolean",
+                                "title": "Include File Name as Field",
+                                "description": "Automatically generate a file name property (AUTO_FILE_NAME)",
+                                "default": false,
+                                "examples": [false]
+                              },
+                              "SelectedRanges": {
+                                "type": "string",
+                                "title": "Selected Ranges",
+                                "description": "If populated, this option will limit CSV data to the defined 0-based comma-separated column ranges set by the user.",
+                                "default": "",
+                                "examples": ["0-4","0,5-9,10-900,920,940-1420"]
                               }
                             }
                           }
@@ -433,6 +453,13 @@
                                 "title": "XSD File Path and Name",
                                 "description": "A fully qualified path to the XSD file.",
                                 "type": "string"
+                              },
+                              "IncludeFileNameAsField": {
+                                "type": "boolean",
+                                "title": "Include File Name as Field",
+                                "description": "Automatically generate a file name property (AUTO_FILE_NAME)",
+                                "default": false,
+                                "examples": [false]
                               }
                             },
                             "required": ["XmlKeys", "XsdFilePathAndName"]
@@ -558,6 +585,13 @@
                                 "default": false,
                                 "examples": [true]
                               },
+                              "IncludeFileNameAsField": {
+                                "type": "boolean",
+                                "title": "Include File Name as Field",
+                                "description": "Automatically generate a file name property (AUTO_FILE_NAME)",
+                                "default": false,
+                                "examples": [false]
+                              },
                               "Columns": {
                                 "readOnly": false,
                                 "type": "array",
@@ -634,6 +668,13 @@
                                 "default": false,
                                 "examples": [true]
                               },
+                              "IncludeFileNameAsField": {
+                                "type": "boolean",
+                                "title": "Include File Name as Field",
+                                "description": "Automatically generate a file name property (AUTO_FILE_NAME)",
+                                "default": false,
+                                "examples": [false]
+                              },
                               "ExcelColumns": {
                                 "type": "string",
                                 "title": "Excel Columns",
@@ -702,6 +743,13 @@
                                 "description": "The number of characters the key value uses from the start of each line.",
                                 "type": "number",
                                 "default": 2
+                              },
+                              "IncludeFileNameAsField": {
+                                "type": "boolean",
+                                "title": "Include File Name as Field",
+                                "description": "Automatically generate a file name property (AUTO_FILE_NAME)",
+                                "default": false,
+                                "examples": [false]
                               },
                               "Formats": {
                                 "readOnly": false,

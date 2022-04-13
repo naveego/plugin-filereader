@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Numerics;
 using System.Text;
 using Naveego.Sdk.Logging;
 using Newtonsoft.Json;
@@ -42,6 +44,8 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         
         public DelimitedImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, ConfigureReplicationFormData replicationFormData)
         {
+            
+            Logger.Info("DelimitedImportExport Constructor: Start");
             if (string.IsNullOrWhiteSpace(tableName))
                 throw new Exception("TableName parameter is required.");
             
@@ -56,6 +60,8 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
             SchemaName = schemaName;
             Delimiter = replicationFormData.GetDelimiter();
             ReplicationFormData = replicationFormData;
+            
+            Logger.Info("DelimitedImportExport Constructor: End");
         }
         
         public DelimitedImportExport(SqlDatabaseConnection sqlDatabaseConnection, string tableName, string schemaName, ConfigureWriteFormData writeFormData)
@@ -157,8 +163,12 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
         public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = long.MaxValue)
         {
             var autoGenRow = rootPath.ModeSettings.DelimitedSettings.AutoGenRowNumber;
+            var includeFileNameAsField = rootPath.ModeSettings.DelimitedSettings.IncludeFileNameAsField;
             var rowCount = 0;
+            bool shouldPullRange = !string.IsNullOrWhiteSpace(rootPath.ModeSettings.DelimitedSettings.SelectedRanges);
+            
             List<string> headerColumns = new List<string>();
+            Dictionary<string, int> selectedColumns = new Dictionary<string, int>() { };
 
             using (DelimitedReader = new DelimitedFileReader(filePathAndName, rootPath, false))
             {
@@ -168,7 +178,49 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 while (DelimitedReader.ReadLine())
                 {
                     int columnCount = 0;
-                    foreach (string field in DelimitedReader.Fields)
+                    
+                    string[] fields;
+                    
+                    if (shouldPullRange)
+                    {
+                        var selectedRanges = rootPath.ModeSettings.DelimitedSettings.SelectedRanges;
+                        var ranges = selectedRanges.Split(',');
+                        foreach (var range in ranges)
+                        {
+                            if (range.Contains('-'))
+                            {
+                                var ends = range.Split('-');
+
+                                var lowEnd = ends.Length == 1 ? int.Parse(ends[0]) : Math.Min(int.Parse(ends[0]), int.Parse(ends[1]));
+                                var highEnd = ends.Length == 1 ? lowEnd : Math.Max(int.Parse(ends[0]), int.Parse(ends[1]));
+                                if (highEnd > DelimitedReader.Fields.Length)
+                                {
+                                    highEnd = DelimitedReader.Fields.Length;
+                                }
+                                for (int i = lowEnd; i <= highEnd; i++)
+                                {
+                                    //here ok
+                                    selectedColumns.Add(DelimitedReader.Fields[i], i);
+                                    
+                                }
+                            }
+                            else
+                            {
+                                    if (int.Parse(range) < DelimitedReader.Fields.Length)
+                                    {
+                                        selectedColumns.Add(DelimitedReader.Fields[int.Parse(range)], int.Parse(range));
+                                    }
+                            }
+                        }
+
+                        fields = selectedColumns.Keys.ToArray();
+                    }
+                    else
+                    {
+                        fields = DelimitedReader.Fields;
+                    }
+                    
+                    foreach (string field in fields)
                     {
                         columnCount++;
                         if (rootPath.ModeSettings.DelimitedSettings.HasHeader)
@@ -204,6 +256,12 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                     cmd.Transaction = SQLDatabaseTransaction;
 
                 cmd.CommandText = $"CREATE TABLE IF NOT EXISTS [{SchemaName}].[{TableName}] ({(autoGenRow ? $"[{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT," : "")}";
+
+                if (includeFileNameAsField)
+                {
+                    headerColumns.Insert(0, Constants.AutoFileName);
+                }
+                
                 foreach (var columnName in headerColumns)
                 {
                     cmd.CommandText +=
@@ -219,7 +277,7 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 var dt = SQLDatabaseConnection.GetSchema("Columns", new string[] {$"[{SchemaName}].[{TableName}]"});
                 
                 // Sanity check if number of columns in CSV and table are equal
-                if ((autoGenRow && dt.Rows.Count - 1 != headerColumns.Count) || (!autoGenRow && dt.Rows.Count != headerColumns.Count))
+                if (((autoGenRow && dt.Rows.Count - 1 != headerColumns.Count) || (!autoGenRow && dt.Rows.Count != headerColumns.Count)) && !shouldPullRange)
                     throw new Exception("Number of columns in CSV should be same as number of columns in the table");
 
                 // Start of code block to generate INSERT statement.
@@ -234,9 +292,31 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                 
                 foreach (string columnName in headerColumns)
                 {
-                    var paramName = $"@param{headerColumns.IndexOf(columnName)}";
-                    querySb.Append($"{paramName},");
-                    cmd.Parameters.Add(paramName);
+                    if (columnName == Constants.AutoFileName && includeFileNameAsField)
+                    {
+                        var lastIndex = Math.Max(filePathAndName.LastIndexOf('\\'),
+                            filePathAndName.LastIndexOf('/')) + 1;
+                        var fileName = filePathAndName.Substring(lastIndex, filePathAndName.Length - lastIndex);
+                        
+                        var paramName = $"{Constants.AutoFileName}";
+                        querySb.Append($"\'{fileName}\',");
+                        cmd.Parameters.Add(paramName);
+                    }
+                    else
+                    {
+                        if (shouldPullRange)
+                        {
+                            var paramName = $"@param{selectedColumns[columnName]}";
+                            querySb.Append($"{paramName},");
+                            cmd.Parameters.Add(paramName);
+                        }
+                        else
+                        {
+                            var paramName = $"@param{headerColumns.IndexOf(columnName) - Convert.ToInt16(includeFileNameAsField)}";
+                            querySb.Append($"{paramName},");
+                            cmd.Parameters.Add(paramName);
+                        }
+                    }
                 }
 
                 querySb.Length--;
@@ -267,8 +347,18 @@ namespace PluginFileReader.API.Factory.Implementations.Delimited
                     
                     try
                     {
+                        
+                        
                         while (DelimitedReader.ReadLine() && rowCount < limit)
                         {
+                            if (includeFileNameAsField)
+                            {
+                                var lastIndex = Math.Max(filePathAndName.LastIndexOf('\\'),
+                                    filePathAndName.LastIndexOf('/')) + 1;
+                                var fileName = filePathAndName.Substring(lastIndex, filePathAndName.Length - lastIndex);
+                                cmd.Parameters[Constants.AutoFileName].Value = $"{fileName},";
+                            }
+
                             int csvColumnCount = 0;
                             foreach (string fieldValue in DelimitedReader.Fields)
                             {

@@ -78,7 +78,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, bool sftp = false)
+            string filter = null, bool multiRoot = false, bool sftp = false, bool includeFileNameAsField = false)
         {
             return new Settings
             {
@@ -103,6 +103,7 @@ namespace PluginFileReaderTest.Plugin
                             {
                                 XMLSettings = new XmlSettings
                                 {
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     XmlKeys = new List<XmlKey>
                                     {
                                         new XmlKey
@@ -132,6 +133,7 @@ namespace PluginFileReaderTest.Plugin
                             {
                                 XMLSettings = new XmlSettings
                                 {
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     XmlKeys = new List<XmlKey>
                                     {
                                         new XmlKey
@@ -164,6 +166,7 @@ namespace PluginFileReaderTest.Plugin
                             {
                                 XMLSettings = new XmlSettings
                                 {
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     XmlKeys = new List<XmlKey>
                                     {
                                         new XmlKey

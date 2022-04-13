@@ -75,6 +75,7 @@ namespace PluginFileReader.API.Factory.Implementations.XML
             var globalKeyIndexId = "GLOBAL_KEY_INDEX";
             var globalKeySb = new StringBuilder();
             var globalKeyValue = "";
+            var includeFileNameAsField = rootPath.ModeSettings.XMLSettings.IncludeFileNameAsField;
             
             // load xml doc
             var stream = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode, downloadToLocal);
@@ -163,6 +164,11 @@ namespace PluginFileReader.API.Factory.Implementations.XML
                 
                 // setup db table
                 var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{fullTableName}] (");
+
+                if (includeFileNameAsField)
+                {
+                    columns.Insert(0, Constants.AutoFileName);
+                }
                 
                 // add the columns
                 foreach (var column in columns)
@@ -198,9 +204,22 @@ namespace PluginFileReader.API.Factory.Implementations.XML
                 
                 foreach (var column in columns)
                 {
-                    var paramName = $"@param{columns.IndexOf(column)}";
-                    querySb.Append($"{paramName},");
-                    cmd.Parameters.Add(paramName);
+                    if (column == Constants.AutoFileName && includeFileNameAsField)
+                    {
+                        var lastIndex = Math.Max(filePathAndName.LastIndexOf('\\'),
+                            filePathAndName.LastIndexOf('/')) + 1;
+                        var fileName = filePathAndName.Substring(lastIndex, filePathAndName.Length - lastIndex);
+                        
+                        var paramName = $"{Constants.AutoFileName}";
+                        querySb.Append($"\'{fileName}\',");
+                        cmd.Parameters.Add(paramName);
+                    }
+                    else
+                    {
+                        var paramName = $"@param{columns.IndexOf(column)- Convert.ToInt16(includeFileNameAsField)}";
+                        querySb.Append($"{paramName},");
+                        cmd.Parameters.Add(paramName);
+                    }
                 }
                 
                 querySb.Length--;
@@ -223,21 +242,33 @@ namespace PluginFileReader.API.Factory.Implementations.XML
 
                         foreach (var column in columns)
                         {
-                            var columnIndex = columns.IndexOf(column);
+                            if (column == Constants.AutoFileName && includeFileNameAsField)
+                            {
+                                var lastIndex = Math.Max(filePathAndName.LastIndexOf('\\'),
+                                    filePathAndName.LastIndexOf('/')) + 1;
+                                var fileName = filePathAndName.Substring(lastIndex, filePathAndName.Length - lastIndex);
 
-                            if (column == globalKeyId)
-                            {
-                                cmd.Parameters[$"@param{columnIndex}"].Value = globalKeyValue;
-                            }
-                            else if (column == globalKeyIndexId)
-                            {
-                                cmd.Parameters[$"@param{columnIndex}"].Value = $"{globalKeyValue}_{rowIndex}";
+                                cmd.Parameters[Constants.AutoFileName].Value = fileName;
                             }
                             else
                             {
-                                var rawValue = row[columnIndex]?.ToString();
-                                cmd.Parameters[$"@param{columnIndex}"].Value = rawValue;
+                                var columnIndex = columns.IndexOf(column) - Convert.ToInt16(includeFileNameAsField);
+
+                                if (column == globalKeyId)
+                                {
+                                    cmd.Parameters[$"@param{columnIndex}"].Value = globalKeyValue;
+                                }
+                                else if (column == globalKeyIndexId)
+                                {
+                                    cmd.Parameters[$"@param{columnIndex}"].Value = $"{globalKeyValue}_{rowIndex}";
+                                }
+                                else
+                                {
+                                    var rawValue = row[columnIndex]?.ToString();
+                                    cmd.Parameters[$"@param{columnIndex}"].Value = rawValue;
+                                }
                             }
+                           
                         }
                         
                         cmd.ExecuteNonQuery();

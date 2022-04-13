@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Naveego.Sdk.Logging;
+using PluginFileReader.API.Utility;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
@@ -37,6 +38,8 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             
             var columnsMap = new Dictionary<string, List<Column>>();
 
+            var includeFileNameAsField = rootPath.ModeSettings.AS400Settings.IncludeFileNameAsField;
+            
             // foreach (var format in AS400.Format25) // POC
             foreach (var format in rootPath.ModeSettings.AS400Settings.Formats)
             {
@@ -55,6 +58,14 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                     {
                         columns.AddRange(globalFormat.Columns);
                     }
+
+                    if (includeFileNameAsField)
+                    {
+                        var includeFileNameColumn = new Column();
+                        includeFileNameColumn.ColumnName = Constants.AutoFileName;
+                        includeFileNameColumn.IsKey = false;
+                        columns.Insert(0, includeFileNameColumn);
+                    }
                     
                     CreateTable(schemaName, tableName, columns);
                     formatCmdDictionary[format.KeyValue.Name] = GetInsertCmd(schemaName, tableName, columns);
@@ -68,6 +79,14 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                     {
                         columns.AddRange(globalFormat.Columns);
                     }
+                    if (includeFileNameAsField)
+                    {
+                        var includeFileNameColumn = new Column();
+                        includeFileNameColumn.ColumnName = Constants.AutoFileName;
+                        includeFileNameColumn.IsKey = false;
+                        columns.Insert(0, includeFileNameColumn);
+                    }
+                    
                     CreateTable(schemaName, tableName, columns);
                     formatCmdDictionary[format.KeyValue.Name] = GetInsertCmd(schemaName, tableName, columns);
                     columnsMap[format.KeyValue.Name] = columns;
@@ -102,6 +121,14 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
 
                     if (format.SingleRecordPerLine)
                     {
+                        if (includeFileNameAsField)
+                        {
+                            var lastIndex = Math.Max(filePathAndName.LastIndexOf('\\'),
+                                filePathAndName.LastIndexOf('/')) + 1;
+                            var fileName = filePathAndName.Substring(lastIndex, filePathAndName.Length - lastIndex);
+                            recordGlobalHeaderMap.TryAdd(Constants.AutoFileName, fileName);
+                        }
+                        
                         foreach (var column in format.Columns)
                         {
                             var valueLength = column.ColumnEnd -
@@ -158,39 +185,49 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                                 var columns = columnsMap[format.KeyValue.Name];
                                 foreach (var column in columns)
                                 {
-                                    string value;
-
-                                    if (column.IsHeader)
+                                    if (column.ColumnName == Constants.AutoFileName && includeFileNameAsField)
                                     {
-                                        if (!recordHeaderMap[format.KeyValue.Name]
-                                            .TryGetValue(column.ColumnName, out value))
-                                        {
-                                            value = "";
-                                        }
-
-                                        cmd.Parameters[$"@{GetParamName(column)}"].Value =
-                                            column.TrimWhitespace ? value.Trim() : value;
-                                    }
-                                    else if (column.IsGlobalHeader)
-                                    {
-                                        if (!recordGlobalHeaderMap.TryGetValue(column.ColumnName, out value))
-                                        {
-                                            value = "";
-                                        }
-
-                                        cmd.Parameters[$"@{GetParamName(column)}"].Value =
-                                            column.TrimWhitespace ? value.Trim() : value;
+                                        var lastIndex = Math.Max(filePathAndName.LastIndexOf('\\'),
+                                            filePathAndName.LastIndexOf('/')) + 1;
+                                        var fileName = filePathAndName.Substring(lastIndex, filePathAndName.Length - lastIndex);
+                                        cmd.Parameters[$"@{Constants.AutoFileName}"].Value = fileName;
                                     }
                                     else
                                     {
-                                        if (!recordMap[format.KeyValue.Name]
-                                            .TryGetValue(column.ColumnName, out value))
-                                        {
-                                            value = "";
-                                        }
+                                        string value;
 
-                                        cmd.Parameters[$"@{GetParamName(column)}"].Value =
-                                            column.TrimWhitespace ? value.Trim() : value;
+                                        if (column.IsHeader)
+                                        {
+                                            if (!recordHeaderMap[format.KeyValue.Name]
+                                                .TryGetValue(column.ColumnName, out value))
+                                            {
+                                                value = "";
+                                            }
+
+                                            cmd.Parameters[$"@{GetParamName(column)}"].Value =
+                                                column.TrimWhitespace ? value.Trim() : value;
+                                        }
+                                        else if (column.IsGlobalHeader)
+                                        {
+                                            if (!recordGlobalHeaderMap.TryGetValue(column.ColumnName, out value))
+                                            {
+                                                value = "";
+                                            }
+
+                                            cmd.Parameters[$"@{GetParamName(column)}"].Value =
+                                                column.TrimWhitespace ? value.Trim() : value;
+                                        }
+                                        else
+                                        {
+                                            if (!recordMap[format.KeyValue.Name]
+                                                .TryGetValue(column.ColumnName, out value))
+                                            {
+                                                value = "";
+                                            }
+
+                                            cmd.Parameters[$"@{GetParamName(column)}"].Value =
+                                                column.TrimWhitespace ? value.Trim() : value;
+                                        }
                                     }
                                 }
 
@@ -206,6 +243,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                                 }
                                 
                                 // insert record
+                                
                                 if (recordHeaderMap[format.KeyValue.Name].Count > 0 && hasKey)
                                 {
                                     cmd.ExecuteNonQuery();

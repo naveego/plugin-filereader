@@ -74,7 +74,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, string excelColumns = null, List<ExcelCell> excelCells = null, bool sftp = false, bool autoGenRow = true)
+            string filter = null, bool multiRoot = false, string excelColumns = null, List<ExcelCell> excelCells = null, bool sftp = false, bool autoGenRow = true, bool includeFileNameAsField = false)
         {
             return new Settings
             {
@@ -102,6 +102,7 @@ namespace PluginFileReaderTest.Plugin
                                 ExcelModeSettings = new ExcelModeSettings
                                 {
                                     AutoGenRowNumber = autoGenRow,
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     HasHeader = true,
                                     ExcelCells = excelCells,
                                     ExcelColumns = excelColumns
@@ -125,6 +126,7 @@ namespace PluginFileReaderTest.Plugin
                                 ExcelModeSettings = new ExcelModeSettings
                                 {
                                     AutoGenRowNumber = autoGenRow,
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     HasHeader = true,
                                     ExcelCells = excelCells,
                                     ExcelColumns = excelColumns
@@ -151,6 +153,7 @@ namespace PluginFileReaderTest.Plugin
                                 ExcelModeSettings = new ExcelModeSettings
                                 {
                                     AutoGenRowNumber = autoGenRow,
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     HasHeader = true,
                                     ExcelCells = excelCells,
                                     ExcelColumns = excelColumns

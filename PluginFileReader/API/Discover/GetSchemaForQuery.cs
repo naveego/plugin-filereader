@@ -28,7 +28,7 @@ namespace PluginFileReader.API.Discover
                     Logger.Info("Returning Write schema unchanged");
                     return schema;
                 }
-
+                
                 if (string.IsNullOrWhiteSpace(query))
                 {
                     if (!string.IsNullOrWhiteSpace(schema.PublisherMetaJson))

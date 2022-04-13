@@ -19,6 +19,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
             var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
                 ? new DirectoryInfo(rootPath.RootPath).Name
                 : rootPath.Name;
+            var includeFilePathAsField = rootPath.ModeSettings.AS400Settings.IncludeFileNameAsField;
             
             var conn = Utility.Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
             
@@ -53,7 +54,7 @@ namespace PluginFileReader.API.Factory.Implementations.AS400
                 
                 schema = Discover.Discover.GetSchemaForQuery(context, schema, sampleSize, rootPath.Columns);
                 schema.PublisherMetaJson = JsonConvert.SerializeObject(publisherMetaJson);
-                
+
                 schemas.Add(schema);
             }
             

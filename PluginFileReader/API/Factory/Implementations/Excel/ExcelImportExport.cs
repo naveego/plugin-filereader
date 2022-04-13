@@ -59,6 +59,8 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
         public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = -1)
         {
             var autoGenRow = rootPath.ModeSettings.ExcelModeSettings.AutoGenRowNumber;
+            var includeFileNameAsField = rootPath.ModeSettings.ExcelModeSettings.IncludeFileNameAsField;
+            
             var rowsRead = 0;
             var rowsSkipped = 0;
             List<string> headerColumns = new List<string>();
@@ -66,6 +68,11 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
             List<ExcelCell> orderedExcelCells = rootPath.ModeSettings.ExcelModeSettings.GetOrderedExcelCells();
             Dictionary<string, object> excelCellsValues = new Dictionary<string, object>();
 
+            if (includeFileNameAsField)
+            {
+                headerColumns.Insert(0, Constants.AutoFileName);
+            }
+            
             if (orderedExcelCells.Count > 0)
             {
                 var cellsStreamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode, downloadToLocal);
@@ -161,6 +168,8 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                     // setup db table
                     var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] ({(autoGenRow ? $"[{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT," : "")}");
 
+                    
+                    
                     foreach (var column in headerColumns)
                     {
                         querySb.Append(
@@ -205,9 +214,22 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
 
                     foreach (var column in headerColumns)
                     {
-                        var paramName = $"@param{headerColumns.IndexOf(column)}";
-                        querySb.Append($"{paramName},");
-                        cmd.Parameters.Add(paramName);
+                        if (column == Constants.AutoFileName && includeFileNameAsField)
+                        {
+                            var lastIndex = Math.Max(filePathAndName.LastIndexOf('\\'),
+                                filePathAndName.LastIndexOf('/')) + 1;
+                            var fileName = filePathAndName.Substring(lastIndex, filePathAndName.Length - lastIndex);
+                        
+                            var paramName = $"{Constants.AutoFileName}";
+                            querySb.Append($"\'{fileName}\',");
+                            cmd.Parameters.Add(paramName);
+                        }
+                        else
+                        {
+                            var paramName = $"@param{headerColumns.IndexOf(column) - Convert.ToInt16(includeFileNameAsField)}";
+                            querySb.Append($"{paramName},");
+                            cmd.Parameters.Add(paramName);
+                        }
                     }
 
                     foreach (var cell in excelCellsValues)
@@ -236,9 +258,19 @@ namespace PluginFileReader.API.Factory.Implementations.Excel
                         {
                             foreach (var column in headerColumns)
                             {
-                                var rawValue = reader.GetValue(columnIndexes[headerColumns.IndexOf(column)])
-                                    ?.ToString();
-                                cmd.Parameters[$"@param{headerColumns.IndexOf(column)}"].Value = rawValue;
+                                if (column == Constants.AutoFileName && includeFileNameAsField)
+                                {
+                                    var lastIndex = Math.Max(filePathAndName.LastIndexOf('\\'),
+                                        filePathAndName.LastIndexOf('/')) + 1;
+                                    var fileName = filePathAndName.Substring(lastIndex, filePathAndName.Length - lastIndex);
+                                    cmd.Parameters[$"{Constants.AutoFileName}"].Value = fileName;
+                                }
+                                else
+                                {
+                                    var rawValue = reader.GetValue(columnIndexes[headerColumns.IndexOf(column) - Convert.ToInt16(includeFileNameAsField)])
+                                        ?.ToString();
+                                    cmd.Parameters[$"@param{headerColumns.IndexOf(column) - Convert.ToInt16(includeFileNameAsField)}"].Value = rawValue;
+                                }
                             }
 
                             foreach (var cell in excelCellsValues)

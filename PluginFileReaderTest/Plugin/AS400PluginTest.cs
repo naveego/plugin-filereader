@@ -81,7 +81,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false)
+            string filter = null, bool multiRoot = false, bool includeFileNameAsField = false)
         {
             return new Settings
             {
@@ -102,6 +102,7 @@ namespace PluginFileReaderTest.Plugin
                             {
                                 AS400Settings = new AS400Settings
                                 {
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     KeyValueWidth = 2,
                                     AS400FormatsConfigurationFile = FormatConfigFilePath
                                 }
@@ -121,6 +122,7 @@ namespace PluginFileReaderTest.Plugin
                             {
                                 AS400Settings = new AS400Settings
                                 {
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     KeyValueWidth = 2,
                                     AS400FormatsConfigurationFile = FormatConfigFilePath
                                 }
@@ -143,6 +145,7 @@ namespace PluginFileReaderTest.Plugin
                             {
                                 AS400Settings = new AS400Settings
                                 {
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     KeyValueWidth = 2,
                                     AS400FormatsConfigurationFile = FormatConfigFilePath
                                 }

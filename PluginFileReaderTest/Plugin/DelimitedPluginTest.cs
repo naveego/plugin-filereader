@@ -75,7 +75,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false, bool sftp = false, bool autoGenRow = true, string name = null, bool errorOnEmpty = false)
+            string filter = null, bool multiRoot = false, bool sftp = false, bool autoGenRow = true, string name = null, bool errorOnEmpty = false, string selectedRanges = "", bool includeFileNameAsField = false)
         {
             return new Settings
             {
@@ -114,6 +114,8 @@ namespace PluginFileReaderTest.Plugin
                                 DelimitedSettings = new DelimitedSettings
                                 {
                                     AutoGenRowNumber = autoGenRow,
+                                    IncludeFileNameAsField = includeFileNameAsField,
+                                    SelectedRanges = selectedRanges,
                                     HasHeader = true,
                                     Delimiter = delimiter
                                 }
@@ -136,6 +138,8 @@ namespace PluginFileReaderTest.Plugin
                                 DelimitedSettings = new DelimitedSettings
                                 {
                                     AutoGenRowNumber = autoGenRow,
+                                    IncludeFileNameAsField = includeFileNameAsField,
+                                    SelectedRanges = selectedRanges,
                                     HasHeader = true,
                                     Delimiter = delimiter
                                 }
@@ -161,6 +165,8 @@ namespace PluginFileReaderTest.Plugin
                                 DelimitedSettings = new DelimitedSettings
                                 {
                                     AutoGenRowNumber = autoGenRow,
+                                    IncludeFileNameAsField = includeFileNameAsField,
+                                    SelectedRanges = selectedRanges,
                                     HasHeader = true,
                                     Delimiter = delimiter
                                 }
@@ -171,7 +177,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false, bool autoGenRow = true, string name = null, bool errorOnEmpty = false)
+            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false, bool autoGenRow = true, string name = null, bool errorOnEmpty = false, bool includeFileNameAsField = false, string selectedRanges = "")
         {
             if (empty)
             {
@@ -185,7 +191,7 @@ namespace PluginFileReaderTest.Plugin
                 };
             }
 
-            var settings = GetSettings(cleanupAction, delimiter, filter, multiRoot, sftp, autoGenRow, name, errorOnEmpty);
+            var settings = GetSettings(cleanupAction, delimiter, filter, multiRoot, sftp, autoGenRow, name, errorOnEmpty, selectedRanges, includeFileNameAsField);
 
             return new ConnectRequest
             {

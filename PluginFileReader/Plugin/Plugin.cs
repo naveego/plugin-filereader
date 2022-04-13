@@ -155,6 +155,7 @@ namespace PluginFileReader.Plugin
             // only return requested schemas if refresh mode selected
             if (request.Mode == DiscoverSchemasRequest.Types.Mode.All)
             {
+                Logger.Info($"Discover All: Start");
                 // get all schemas
                 try
                 {
@@ -162,7 +163,7 @@ namespace PluginFileReader.Plugin
 
                     var files = _server.Settings.GetAllFilesByRootPath();
                     Logger.Info($"Files attempted: {files.Count}");
-
+                    
                     var schemas = _server.Settings.RootPaths.Select(p =>
                             Discover.GetSchemasForDirectory(context, Utility.GetImportExportFactory(p.Mode), p,
                                 files[p.RootPathName()],

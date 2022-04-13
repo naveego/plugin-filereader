@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Grpc.Core;
+using Naveego.Sdk.Logging;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginFileReader.API.Factory;
@@ -17,6 +18,7 @@ namespace PluginFileReader.API.Discover
             IImportExportFactory factory, RootPathObject rootPath, List<string> paths,
             int sampleSize = 5)
         {
+            Logger.Info("GetSchemasForDirectory: Start");
             if (paths.Count == 0)
             {
                 return new List<Schema>();
@@ -64,6 +66,7 @@ namespace PluginFileReader.API.Discover
                 schemas.Add(schema);
             }
 
+            Logger.Info("GetSchemasForDirectory: End");
             return schemas;
         }
     }

@@ -50,10 +50,24 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
         public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false, long limit = long.MaxValue)
         {
             var autoGenRow = rootPath.ModeSettings.FixedWidthSettings.AutoGenRowNumber;
+            var includeFileNameAsField = rootPath.ModeSettings.FixedWidthSettings.IncludeFileNameAsField;
             
             // setup db table
             var querySb = new StringBuilder($"CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] ({(autoGenRow ? $"[{Constants.AutoRowNum}] INTEGER PRIMARY KEY AUTOINCREMENT," : "")}");
 
+            var headerColumns = new List<string>{};
+            foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
+            {
+                headerColumns.Add(column.ColumnName);
+            }
+            
+            if (includeFileNameAsField)
+            {
+                headerColumns.Insert(0, Constants.AutoFileName);
+                querySb.Append(
+                    $"[{Constants.AutoFileName}] VARCHAR({int.MaxValue}),");
+            }
+            
             foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
             {
                 querySb.Append(
@@ -78,25 +92,39 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
             // read file into db
             var streamWrapper = Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode, downloadToLocal);
             var file = streamWrapper.StreamReader;
+            var lastIndex = Math.Max(filePathAndName.LastIndexOf('\\'),
+                filePathAndName.LastIndexOf('/')) + 1;
+            var fileName = filePathAndName.Substring(lastIndex, filePathAndName.Length - lastIndex);
+
             string line;
             var rowsRead = 0;
             var rowsSkipped = 0;
 
             // prepare insert cmd with parameters
             querySb = new StringBuilder($"INSERT INTO [{_schemaName}].[{_tableName}] (");
-            foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
+            foreach (var column in headerColumns)
             {
-                querySb.Append($"[{column.ColumnName}],");
+                querySb.Append($"[{column}],");
             }
 
             querySb.Length--;
             querySb.Append(") VALUES (");
 
-            foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
+            foreach (var column in headerColumns)
             {
-                var paramName = $"@param{rootPath.ModeSettings.FixedWidthSettings.Columns.IndexOf(column)}";
-                querySb.Append($"{paramName},");
-                cmd.Parameters.Add(paramName);
+                if (column == Constants.AutoFileName && includeFileNameAsField)
+                {
+                    var paramName = $"{Constants.AutoFileName}";
+                    querySb.Append($"\'{fileName}\',");
+                    cmd.Parameters.Add(paramName);
+                }
+                else
+                {
+                    var paramName = $"@param{headerColumns.IndexOf(column) - Convert.ToInt16(includeFileNameAsField)}";
+                    querySb.Append($"{paramName},");
+                    cmd.Parameters.Add(paramName);
+                }
+                
             }
 
             querySb.Length--;
@@ -124,12 +152,17 @@ namespace PluginFileReader.API.Factory.Implementations.FixedWidthColumns
                 // read all lines from file
                 while ((line = file.ReadLine()) != null && rowsRead < limit)
                 {
+                    if (includeFileNameAsField)
+                    {
+                        cmd.Parameters[$"{Constants.AutoFileName}"].Value = fileName;
+                    }
+                    
                     foreach (var column in rootPath.ModeSettings.FixedWidthSettings.Columns)
                     {
                         var rawValue = line.Substring(column.ColumnStart, column.ColumnEnd - column.ColumnStart + 1);
                         cmd.Parameters[$"@param{rootPath.ModeSettings.FixedWidthSettings.Columns.IndexOf(column)}"].Value = column.TrimWhitespace ? rawValue.Trim() : rawValue;
                     }
-
+                    
                     cmd.ExecuteNonQuery();
 
                     rowsRead++;

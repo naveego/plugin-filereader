@@ -63,7 +63,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, string delimiter = ",",
-            string filter = null, bool multiRoot = false, bool autoRowGen = true)
+            string filter = null, bool multiRoot = false, bool autoRowGen = true, bool includeFileNameAsField = false)
         {
             return new Settings
             {
@@ -84,6 +84,7 @@ namespace PluginFileReaderTest.Plugin
                                 FixedWidthSettings = new FixedWidthSettings
                                 {
                                     AutoGenRowNumber = autoRowGen,
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     Columns = new List<Column>
                                     {
                                         new Column()
@@ -146,6 +147,7 @@ namespace PluginFileReaderTest.Plugin
                                 FixedWidthSettings = new FixedWidthSettings
                                 {
                                     AutoGenRowNumber = autoRowGen,
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     Columns = new List<Column>
                                     {
                                         new Column()
@@ -190,6 +192,7 @@ namespace PluginFileReaderTest.Plugin
                                 FixedWidthSettings = new FixedWidthSettings
                                 {
                                     AutoGenRowNumber = autoRowGen,
+                                    IncludeFileNameAsField = includeFileNameAsField,
                                     Columns = new List<Column>
                                     {
                                         new Column()
