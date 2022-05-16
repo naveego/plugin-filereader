@@ -79,7 +79,7 @@ namespace PluginFileReader.Helper
                 var directoryPath = rootPath.RootPath;
                 var rootPathName = rootPath.RootPathName();
 
-                List<string> filesToAdd;
+                List<string> filesToAdd = new List<string>();
 
                 if (rootPath.FileReadMode != Constants.FileModeLocal)
                 {
@@ -90,8 +90,7 @@ namespace PluginFileReader.Helper
                     var filters = rootPath.Filter.Split(',');
                     if (filters.Length > 1)
                     {
-                        filesToAdd = Directory.GetFiles(directoryPath, filters[0].Trim()).ToList();
-                        foreach (var filter in filters.Skip(1))
+                        foreach (var filter in filters)
                         {
                             var safeFilter = filter.Trim();
                             foreach (var file in Directory.GetFiles(directoryPath, safeFilter).ToList())
