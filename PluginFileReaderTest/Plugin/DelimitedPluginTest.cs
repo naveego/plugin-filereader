@@ -25,7 +25,7 @@ namespace PluginFileReaderTest.Plugin
         private const string GoldenReplicationFile = "golden.csv";
         private const string VersionReplicationFile = "version.csv";
         private const string DefaultCleanupAction = "none";
-        private const string DefaultFilter = "*.csv";
+        private const string DefaultFilter = "MOCK_DATA.csv,MOCK_DATA.csv,MOCK_DATA_SAME.csv,*.csv";
         private const string DelimitedMode = "Delimited";
 
         private void PrepareTestEnvironment(bool configureInvalid = false, bool configureArchiveFull = false,

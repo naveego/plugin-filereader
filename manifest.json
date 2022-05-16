@@ -296,7 +296,7 @@
               },
               "Filter": {
                 "type": "string",
-                "description": "Filters used to select files beneath the root path. Each filter should be a regular expression.",
+                "description": "Filters used to select files beneath the root path. Each filter should be a regular expression. Separate filters with commas.",
                 "default": "*.csv"
               },
               "Name": {

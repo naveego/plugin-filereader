@@ -87,7 +87,26 @@ namespace PluginFileReader.Helper
                 }
                 else
                 {
-                    filesToAdd = Directory.GetFiles(directoryPath, rootPath.Filter).ToList();
+                    var filters = rootPath.Filter.Split(',');
+                    if (filters.Length > 1)
+                    {
+                        filesToAdd = Directory.GetFiles(directoryPath, filters[0].Trim()).ToList();
+                        foreach (var filter in filters.Skip(1))
+                        {
+                            var safeFilter = filter.Trim();
+                            foreach (var file in Directory.GetFiles(directoryPath, safeFilter).ToList())
+                            {
+                                if (!filesToAdd.Contains(file))
+                                {
+                                    filesToAdd.Add(file);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        filesToAdd = Directory.GetFiles(directoryPath, rootPath.Filter).ToList();
+                    }
                 }
 
                 if (filesByRootPath.TryGetValue(rootPathName, out var existingFiles))
