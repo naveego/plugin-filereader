@@ -142,19 +142,47 @@ namespace PluginFileReader.Helper
                         case Constants.FileModeFtp:
                             using (var client = Utility.GetFtpClient())
                             {
-                                var mask = new Regex(rootPath.Filter
-                                    .Replace(".", "[.]")
-                                    .Replace("*", ".*")
-                                    .Replace("?", "."));
-
-                                foreach (var item in await client.GetListingAsync(rootPath.RootPath))
+                                if (rootPath.Filter.Split(',').Length > 1)
                                 {
-                                    // if this is a file
-                                    if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
+                                    foreach (var filter in rootPath.Filter.Split(','))
                                     {
-                                        files.Add(item.FullName);
+                                        var safeFilter = filter.Trim();
+                                        var mask = new Regex(safeFilter
+                                            .Replace(".", "[.]")
+                                            .Replace("*", ".*")
+                                            .Replace("?", "."));
+                                        
+                                        foreach (var item in await client.GetListingAsync(rootPath.RootPath))
+                                        {
+                                            // if this is a file
+                                            if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
+                                            {
+                                                if (!files.Contains(item.FullName))
+                                                {
+                                                    files.Add(item.FullName);
 
-                                        Logger.Debug($"Added file {item.Name}");
+                                                    Logger.Debug($"Added file {item.Name}");
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var mask = new Regex(rootPath.Filter
+                                        .Replace(".", "[.]")
+                                        .Replace("*", ".*")
+                                        .Replace("?", "."));
+
+                                    foreach (var item in await client.GetListingAsync(rootPath.RootPath))
+                                    {
+                                        // if this is a file
+                                        if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
+                                        {
+                                            files.Add(item.FullName);
+
+                                            Logger.Debug($"Added file {item.Name}");
+                                        }
                                     }
                                 }
 
@@ -165,19 +193,48 @@ namespace PluginFileReader.Helper
                         case Constants.FileModeSftp:
                             using (var client = Utility.GetSftpClient())
                             {
-                                var mask = new Regex(rootPath.Filter
-                                    .Replace(".", "[.]")
-                                    .Replace("*", ".*")
-                                    .Replace("?", "."));
-
-                                var allFiles = client.ListDirectory(rootPath.RootPath);
-                                var downloadFiles = allFiles.Where(f => f.IsDirectory == false && mask.IsMatch(f.Name));
-
-                                foreach (var file in downloadFiles)
+                                if (rootPath.Filter.Split(',').Length > 1)
                                 {
-                                    files.Add(file.FullName);
+                                    foreach (var filter in rootPath.Filter.Split(','))
+                                    {
+                                        var safeFilter = filter.Trim();
+                                        var mask = new Regex(safeFilter
+                                            .Replace(".", "[.]")
+                                            .Replace("*", ".*")
+                                            .Replace("?", "."));
 
-                                    Logger.Debug($"Added file {file.Name}");
+                                        var allFiles = client.ListDirectory(rootPath.RootPath);
+                                        var downloadFiles =
+                                            allFiles.Where(f => f.IsDirectory == false && mask.IsMatch(f.Name));
+
+                                        foreach (var file in downloadFiles)
+                                        {
+                                            if (!files.Contains(file.FullName))
+                                            {
+                                                files.Add(file.FullName);    
+                                            }
+
+                                            Logger.Debug($"Added file {file.Name}");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var mask = new Regex(rootPath.Filter
+                                        .Replace(".", "[.]")
+                                        .Replace("*", ".*")
+                                        .Replace("?", "."));
+
+                                    var allFiles = client.ListDirectory(rootPath.RootPath);
+                                    var downloadFiles =
+                                        allFiles.Where(f => f.IsDirectory == false && mask.IsMatch(f.Name));
+
+                                    foreach (var file in downloadFiles)
+                                    {
+                                        files.Add(file.FullName);
+
+                                        Logger.Debug($"Added file {file.Name}");
+                                    }
                                 }
 
                                 client.Disconnect();
