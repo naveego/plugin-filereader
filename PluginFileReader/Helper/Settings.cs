@@ -79,7 +79,7 @@ namespace PluginFileReader.Helper
                 var directoryPath = rootPath.RootPath;
                 var rootPathName = rootPath.RootPathName();
 
-                List<string> filesToAdd;
+                List<string> filesToAdd = new List<string>();
 
                 if (rootPath.FileReadMode != Constants.FileModeLocal)
                 {
@@ -87,7 +87,25 @@ namespace PluginFileReader.Helper
                 }
                 else
                 {
-                    filesToAdd = Directory.GetFiles(directoryPath, rootPath.Filter).ToList();
+                    var filters = rootPath.Filter.Split(',');
+                    if (filters.Length > 1)
+                    {
+                        foreach (var filter in filters)
+                        {
+                            var safeFilter = filter.Trim();
+                            foreach (var file in Directory.GetFiles(directoryPath, safeFilter).ToList())
+                            {
+                                if (!filesToAdd.Contains(file))
+                                {
+                                    filesToAdd.Add(file);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        filesToAdd = Directory.GetFiles(directoryPath, rootPath.Filter).ToList();
+                    }
                 }
 
                 if (filesByRootPath.TryGetValue(rootPathName, out var existingFiles))
@@ -123,19 +141,47 @@ namespace PluginFileReader.Helper
                         case Constants.FileModeFtp:
                             using (var client = Utility.GetFtpClient())
                             {
-                                var mask = new Regex(rootPath.Filter
-                                    .Replace(".", "[.]")
-                                    .Replace("*", ".*")
-                                    .Replace("?", "."));
-
-                                foreach (var item in await client.GetListingAsync(rootPath.RootPath))
+                                if (rootPath.Filter.Split(',').Length > 1)
                                 {
-                                    // if this is a file
-                                    if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
+                                    foreach (var filter in rootPath.Filter.Split(','))
                                     {
-                                        files.Add(item.FullName);
+                                        var safeFilter = filter.Trim();
+                                        var mask = new Regex(safeFilter
+                                            .Replace(".", "[.]")
+                                            .Replace("*", ".*")
+                                            .Replace("?", "."));
+                                        
+                                        foreach (var item in await client.GetListingAsync(rootPath.RootPath))
+                                        {
+                                            // if this is a file
+                                            if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
+                                            {
+                                                if (!files.Contains(item.FullName))
+                                                {
+                                                    files.Add(item.FullName);
 
-                                        Logger.Debug($"Added file {item.Name}");
+                                                    Logger.Debug($"Added file {item.Name}");
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var mask = new Regex(rootPath.Filter
+                                        .Replace(".", "[.]")
+                                        .Replace("*", ".*")
+                                        .Replace("?", "."));
+
+                                    foreach (var item in await client.GetListingAsync(rootPath.RootPath))
+                                    {
+                                        // if this is a file
+                                        if (item.Type == FtpFileSystemObjectType.File && mask.IsMatch(item.Name))
+                                        {
+                                            files.Add(item.FullName);
+
+                                            Logger.Debug($"Added file {item.Name}");
+                                        }
                                     }
                                 }
 
@@ -146,19 +192,48 @@ namespace PluginFileReader.Helper
                         case Constants.FileModeSftp:
                             using (var client = Utility.GetSftpClient())
                             {
-                                var mask = new Regex(rootPath.Filter
-                                    .Replace(".", "[.]")
-                                    .Replace("*", ".*")
-                                    .Replace("?", "."));
-
-                                var allFiles = client.ListDirectory(rootPath.RootPath);
-                                var downloadFiles = allFiles.Where(f => f.IsDirectory == false && mask.IsMatch(f.Name));
-
-                                foreach (var file in downloadFiles)
+                                if (rootPath.Filter.Split(',').Length > 1)
                                 {
-                                    files.Add(file.FullName);
+                                    foreach (var filter in rootPath.Filter.Split(','))
+                                    {
+                                        var safeFilter = filter.Trim();
+                                        var mask = new Regex(safeFilter
+                                            .Replace(".", "[.]")
+                                            .Replace("*", ".*")
+                                            .Replace("?", "."));
 
-                                    Logger.Debug($"Added file {file.Name}");
+                                        var allFiles = client.ListDirectory(rootPath.RootPath);
+                                        var downloadFiles =
+                                            allFiles.Where(f => f.IsDirectory == false && mask.IsMatch(f.Name));
+
+                                        foreach (var file in downloadFiles)
+                                        {
+                                            if (!files.Contains(file.FullName))
+                                            {
+                                                files.Add(file.FullName);    
+                                            }
+
+                                            Logger.Debug($"Added file {file.Name}");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var mask = new Regex(rootPath.Filter
+                                        .Replace(".", "[.]")
+                                        .Replace("*", ".*")
+                                        .Replace("?", "."));
+
+                                    var allFiles = client.ListDirectory(rootPath.RootPath);
+                                    var downloadFiles =
+                                        allFiles.Where(f => f.IsDirectory == false && mask.IsMatch(f.Name));
+
+                                    foreach (var file in downloadFiles)
+                                    {
+                                        files.Add(file.FullName);
+
+                                        Logger.Debug($"Added file {file.Name}");
+                                    }
                                 }
 
                                 client.Disconnect();
