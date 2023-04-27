@@ -162,10 +162,24 @@ namespace PluginFileReader.Plugin
                     await DiscoverSemaphoreSlim.WaitAsync();
 
                     var files = _server.Settings.GetAllFilesByRootPath();
+
+                    var connectPaths = _server.Settings.RootPaths.Select(p => new RootPathConnectObject {
+                        RootPathObject = p,
+                        Paths = files[p.RootPathName()],
+                        ImportExportFactory = Utility.GetImportExportFactory(p.Mode)
+                    }).ToList();
+
                     Logger.Info($"Files attempted: {files.Count}");
-                    
-                    var schemas = _server.Settings.RootPaths.Select(p =>
-                            Discover.GetSchemasForDirectory(context, Utility.GetImportExportFactory(p.Mode), p,
+
+                    // TODO: Confirm whether sample size should apply to file info schema
+                    // attach a file information schema
+                    var fileInfoSchema = Discover.GetFileInfoSchema(context, connectPaths, sampleSize);
+
+                    discoverSchemasResponse.Schemas.Add(fileInfoSchema);
+
+                    // discover all schemas
+                    var schemas = _server.Settings.RootPaths.Select((p, i) =>
+                            Discover.GetSchemasForDirectory(context, connectPaths[i].ImportExportFactory, p,
                                 files[p.RootPathName()],
                                 sampleSize)).Select(l => l.Where(s => s != null))
                         .ToList();

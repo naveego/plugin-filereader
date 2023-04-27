@@ -1,13 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Grpc.Core;
 using Naveego.Sdk.Logging;
 using Naveego.Sdk.Plugins;
-using Newtonsoft.Json;
 using PluginFileReader.API.Factory;
 using PluginFileReader.API.Utility;
-using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
 
 namespace PluginFileReader.API.Discover
