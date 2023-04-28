@@ -4,7 +4,6 @@ using Grpc.Core;
 using Naveego.Sdk.Logging;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
-using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
 
 namespace PluginFileReader.API.Read

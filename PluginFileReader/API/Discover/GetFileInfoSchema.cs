@@ -3,64 +3,29 @@ using Grpc.Core;
 using Naveego.Sdk.Logging;
 using Naveego.Sdk.Plugins;
 using PluginFileReader.Helper;
+using PluginFileReader.DataContracts;
+using System.IO;
 
 namespace PluginFileReader.API.Discover
 {
     public static partial class Discover
     {
-        public static Schema GetFileInfoSchema(ServerCallContext context,
-            List<RootPathConnectObject> rootPathConnects, int sampleSize = 5)
-        {
-            Logger.Info("GetFileInfoSchema: Start");
+        public const string FileInfoSchemaId = "AU_FileInformation";
 
+        public static Schema GetFileInfoSchema()
+        {
             var schema = new Schema
             {
-                Id = "AU_FileInformation",
-                Name = "AU_FileInformation",
+                Id = FileInfoSchemaId,
+                Name = FileInfoSchemaId,
                 DataFlowDirection = Schema.Types.DataFlowDirection.Read,
                 Properties =
                 {
-                    new Property
-                    {
-                        Id = "RootPathName",
-                        Name = "Root Path Name",
-                        IsKey = true,
-                        IsNullable = false,
-                        Type = PropertyType.String
-                    },
-                    new Property
-                    {
-                        Id = "FileName",
-                        Name = "File Name",
-                        IsKey = true,
-                        IsNullable = false,
-                        Type = PropertyType.String
-                    },
-                    new Property
-                    {
-                        Id = "FileType",
-                        Name = "File Type",
-                        IsKey = false,
-                        IsNullable = false,
-                        Type = PropertyType.String
-                    },
-                    new Property
-                    {
-                        Id = "FileSize",
-                        Name = "File Size",
-                        IsKey = false,
-                        IsNullable = false,
-                        Type = PropertyType.String
-                    }
+                    FileInfoData.FileInfoProperties
                 }
             };
 
-            for (int i = 0; i < rootPathConnects.Count; i++)
-            {
-                // TODO: Discover all files and their matches in root paths
-            }
-
-            Logger.Info($"Schemas returned: {schema}");
+            Logger.Info($"File Info Schema returned: {schema}");
             return schema;
         }
     }

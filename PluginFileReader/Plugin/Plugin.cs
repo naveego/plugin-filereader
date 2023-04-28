@@ -163,26 +163,18 @@ namespace PluginFileReader.Plugin
 
                     var files = _server.Settings.GetAllFilesByRootPath();
 
-                    var connectPaths = _server.Settings.RootPaths.Select(p => new RootPathConnectObject {
-                        RootPathObject = p,
-                        Paths = files[p.RootPathName()],
-                        ImportExportFactory = Utility.GetImportExportFactory(p.Mode)
-                    }).ToList();
-
                     Logger.Info($"Files attempted: {files.Count}");
 
-                    // TODO: Confirm whether sample size should apply to file info schema
                     // attach a file information schema
-                    var fileInfoSchema = Discover.GetFileInfoSchema(context, connectPaths, sampleSize);
+                    var fileInfoSchema = Discover.GetFileInfoSchema();
 
                     discoverSchemasResponse.Schemas.Add(fileInfoSchema);
 
                     // discover all schemas
                     var schemas = _server.Settings.RootPaths.Select((p, i) =>
-                            Discover.GetSchemasForDirectory(context, connectPaths[i].ImportExportFactory, p,
-                                files[p.RootPathName()],
-                                sampleSize)).Select(l => l.Where(s => s != null))
-                        .ToList();
+                            Discover.GetSchemasForDirectory(context, Utility.GetImportExportFactory(p.Mode),
+                                p, files[p.RootPathName()],
+                                sampleSize)).Select(l => l.Where(s => s != null)).ToList();
 
                     discoverSchemasResponse.Schemas.AddRange(schemas.SelectMany(s => s));
 
@@ -226,9 +218,8 @@ namespace PluginFileReader.Plugin
                             ? new DirectoryInfo(rootPath.RootPath).Name
                             : rootPath.Name;
 
-                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn,
-                            rootPath,
-                            tableName, schemaName, files[rootPath.RootPathName()], true);
+                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode),
+                            conn, rootPath, tableName, schemaName, files[rootPath.RootPathName()], true);
                     }
                 }
                 else
@@ -288,8 +279,29 @@ namespace PluginFileReader.Plugin
 
             try
             {
-                var conn = Utility.GetSqlConnection(jobId);
                 var filesByRootPath = _server.Settings.GetAllFilesByRootPath();
+
+                if (schema.Id == Discover.FileInfoSchemaId)
+                {
+                    var records = Read.ReadFileInfo(_server.Settings.RootPaths.Select(p =>
+                        new RootPathFilesObject { Root = p, Paths = filesByRootPath[p.RootPathName()] })
+                        .ToList());
+
+                    foreach (var record in records)
+                    {
+                        if ((limitFlag && recordsCount == limit) || !_server.Connected)
+                        {
+                            break;
+                        }
+
+                        // publish record
+                        await responseStream.WriteAsync(record);
+                        recordsCount++;
+                    }
+                    return;
+                }
+
+                var conn = Utility.GetSqlConnection(jobId);
 
                 if (string.IsNullOrWhiteSpace(schema.Query))
                 {
