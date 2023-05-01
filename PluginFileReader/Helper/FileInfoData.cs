@@ -51,7 +51,7 @@ namespace PluginFileReader.Helper
                 Id = "FileExtension",
                 Name = "File Extension",
                 IsKey = false,
-                IsNullable = false,
+                IsNullable = true,
                 Type = PropertyType.String,
                 TypeAtSource = $"VARCHAR({int.MaxValue})"
             },

@@ -277,13 +277,9 @@ namespace PluginFileReader.Plugin
                     var tableName = schema.Id;
                     if (files.Count > 0)
                     {
-                        // load file and then stream files one by one
-                        foreach (var file in files)
-                        {
-                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo), conn,
+                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo), conn,
                                 rootPath,
-                                tableName, schemaName, new List<string> {file}, true);
-                        }
+                                tableName, schemaName, files, true);
                     }
                     else
                     {
