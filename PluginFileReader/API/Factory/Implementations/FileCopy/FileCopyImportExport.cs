@@ -207,23 +207,17 @@ CREATE TABLE IF NOT EXISTS [{_schemaName}].[{_tableName}] (
                 }
                 finally
                 {
-                    // calculate file size
-                    var totalBytes = streamWrapper.Stream.Length;
-                    var suffixes = new List<string>
+                    try
                     {
-                        "B", "KB", "MB", "GB", "TB", "PB", "EB"
-                    };
-                    
-                    if (totalBytes == 0)
-                    {
-                        runFileSize = "0 B";
+                        runFileSize = streamWrapper.PrintStreamLength();
                     }
-                    else
+                    catch (Exception e)
                     {
-                        var bytes = Math.Abs(totalBytes);
-                        var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
-                        var num = Math.Round(bytes / Math.Pow(1024, place), 1);
-                        runFileSize = $"{Math.Sign(totalBytes) * num}{suffixes[place]}";
+                        Logger.Error(e, e.Message);
+                        if (string.IsNullOrWhiteSpace(runError))
+                        {
+                            runError = e.Message;
+                        }
                     }
                     
                     // close input file stream

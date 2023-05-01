@@ -11,7 +11,7 @@ using Record = Naveego.Sdk.Plugins.Record;
 
 namespace PluginFileReaderTest.Plugin
 {
-    public class FileCopyPluginTest
+    public class FileInfoPluginTest
     {
         private const string BasePath = "../../../MockData/XMLData";
         private const string ReadPath = "../../../MockData/ReadDirectory";
@@ -19,8 +19,6 @@ namespace PluginFileReaderTest.Plugin
         private const string ArchivePath = "../../../MockData/ArchiveDirectory";
         private const string ReplicationPath = "../../../MockData/ReplicationDirectory";
         private const string TargetWriteFile = "target.csv";
-        private const string GoldenReplicationFile = "golden.csv";
-        private const string VersionReplicationFile = "version.csv";
         private const string DefaultCleanupAction = "none";
         private const string DefaultFilter = "*.xml";
         private const string FileCopyMode = "File Copy";
@@ -193,7 +191,7 @@ namespace PluginFileReaderTest.Plugin
                 };
             }
 
-            var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, sftp, delayMS, oldRegexReplace, newRegexReplace);
+            var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, sftp);
 
             return new ConnectRequest
             {
@@ -325,11 +323,19 @@ namespace PluginFileReaderTest.Plugin
                 JobId = "test",
             };
 
-            // act
+            // act - find AU_FileInformation schema, then read table
             client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
+
+            var fileInfoSchema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
+            Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
+            Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
+            Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+
+            request.Schema = fileInfoSchema;
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -344,77 +350,8 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal(3, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            Assert.Equal("True", record["RUN_SUCCESS"]);
-            Assert.Equal("", record["RUN_ERROR"]);
-
-            // cleanup
-            await channel.ShutdownAsync();
-            await server.ShutdownAsync();
-        }
-        
-        [Fact]
-        public async Task ReadStreamDelayTest()
-        {
-            // setup
-            PrepareTestEnvironment(false);
-            Server server = new Server
-            {
-                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
-                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
-            };
-            server.Start();
-
-            var port = server.Ports.First().BoundPort;
-
-            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
-            var client = new Publisher.PublisherClient(channel);
-            
-            var configureRequest = new ConfigureRequest
-            {
-                TemporaryDirectory = "../../../Temp",
-                PermanentDirectory = "../../../Perm",
-                LogDirectory = "../../../Logs",
-                DataVersions = new DataVersions(),
-                LogLevel = LogLevel.Debug
-            };
-
-            var connectRequest = GetConnectSettings(null, 0, "*", false, false, false, 5000);
-
-            var discoverRequest = new DiscoverSchemasRequest
-            {
-                Mode = DiscoverSchemasRequest.Types.Mode.All,
-            };
-            
-            var request = new ReadRequest()
-            {
-                DataVersions = new DataVersions
-                {
-                    JobId = "test"
-                },
-                JobId = "test",
-            };
-
-            // act
-            client.Configure(configureRequest);
-            client.Connect(connectRequest);
-            var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
-
-            var response = client.ReadStream(request);
-            var responseStream = response.ResponseStream;
-            var records = new List<Record>();
-
-            while (await responseStream.MoveNext())
-            {
-                records.Add(responseStream.Current);
-            }
-
-            // assert
-            Assert.Equal(3, records.Count);
-
-            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            Assert.Equal("True", record["RUN_SUCCESS"]);
-            Assert.Equal("", record["RUN_ERROR"]);
+            Assert.Equal(record["RootPath"], "");
+            Assert.Equal(record["FileName"], "");
 
             // cleanup
             await channel.ShutdownAsync();

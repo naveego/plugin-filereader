@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using Grpc.Core;
 using Naveego.Sdk.Logging;
 using Naveego.Sdk.Plugins;
@@ -15,6 +16,7 @@ using PluginFileReader.API.Utility;
 using PluginFileReader.API.Write;
 using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
+using SQLDatabase.Net.SQLDatabaseClient;
 
 namespace PluginFileReader.Plugin
 {
@@ -257,6 +259,64 @@ namespace PluginFileReader.Plugin
             }
         }
 
+        private async Task ReadStreamFileInfo(ReadRequest request, IServerStreamWriter<Record> responseStream,
+            ServerCallContext context, Schema schema, Dictionary<string, List<string>> filesByRootPath,
+            SqlDatabaseConnection conn)
+        {
+            var limit = request.Limit;
+            var limitFlag = request.Limit != 0;
+            var jobId = request.JobId;
+            long recordsCount = 0;
+
+            try
+            {
+                foreach (var rootPath in _server.Settings.RootPaths)
+                {
+                    var files = filesByRootPath[rootPath.RootPathName()];
+                    var schemaName = Constants.SchemaName;
+                    var tableName = schema.Id;
+                    if (files.Count > 0)
+                    {
+                        // load file and then stream files one by one
+                        foreach (var file in files)
+                        {
+                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo), conn,
+                                rootPath,
+                                tableName, schemaName, new List<string> {file}, true);
+                        }
+                    }
+                    else
+                    {
+                        Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName, Utility.GetImportExportFactory(rootPath.Mode), rootPath, files);
+
+                        if (rootPath.ErrorOnEmptyRootPath)
+                        {
+                            throw new Exception($"Root Path {rootPath.RootPathName()} was empty");
+                        }
+                    }
+                }
+
+                var records = Read.ReadRecords(context, schema, jobId);
+
+                foreach (var record in records)
+                {
+                    // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
+                    if ((limitFlag && recordsCount == limit) || !_server.Connected)
+                    {
+                        break;
+                    }
+
+                    // publish record
+                    await responseStream.WriteAsync(record);
+                    recordsCount++;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, e.Message);
+            }
+        }
+
         /// <summary>
         /// Publishes a stream of data for a given schema
         /// </summary>
@@ -280,31 +340,17 @@ namespace PluginFileReader.Plugin
             try
             {
                 var filesByRootPath = _server.Settings.GetAllFilesByRootPath();
-
-                if (schema.Id == Discover.FileInfoSchemaId)
-                {
-                    var records = Read.ReadFileInfo(_server.Settings.RootPaths.Select(p =>
-                        new RootPathFilesObject { Root = p, Paths = filesByRootPath[p.RootPathName()] })
-                        .ToList());
-
-                    foreach (var record in records)
-                    {
-                        if ((limitFlag && recordsCount == limit) || !_server.Connected)
-                        {
-                            break;
-                        }
-
-                        // publish record
-                        await responseStream.WriteAsync(record);
-                        recordsCount++;
-                    }
-                    return;
-                }
-
                 var conn = Utility.GetSqlConnection(jobId);
 
                 if (string.IsNullOrWhiteSpace(schema.Query))
                 {
+                    if (FileInfoData.IsFileInfoSchema(schema))
+                    {
+                        await ReadStreamFileInfo(request, responseStream, context, schema, filesByRootPath, conn);
+                        await conn.CloseAsync();
+                        return;
+                    }
+
                     // schema is not query based so we can stream each file as it is loaded
                     rootPaths = _server.Settings.GetRootPathsFromQuery(Utility.GetDefaultQuery(schema));
                     var rootPath = rootPaths.First();
