@@ -440,6 +440,92 @@ namespace PluginFileReaderTest.Plugin
         }
         
         [Fact]
+        public async Task ReadStreamRefreshTest()
+        {
+            // setup
+            PrepareTestEnvironment(true);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*", false, false, false);
+
+            var discoverRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                ToRefresh =
+                {
+                    FileInfoData.GetFileInfoSchema()
+                },
+                SampleSize = 10
+            };
+            
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act - find AU_FileInformation schema, then read table
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(discoverRequest);
+
+            Assert.Single(schemasResponse.Schemas);
+
+            var fileInfoSchema = schemasResponse.Schemas.First();
+            Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
+            Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
+            Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+
+            request.Schema = fileInfoSchema;
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(3, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal(ReadPath, record["RootPath"]);
+            Assert.Equal("VL_CREDITREPORT.xsd", record["FileName"]);
+            Assert.Equal("XSD file", record["FileExtension"]);
+            Assert.Equal("22.8KB", record["FileSize"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
         public async Task ReadStreamSftpTest()
         {
             // setup

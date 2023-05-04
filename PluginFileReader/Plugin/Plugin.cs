@@ -174,9 +174,9 @@ namespace PluginFileReader.Plugin
 
                     // discover all schemas
                     var schemas = _server.Settings.RootPaths.Select((p, i) =>
-                            Discover.GetSchemasForDirectory(context, Utility.GetImportExportFactory(p.Mode),
-                                p, files[p.RootPathName()],
-                                sampleSize)).Select(l => l.Where(s => s != null)).ToList();
+                        Discover.GetSchemasForDirectory(context, Utility.GetImportExportFactory(p.Mode),
+                            p, files[p.RootPathName()],
+                            sampleSize)).Select(l => l.Where(s => s != null)).ToList();
 
                     discoverSchemasResponse.Schemas.AddRange(schemas.SelectMany(s => s));
 
@@ -202,6 +202,7 @@ namespace PluginFileReader.Plugin
                 var refreshSchemas = request.ToRefresh;
 
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
+                if (refreshSchemas.Count == 1) Logger.Info($"Refresh schema id: {refreshSchemas.First().Id}");
 
                 var files = _server.Settings.GetAllFilesByRootPath();
                 var conn = Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
@@ -211,8 +212,37 @@ namespace PluginFileReader.Plugin
                     sampleSize = 5;
                 }
 
-                if (Discover.ShouldLoadAll(refreshSchemas.ToList()))
+                var fileInfoSchema = refreshSchemas.FirstOrDefault(s => FileInfoData.IsFileInfoSchema(s));
+                if (fileInfoSchema != null)
                 {
+                    var deleteAllOnStart = true;
+                    var discoverAll = Discover.ShouldLoadAll(refreshSchemas.Where(s => FileInfoData.IsFileInfoSchema(s)).ToList());
+                    var infoSampleSize = long.MaxValue;
+                    var infoFileLimit = int.MaxValue;
+                    if (!discoverAll)
+                    {
+                        infoSampleSize = sampleSize;
+                        infoFileLimit = 1;
+                    }
+
+                    foreach (var rootPath in _server.Settings.RootPaths)
+                    {
+                        var schemaName = Constants.SchemaName;
+                        var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                            ? new DirectoryInfo(rootPath.RootPath).Name
+                            : rootPath.Name;
+
+                        Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
+                            conn, rootPath, fileInfoSchema.Id, schemaName, files[rootPath.RootPathName()], discoverAll, infoSampleSize,
+                            infoFileLimit, deleteAllOnStart);
+                        deleteAllOnStart = false;
+                    }
+                }
+
+                // exclude file info schema from normal discover operation
+                if (Discover.ShouldLoadAll(refreshSchemas.Where(s => !FileInfoData.IsFileInfoSchema(s)).ToList()))
+                {
+                    Logger.Info($"Should discover all");
                     foreach (var rootPath in _server.Settings.RootPaths)
                     {
                         var schemaName = Constants.SchemaName;
@@ -226,6 +256,7 @@ namespace PluginFileReader.Plugin
                 }
                 else
                 {
+                    Logger.Info($"Partial discover");
                     foreach (var rootPath in _server.Settings.RootPaths)
                     {
                         var schemaName = Constants.SchemaName;
@@ -233,8 +264,7 @@ namespace PluginFileReader.Plugin
                             ? new DirectoryInfo(rootPath.RootPath).Name
                             : rootPath.Name;
 
-                        Utility.LoadDirectoryFilesIntoDb(
-                            Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
+                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
                             tableName, schemaName, files[rootPath.RootPathName()], false, sampleSize, 1);
                     }
                 }
@@ -244,7 +274,7 @@ namespace PluginFileReader.Plugin
 
                 discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
 
-                // return all schemas 
+                // return all schemas
                 Logger.Info($"Schemas returned: {discoverSchemasResponse.Schemas.Count}");
                 return discoverSchemasResponse;
             }
