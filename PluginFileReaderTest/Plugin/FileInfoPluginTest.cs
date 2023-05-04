@@ -281,6 +281,79 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
+
+        [Fact]
+        public async Task ReadStreamEmptyTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*.nvld", false, false, false);
+
+            var discoverRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act - find AU_FileInformation schema, then read table
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(discoverRequest);
+
+            var fileInfoSchema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
+            Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
+            Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
+            Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+
+            request.Schema = fileInfoSchema;
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(0, records.Count);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
         
         [Fact]
         public async Task ReadStreamTest()
@@ -431,9 +504,9 @@ namespace PluginFileReaderTest.Plugin
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             Assert.Equal(ReadSFTPPath, record["RootPath"]);
-            Assert.Equal("<xsd-file>", record["FileName"]);
-            Assert.Equal("XSD file", record["FileExtension"]);
-            Assert.Equal("<xsd-filesize>", record["FileSize"]);
+            Assert.Equal("<xml-file>", record["FileName"]);
+            Assert.Equal("XML file", record["FileExtension"]);
+            Assert.Equal("<xml-filesize>", record["FileSize"]);
 
             // cleanup
             await channel.ShutdownAsync();

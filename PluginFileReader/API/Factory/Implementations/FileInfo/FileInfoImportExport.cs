@@ -53,6 +53,8 @@ namespace PluginFileReader.API.Factory.Implementations.FileInfo
         public long ImportTable(string filePathAndName, RootPathObject rootPath, bool downloadToLocal = false,
             long limit = long.MaxValue)
         {
+            var createAndInsert = string.IsNullOrWhiteSpace(filePathAndName) || rootPath == null;
+
             var rootPathName = rootPath.RootPath;
             var fileName = filePathAndName;
             var fileType = "";
@@ -61,32 +63,35 @@ namespace PluginFileReader.API.Factory.Implementations.FileInfo
             // get information from the file path and name
             Logger.Debug("Getting file information...");
 
-            try
+            if (!string.IsNullOrWhiteSpace(filePathAndName))
             {
-                fileName = Path.GetFileName(filePathAndName);
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, e.Message);
-            }
-
-            try
-            {
-                fileType = Path.GetExtension(filePathAndName).Trim();
-                if (!string.IsNullOrWhiteSpace(fileType))
+                try
                 {
-                    if (fileType.StartsWith('.'))
-                        fileType = $"{fileType.ToUpper().Substring(1)} file";
-                    else if (fileType == ".")
-                        fileType = null;
-                    else
-                        fileType = $"{fileType.ToUpper()} file";
+                    fileName = Path.GetFileName(filePathAndName);
                 }
-                else fileType = null;
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, e.Message);
+                catch (Exception e)
+                {
+                    Logger.Error(e, e.Message);
+                }
+
+                try
+                {
+                    fileType = Path.GetExtension(filePathAndName).Trim();
+                    if (!string.IsNullOrWhiteSpace(fileType))
+                    {
+                        if (fileType.StartsWith('.'))
+                            fileType = $"{fileType.ToUpper().Substring(1)} file";
+                        else if (fileType == ".")
+                            fileType = null;
+                        else
+                            fileType = $"{fileType.ToUpper()} file";
+                    }
+                    else fileType = null;
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, e.Message);
+                }
             }
 
             // build target table from static file info properties
@@ -119,75 +124,78 @@ namespace PluginFileReader.API.Factory.Implementations.FileInfo
 
             cmd.ExecuteNonQuery();
 
-            // get file size
-            var streamWrapper =
+            if (!createAndInsert)
+            {
+                // get file size
+                var streamWrapper =
                     Utility.Utility.GetStream(filePathAndName, rootPath.FileReadMode, true);
                 
-            try
-            {
-                fileSize = streamWrapper.PrintStreamLength();
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, e.Message);
-            }
-            
-            // close input file stream
-            streamWrapper.Close();
-
-            // build insert query
-            queryBuilder.Append($"INSERT INTO [{_schemaName}].[{_tableName}] (");
-            foreach (var prop in FileInfoData.FileInfoProperties)
-            {
-                queryBuilder.Append($"\n[{prop.Id}],");
-            }
-            queryBuilder.Length--; // remove trailing comma
-            queryBuilder.Append("\n) VALUES (");
-            for (var i = 0; i < FileInfoData.FileInfoProperties.Count; i++)
-            {
-                queryBuilder.Append($"\n@param{i},");
-            }
-            queryBuilder.Length--; // remove trailing comma
-            queryBuilder.Append("\n);");
-
-            query = queryBuilder.ToString();
-
-            Logger.Debug($"Insert record query: {query}");
-
-            cmd.CommandText = query;
-
-            var trans = _conn.BeginTransaction();
-
-            try
-            {
-                // set params
-                // Root Path Name
-                cmd.Parameters.Add("@param0");
-                cmd.Parameters[$"@param0"].Value = rootPathName;
-                // File Name
-                cmd.Parameters.Add("@param1");
-                cmd.Parameters[$"@param1"].Value = fileName;
-                // File Type (extension)
-                cmd.Parameters.Add("@param2");
-                cmd.Parameters[$"@param2"].Value = fileType;
-                // File Size
-                cmd.Parameters.Add("@param3");
-                cmd.Parameters[$"@param3"].Value = fileSize;
+                try
+                {
+                    fileSize = streamWrapper.PrintStreamLength();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, e.Message);
+                }
                 
-                cmd.ExecuteNonQuery();
-                
-                // commit any pending inserts
-                trans.Commit();
-            }
-            catch (Exception e)
-            {
-                // rollback on error
-                trans.Rollback();
-                Logger.Error(e, e.Message);
-                throw;
+                // close input file stream
+                streamWrapper.Close();
+
+                // build insert query
+                queryBuilder.Append($"INSERT INTO [{_schemaName}].[{_tableName}] (");
+                foreach (var prop in FileInfoData.FileInfoProperties)
+                {
+                    queryBuilder.Append($"\n[{prop.Id}],");
+                }
+                queryBuilder.Length--; // remove trailing comma
+                queryBuilder.Append("\n) VALUES (");
+                for (var i = 0; i < FileInfoData.FileInfoProperties.Count; i++)
+                {
+                    queryBuilder.Append($"\n@param{i},");
+                }
+                queryBuilder.Length--; // remove trailing comma
+                queryBuilder.Append("\n);");
+
+                query = queryBuilder.ToString();
+
+                Logger.Debug($"Insert record query: {query}");
+
+                cmd.CommandText = query;
+
+                var trans = _conn.BeginTransaction();
+
+                try
+                {
+                    // set params
+                    // Root Path Name
+                    cmd.Parameters.Add("@param0");
+                    cmd.Parameters[$"@param0"].Value = rootPathName;
+                    // File Name
+                    cmd.Parameters.Add("@param1");
+                    cmd.Parameters[$"@param1"].Value = fileName;
+                    // File Type (extension)
+                    cmd.Parameters.Add("@param2");
+                    cmd.Parameters[$"@param2"].Value = fileType;
+                    // File Size
+                    cmd.Parameters.Add("@param3");
+                    cmd.Parameters[$"@param3"].Value = fileSize;
+                    
+                    cmd.ExecuteNonQuery();
+                    
+                    // commit any pending inserts
+                    trans.Commit();
+                }
+                catch (Exception e)
+                {
+                    // rollback on error
+                    trans.Rollback();
+                    Logger.Error(e, e.Message);
+                    throw;
+                }
             }
 
-            return 1;
+            return createAndInsert ? 0 : 1;
         }
     }
 }

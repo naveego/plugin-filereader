@@ -10,8 +10,8 @@ namespace PluginFileReader.API.Utility
     public static partial class Utility
     {
         private static long ImportRecordsForPath(IImportExportFactory factory, SqlDatabaseConnection conn,
-            RootPathObject rootPath,
-            string tableName, string schemaName, string path, bool downloadToLocal = false, long limit = long.MaxValue)
+            RootPathObject rootPath, string tableName, string schemaName, string path, bool downloadToLocal = false,
+            long limit = long.MaxValue)
         {
             Logger.Info($"Preparing to load file: {path} from {rootPath.FileReadMode}");
             var importExportFile = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName);

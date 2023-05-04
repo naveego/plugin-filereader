@@ -17,6 +17,7 @@ using PluginFileReader.API.Write;
 using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
 using SQLDatabase.Net.SQLDatabaseClient;
+using PluginFileReader.API.Factory.Implementations.FileInfo;
 
 namespace PluginFileReader.Plugin
 {
@@ -169,7 +170,6 @@ namespace PluginFileReader.Plugin
 
                     // attach a file information schema
                     var fileInfoSchema = Discover.GetFileInfoSchema();
-
                     discoverSchemasResponse.Schemas.Add(fileInfoSchema);
 
                     // discover all schemas
@@ -273,24 +273,15 @@ namespace PluginFileReader.Plugin
                 var deleteAllOnStart = true;
                 foreach (var rootPath in _server.Settings.RootPaths)
                 {
-                    var files = filesByRootPath[rootPath.RootPathName()];
                     var schemaName = Constants.SchemaName;
                     var tableName = schema.Id;
-                    if (files.Count > 0)
-                    {
-                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo), conn,
-                            rootPath, tableName, schemaName, files, true, deleteAllOnStart: deleteAllOnStart);
-                        deleteAllOnStart = false;
-                    }
-                    else
-                    {
-                        Utility.DeleteDirectoryFilesFromDb(conn, tableName, schemaName, Utility.GetImportExportFactory(rootPath.Mode), rootPath, files);
+                    List<string> files = null;
+                    filesByRootPath.TryGetValue(rootPath.RootPathName(), out files);
 
-                        if (rootPath.ErrorOnEmptyRootPath)
-                        {
-                            throw new Exception($"Root Path {rootPath.RootPathName()} was empty");
-                        }
-                    }
+                    Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
+                        conn, rootPath, tableName, schemaName, files, true, deleteAllOnStart: deleteAllOnStart);
+                    
+                    if (deleteAllOnStart) deleteAllOnStart = false;
                 }
 
                 var records = Read.ReadRecords(context, schema, jobId);
@@ -298,10 +289,7 @@ namespace PluginFileReader.Plugin
                 foreach (var record in records)
                 {
                     // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
-                    if ((limitFlag && recordsCount == limit) || !_server.Connected)
-                    {
-                        break;
-                    }
+                    if ((limitFlag && recordsCount == limit) || !_server.Connected) break;
 
                     // publish record
                     await responseStream.WriteAsync(record);
