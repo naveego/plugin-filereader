@@ -178,7 +178,8 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false, int delayMS = 0, string oldRegexReplace = "", string newRegexReplace = "")
+            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false, int delayMS = 0, string oldRegexReplace = "",
+            string newRegexReplace = "", bool noRootPaths = false)
         {
             if (empty)
             {
@@ -193,6 +194,10 @@ namespace PluginFileReaderTest.Plugin
             }
 
             var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, sftp);
+            if (noRootPaths)
+            {
+                settings.RootPaths = new List<RootPathObject>();
+            }
 
             return new ConnectRequest
             {
@@ -308,7 +313,7 @@ namespace PluginFileReaderTest.Plugin
                 LogLevel = LogLevel.Debug
             };
 
-            var connectRequest = GetConnectSettings(null, 0, "*.nvld", false, false, false);
+            var connectRequest = GetConnectSettings(null, 0, "*.nvld", false, false, false, noRootPaths: true);
 
             var discoverRequest = new DiscoverSchemasRequest
             {

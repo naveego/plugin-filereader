@@ -270,18 +270,27 @@ namespace PluginFileReader.Plugin
 
             try
             {
+                var schemaName = Constants.SchemaName;
+                var tableName = schema.Id;
                 var deleteAllOnStart = true;
-                foreach (var rootPath in _server.Settings.RootPaths)
-                {
-                    var schemaName = Constants.SchemaName;
-                    var tableName = schema.Id;
-                    List<string> files = null;
-                    filesByRootPath.TryGetValue(rootPath.RootPathName(), out files);
 
+                if (_server.Settings.RootPaths.Count > 0)
+                {
+                    foreach (var rootPath in _server.Settings.RootPaths)
+                    {
+                        List<string> files = null;
+                        filesByRootPath.TryGetValue(rootPath.RootPathName(), out files);
+
+                        Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
+                            conn, rootPath, tableName, schemaName, files, true, deleteAllOnStart: deleteAllOnStart);
+                        
+                        if (deleteAllOnStart) deleteAllOnStart = false;
+                    }
+                }
+                else
+                {
                     Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
-                        conn, rootPath, tableName, schemaName, files, true, deleteAllOnStart: deleteAllOnStart);
-                    
-                    if (deleteAllOnStart) deleteAllOnStart = false;
+                        conn, null, tableName, schemaName, new List<string>(), true);
                 }
 
                 var records = Read.ReadRecords(context, schema, jobId);
