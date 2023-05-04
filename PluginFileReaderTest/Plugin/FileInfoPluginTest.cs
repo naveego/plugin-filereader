@@ -15,10 +15,11 @@ namespace PluginFileReaderTest.Plugin
     {
         private const string BasePath = "../../../MockData/XMLData";
         private const string ReadPath = "../../../MockData/ReadDirectory";
+        private const string ReadSFTPPath = "";
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
+        private const string ReadSFTPDifferentPath = "";
         private const string ArchivePath = "../../../MockData/ArchiveDirectory";
-        private const string ReplicationPath = "../../../MockData/ReplicationDirectory";
-        private const string TargetWriteFile = "target.csv";
+        private const string ArchiveSFTPPath = "";
         private const string DefaultCleanupAction = "none";
         private const string DefaultFilter = "*.xml";
         private const string FileCopyMode = "File Copy";
@@ -87,13 +88,13 @@ namespace PluginFileReaderTest.Plugin
                     {
                         new RootPathObject
                         {
-                            RootPath = sftp ? "" : ReadPath,
+                            RootPath = sftp ? ReadSFTPPath : ReadPath,
                             Filter = filter ?? DefaultFilter,
                             Mode = FileCopyMode,
                             SkipLines = skipLines,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = ArchivePath,
+                            ArchivePath = sftp ? ArchiveSFTPPath : ArchivePath,
                             FileReadMode = sftp ? "SFTP" : "Local",
                             ModeSettings = new ModeSettings
                             {
@@ -115,13 +116,13 @@ namespace PluginFileReaderTest.Plugin
                         },
                         new RootPathObject
                         {
-                            RootPath = sftp ? "" : ReadDifferentPath,
+                            RootPath = sftp ? ReadSFTPDifferentPath : ReadDifferentPath,
                             Filter = filter ?? DefaultFilter,
                             Mode = FileCopyMode,
                             SkipLines = skipLines,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = ArchivePath,
+                            ArchivePath = sftp ? ArchiveSFTPPath : ArchivePath,
                             FileReadMode = sftp ? "SFTP" : "Local",
                             ModeSettings = new ModeSettings
                             {
@@ -146,13 +147,13 @@ namespace PluginFileReaderTest.Plugin
                     {
                         new RootPathObject
                         {
-                            RootPath = sftp ? "" : ReadPath,
+                            RootPath = sftp ? ReadSFTPPath : ReadPath,
                             Filter = filter ?? DefaultFilter,
                             SkipLines = skipLines,
                             Mode = FileCopyMode,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = ArchivePath,
+                            ArchivePath = sftp ? ArchiveSFTPPath : ArchivePath,
                             FileReadMode = sftp ? "SFTP" : "Local",
                             ModeSettings = new ModeSettings
                             {
@@ -350,83 +351,16 @@ namespace PluginFileReaderTest.Plugin
             Assert.Equal(3, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            Assert.Equal(record["RootPath"], "");
-            Assert.Equal(record["FileName"], "");
+            Assert.Equal(ReadPath, record["RootPath"]);
+            Assert.Equal("<xsd-file>", record["FileName"]);
+            Assert.Equal("XSD file", record["FileExtension"]);
+            Assert.Equal("<xsd-filesize>", record["FileSize"]);
 
             // cleanup
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
         
-        [Fact]
-        public async Task ReadStreamRenameTest()
-        {
-            // setup
-            PrepareTestEnvironment(false);
-            Server server = new Server
-            {
-                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
-                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
-            };
-            server.Start();
-
-            var port = server.Ports.First().BoundPort;
-
-            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
-            var client = new Publisher.PublisherClient(channel);
-            
-            var configureRequest = new ConfigureRequest
-            {
-                TemporaryDirectory = "../../../Temp",
-                PermanentDirectory = "../../../Perm",
-                LogDirectory = "../../../Logs",
-                DataVersions = new DataVersions(),
-                LogLevel = LogLevel.Debug
-            };
-
-            var connectRequest = GetConnectSettings(null, 0, "*", false, false, false, 0, "^(.*)$", "part-$1");
-
-            var discoverRequest = new DiscoverSchemasRequest
-            {
-                Mode = DiscoverSchemasRequest.Types.Mode.All,
-            };
-            
-            var request = new ReadRequest()
-            {
-                DataVersions = new DataVersions
-                {
-                    JobId = "test"
-                },
-                JobId = "test",
-            };
-
-            // act
-            client.Configure(configureRequest);
-            client.Connect(connectRequest);
-            var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
-
-            var response = client.ReadStream(request);
-            var responseStream = response.ResponseStream;
-            var records = new List<Record>();
-
-            while (await responseStream.MoveNext())
-            {
-                records.Add(responseStream.Current);
-            }
-
-            // assert
-            Assert.Equal(3, records.Count);
-
-            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            Assert.Equal("True", record["RUN_SUCCESS"]);
-            Assert.Equal("", record["RUN_ERROR"]);
-
-            // cleanup
-            await channel.ShutdownAsync();
-            await server.ShutdownAsync();
-        }
-
         [Fact]
         public async Task ReadStreamSftpTest()
         {
@@ -473,7 +407,15 @@ namespace PluginFileReaderTest.Plugin
             client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
+
+            var fileInfoSchema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
+            Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
+            Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
+            Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+
+            request.Schema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -485,11 +427,98 @@ namespace PluginFileReaderTest.Plugin
             }
 
             // assert
-            Assert.Equal(1, records.Count);
+            Assert.Equal(3, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            Assert.Equal("True", record["RUN_SUCCESS"]);
-            Assert.Equal("", record["RUN_ERROR"]);
+            Assert.Equal(ReadSFTPPath, record["RootPath"]);
+            Assert.Equal("<xsd-file>", record["FileName"]);
+            Assert.Equal("XSD file", record["FileExtension"]);
+            Assert.Equal("<xsd-filesize>", record["FileSize"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
+        public async Task ReadStreamSftpMultirootTest()
+        {
+            // setup
+            PrepareTestEnvironment(false);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*", true, false, true);
+
+            var discoverRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(discoverRequest);
+
+            var fileInfoSchema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
+            Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
+            Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
+            Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+
+            request.Schema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(5, records.Count);
+
+            var recordData = records.Select(r => JsonConvert.DeserializeObject<Dictionary<string, object>>(r.DataJson));
+
+            var recordXML = recordData.First(d => (string)d["RootPath"] == ReadSFTPPath);
+            Assert.Equal("<xml-file>", recordXML["FileName"]);
+            Assert.Equal("XML file", recordXML["FileExtension"]);
+            Assert.Equal("<xml-filesize>", recordXML["FileSize"]);
+
+            var recordCSV = recordData.First(d => (string)d["RootPath"] == ReadSFTPDifferentPath);
+            Assert.Equal("<csv-file>", recordCSV["FileName"]);
+            Assert.Equal("CSV file", recordCSV["FileExtension"]);
+            Assert.Equal("<csv-filesize>", recordCSV["FileSize"]);
 
             // cleanup
             await channel.ShutdownAsync();

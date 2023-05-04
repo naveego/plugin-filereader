@@ -270,6 +270,7 @@ namespace PluginFileReader.Plugin
 
             try
             {
+                var deleteAllOnStart = true;
                 foreach (var rootPath in _server.Settings.RootPaths)
                 {
                     var files = filesByRootPath[rootPath.RootPathName()];
@@ -277,13 +278,9 @@ namespace PluginFileReader.Plugin
                     var tableName = schema.Id;
                     if (files.Count > 0)
                     {
-                        // load file and then stream files one by one
-                        foreach (var file in files)
-                        {
-                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo), conn,
-                                rootPath,
-                                tableName, schemaName, new List<string> {file}, true);
-                        }
+                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo), conn,
+                            rootPath, tableName, schemaName, files, true, deleteAllOnStart: deleteAllOnStart);
+                        deleteAllOnStart = false;
                     }
                     else
                     {

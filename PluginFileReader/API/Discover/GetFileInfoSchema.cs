@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Naveego.Sdk.Logging;
 using Naveego.Sdk.Plugins;
 using PluginFileReader.Helper;
@@ -9,7 +10,7 @@ namespace PluginFileReader.API.Discover
         public static Schema GetFileInfoSchema()
         {
             var schema = FileInfoData.GetFileInfoSchema();
-            Logger.Info($"File Info Schema returned: {schema}");
+            Logger.Info($"File Info Schema returned: {JsonConvert.SerializeObject(schema, Formatting.Indented)}");
             return schema;
         }
     }

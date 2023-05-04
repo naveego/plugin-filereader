@@ -582,7 +582,7 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             // act
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
+            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -664,7 +664,7 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
+            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -737,7 +737,7 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             // act
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
+            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;

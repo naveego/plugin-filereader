@@ -72,11 +72,17 @@ namespace PluginFileReader.API.Factory.Implementations.FileInfo
 
             try
             {
-                fileType = Path.GetExtension(filePathAndName);
+                fileType = Path.GetExtension(filePathAndName).Trim();
                 if (!string.IsNullOrWhiteSpace(fileType))
                 {
-                    fileType = $"{fileType.ToUpper()} file";
+                    if (fileType.StartsWith('.'))
+                        fileType = $"{fileType.ToUpper().Substring(1)} file";
+                    else if (fileType == ".")
+                        fileType = null;
+                    else
+                        fileType = $"{fileType.ToUpper()} file";
                 }
+                else fileType = null;
             }
             catch (Exception e)
             {
@@ -89,7 +95,7 @@ namespace PluginFileReader.API.Factory.Implementations.FileInfo
             foreach (var prop in FileInfoData.FileInfoProperties)
             {
                 queryBuilder.Append($"\n[{prop.Id}] {prop.TypeAtSource},");
-                if (prop.IsNullable) queryBuilder.Insert(queryBuilder.Length - 1, " NOT NULL");
+                if (!prop.IsNullable) queryBuilder.Insert(queryBuilder.Length - 1, " NOT NULL");
                 if (prop.IsKey) keyCols.Add(prop);
             }
             queryBuilder.Append("\nPRIMARY KEY (");
@@ -144,6 +150,8 @@ namespace PluginFileReader.API.Factory.Implementations.FileInfo
             queryBuilder.Length--; // remove trailing comma
             queryBuilder.Append("\n);");
 
+            query = queryBuilder.ToString();
+
             Logger.Debug($"Insert record query: {query}");
 
             cmd.CommandText = query;
@@ -153,15 +161,18 @@ namespace PluginFileReader.API.Factory.Implementations.FileInfo
             try
             {
                 // set params
-                // RUN_ID
+                // Root Path Name
                 cmd.Parameters.Add("@param0");
                 cmd.Parameters[$"@param0"].Value = rootPathName;
-                // RUN_START_TIMESTAMP
+                // File Name
                 cmd.Parameters.Add("@param1");
                 cmd.Parameters[$"@param1"].Value = fileName;
-                // RUN_SUCCESS
+                // File Type (extension)
                 cmd.Parameters.Add("@param2");
-                cmd.Parameters[$"@param2"].Value = fileSize;
+                cmd.Parameters[$"@param2"].Value = fileType;
+                // File Size
+                cmd.Parameters.Add("@param3");
+                cmd.Parameters[$"@param3"].Value = fileSize;
                 
                 cmd.ExecuteNonQuery();
                 

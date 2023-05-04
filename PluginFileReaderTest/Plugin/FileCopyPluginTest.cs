@@ -329,7 +329,7 @@ namespace PluginFileReaderTest.Plugin
             client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
+            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -398,7 +398,7 @@ namespace PluginFileReaderTest.Plugin
             client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
+            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -467,7 +467,7 @@ namespace PluginFileReaderTest.Plugin
             client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
+            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -536,7 +536,7 @@ namespace PluginFileReaderTest.Plugin
             client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas[0];
+            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -548,7 +548,7 @@ namespace PluginFileReaderTest.Plugin
             }
 
             // assert
-            Assert.Equal(1, records.Count);
+            Assert.Equal(3, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             Assert.Equal("True", record["RUN_SUCCESS"]);
