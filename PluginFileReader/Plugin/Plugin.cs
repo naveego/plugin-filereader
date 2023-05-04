@@ -200,8 +200,13 @@ namespace PluginFileReader.Plugin
                 await DiscoverSemaphoreSlim.WaitAsync();
 
                 var refreshSchemas = request.ToRefresh;
-                var fileInfoSchemas = refreshSchemas.Where(s => FileInfoData.IsFileInfoSchema(s)).ToList();
-                var dataSchemas = refreshSchemas.Where(s => !FileInfoData.IsFileInfoSchema(s)).ToList();
+                var fileInfoSchemas = new List<Schema>();
+                var dataSchemas = new List<Schema>();
+                foreach (var s in refreshSchemas.ToArray())
+                {
+                    if (FileInfoData.IsFileInfoSchema(s)) fileInfoSchemas.Add(s);
+                    else dataSchemas.Add(s);
+                }
 
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
 
@@ -219,27 +224,13 @@ namespace PluginFileReader.Plugin
 
                     // exclude file info schema from normal discover operation
                     var deleteAllOnStart = true;
-                    if (Discover.ShouldLoadAll(fileInfoSchemas))
+                    foreach (var rootPath in _server.Settings.RootPaths)
                     {
-                        foreach (var rootPath in _server.Settings.RootPaths)
-                        {
-                            var schemaName = Constants.SchemaName;
-                            Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
-                                conn, rootPath, FileInfoData.FileInfoSchemaId, schemaName, files[rootPath.RootPathName()], true,
-                                deleteAllOnStart: deleteAllOnStart);
-                            deleteAllOnStart = false;
-                        }
-                    }
-                    else
-                    {
-                        foreach (var rootPath in _server.Settings.RootPaths)
-                        {
-                            var schemaName = Constants.SchemaName;
-                            Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
-                                conn, rootPath, FileInfoData.FileInfoSchemaId, schemaName, files[rootPath.RootPathName()], false, sampleSize, 1,
-                                deleteAllOnStart);
-                            deleteAllOnStart = false;
-                        }
+                        var schemaName = Constants.SchemaName;
+                        Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
+                            conn, rootPath, FileInfoData.FileInfoSchemaId, schemaName, files[rootPath.RootPathName()], false, sampleSize,
+                            deleteAllOnStart: deleteAllOnStart);
+                        deleteAllOnStart = false;
                     }
                 }
 
