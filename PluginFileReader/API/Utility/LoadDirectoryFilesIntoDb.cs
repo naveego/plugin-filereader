@@ -16,7 +16,7 @@ namespace PluginFileReader.API.Utility
             string tableName, string schemaName, List<string> paths, bool downloadToLocal, long recordLimit = long.MaxValue, int fileLimit = int.MaxValue,
             bool deleteAllOnStart = true)
         {
-            Logger.Info($"Loading files:\n {JsonConvert.SerializeObject(paths, Formatting.Indented)}");
+            Logger.Info($"Loading files:\n{JsonConvert.SerializeObject(paths, Formatting.Indented)}");
             
             if (deleteAllOnStart)
                 DeleteDirectoryFilesFromDb(conn, tableName, schemaName, factory, rootPath, paths);

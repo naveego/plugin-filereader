@@ -200,9 +200,10 @@ namespace PluginFileReader.Plugin
                 await DiscoverSemaphoreSlim.WaitAsync();
 
                 var refreshSchemas = request.ToRefresh;
+                var fileInfoSchemas = refreshSchemas.Where(s => FileInfoData.IsFileInfoSchema(s)).ToList();
+                var dataSchemas = refreshSchemas.Where(s => !FileInfoData.IsFileInfoSchema(s)).ToList();
 
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
-                if (refreshSchemas.Count == 1) Logger.Info($"Refresh schema id: {refreshSchemas.First().Id}");
 
                 var files = _server.Settings.GetAllFilesByRootPath();
                 var conn = Utility.GetSqlConnection(Constants.DiscoverDbPrefix);
@@ -212,60 +213,66 @@ namespace PluginFileReader.Plugin
                     sampleSize = 5;
                 }
 
-                var fileInfoSchema = refreshSchemas.FirstOrDefault(s => FileInfoData.IsFileInfoSchema(s));
-                if (fileInfoSchema != null)
+                if (fileInfoSchemas.Any())
                 {
+                    Logger.Debug($"Refreshing file info schemas...");
+
+                    // exclude file info schema from normal discover operation
                     var deleteAllOnStart = true;
-                    var discoverAll = Discover.ShouldLoadAll(refreshSchemas.Where(s => FileInfoData.IsFileInfoSchema(s)).ToList());
-                    var infoSampleSize = long.MaxValue;
-                    var infoFileLimit = int.MaxValue;
-                    if (!discoverAll)
+                    if (Discover.ShouldLoadAll(fileInfoSchemas))
                     {
-                        infoSampleSize = sampleSize;
-                        infoFileLimit = 1;
+                        foreach (var rootPath in _server.Settings.RootPaths)
+                        {
+                            var schemaName = Constants.SchemaName;
+                            Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
+                                conn, rootPath, FileInfoData.FileInfoSchemaId, schemaName, files[rootPath.RootPathName()], true,
+                                deleteAllOnStart: deleteAllOnStart);
+                            deleteAllOnStart = false;
+                        }
                     }
-
-                    foreach (var rootPath in _server.Settings.RootPaths)
+                    else
                     {
-                        var schemaName = Constants.SchemaName;
-                        var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
-                            ? new DirectoryInfo(rootPath.RootPath).Name
-                            : rootPath.Name;
-
-                        Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
-                            conn, rootPath, fileInfoSchema.Id, schemaName, files[rootPath.RootPathName()], discoverAll, infoSampleSize,
-                            infoFileLimit, deleteAllOnStart);
-                        deleteAllOnStart = false;
-                    }
-                }
-
-                // exclude file info schema from normal discover operation
-                if (Discover.ShouldLoadAll(refreshSchemas.Where(s => !FileInfoData.IsFileInfoSchema(s)).ToList()))
-                {
-                    Logger.Info($"Should discover all");
-                    foreach (var rootPath in _server.Settings.RootPaths)
-                    {
-                        var schemaName = Constants.SchemaName;
-                        var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
-                            ? new DirectoryInfo(rootPath.RootPath).Name
-                            : rootPath.Name;
-
-                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode),
-                            conn, rootPath, tableName, schemaName, files[rootPath.RootPathName()], true);
+                        foreach (var rootPath in _server.Settings.RootPaths)
+                        {
+                            var schemaName = Constants.SchemaName;
+                            Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
+                                conn, rootPath, FileInfoData.FileInfoSchemaId, schemaName, files[rootPath.RootPathName()], false, sampleSize, 1,
+                                deleteAllOnStart);
+                            deleteAllOnStart = false;
+                        }
                     }
                 }
-                else
-                {
-                    Logger.Info($"Partial discover");
-                    foreach (var rootPath in _server.Settings.RootPaths)
-                    {
-                        var schemaName = Constants.SchemaName;
-                        var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
-                            ? new DirectoryInfo(rootPath.RootPath).Name
-                            : rootPath.Name;
 
-                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
-                            tableName, schemaName, files[rootPath.RootPathName()], false, sampleSize, 1);
+                if (dataSchemas.Any())
+                {
+                    Logger.Debug($"Refreshing data schemas...");
+
+                    // discover other schemas
+                    if (Discover.ShouldLoadAll(dataSchemas))
+                    {
+                        foreach (var rootPath in _server.Settings.RootPaths)
+                        {
+                            var schemaName = Constants.SchemaName;
+                            var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                                ? new DirectoryInfo(rootPath.RootPath).Name
+                                : rootPath.Name;
+
+                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode),
+                                conn, rootPath, tableName, schemaName, files[rootPath.RootPathName()], true);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var rootPath in _server.Settings.RootPaths)
+                        {
+                            var schemaName = Constants.SchemaName;
+                            var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                                ? new DirectoryInfo(rootPath.RootPath).Name
+                                : rootPath.Name;
+
+                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
+                                tableName, schemaName, files[rootPath.RootPathName()], false, sampleSize, 1);
+                        }
                     }
                 }
 

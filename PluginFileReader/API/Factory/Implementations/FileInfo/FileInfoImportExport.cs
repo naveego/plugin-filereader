@@ -55,13 +55,15 @@ namespace PluginFileReader.API.Factory.Implementations.FileInfo
         {
             var createAndInsert = string.IsNullOrWhiteSpace(filePathAndName) || rootPath == null;
 
-            var rootPathName = rootPath.RootPath;
+            var rootPathName = "";
             var fileName = filePathAndName;
             var fileType = "";
             var fileSize = "";
 
             // get information from the file path and name
             Logger.Debug("Getting file information...");
+
+            if (rootPath != null) rootPathName = rootPath.RootPath;
 
             if (!string.IsNullOrWhiteSpace(filePathAndName))
             {

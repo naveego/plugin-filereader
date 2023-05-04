@@ -438,7 +438,7 @@ namespace PluginFileReaderTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamRefreshTest()
         {
@@ -516,9 +516,92 @@ namespace PluginFileReaderTest.Plugin
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             Assert.Equal(ReadPath, record["RootPath"]);
-            Assert.Equal("VL_CREDITREPORT.xsd", record["FileName"]);
+            Assert.Equal("<xsd-file>", record["FileName"]);
             Assert.Equal("XSD file", record["FileExtension"]);
-            Assert.Equal("22.8KB", record["FileSize"]);
+            Assert.Equal("<xsd-filesize>", record["FileSize"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
+        public async Task ReadStreamRefreshTest2()
+        {
+            // setup
+            PrepareTestEnvironment(true);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*", false, false, false);
+
+            // act - find AU_FileInformation schema, then read table
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var allSchemasResponse = client.DiscoverSchemas(
+                new DiscoverSchemasRequest
+                {
+                    Mode = DiscoverSchemasRequest.Types.Mode.All
+                }
+            );
+
+            var discoverRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                SampleSize = 10,
+                ToRefresh =
+                {
+                    allSchemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s))
+                }
+            };
+            var schemasResponse = client.DiscoverSchemas(discoverRequest);
+
+            Assert.Single(schemasResponse.Schemas);
+
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            request.Schema = schemasResponse.Schemas.First();
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(3, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal("True", record["RUN_SUCCESS"]);
+            Assert.Equal("", record["RUN_ERROR"]);
 
             // cleanup
             await channel.ShutdownAsync();

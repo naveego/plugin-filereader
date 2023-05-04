@@ -13,13 +13,16 @@ namespace PluginFileReader.API.Utility
             RootPathObject rootPath, string tableName, string schemaName, string path, bool downloadToLocal = false,
             long limit = long.MaxValue)
         {
-            Logger.Info($"Preparing to load file: {path} from {rootPath.FileReadMode}");
+            var fileReadMode = "(none)";
+            if (rootPath != null) fileReadMode = rootPath.FileReadMode;
+
+            Logger.Info($"Preparing to load file: {path} from {fileReadMode}");
             var importExportFile = factory.MakeImportExportFile(conn, rootPath, tableName, schemaName);
             
-            Logger.Info($"Begin loading file: {path} from {rootPath.FileReadMode}");
+            Logger.Info($"Begin loading file: {path} from {fileReadMode}");
             var rowsWritten = importExportFile.ImportTable(path, rootPath, downloadToLocal, limit);
             
-            Logger.Info($"Loaded file {path} with {rowsWritten} rows from {rootPath.FileReadMode}");
+            Logger.Info($"Loaded file {path} with {rowsWritten} rows from {fileReadMode}");
 
             return rowsWritten;
         }
