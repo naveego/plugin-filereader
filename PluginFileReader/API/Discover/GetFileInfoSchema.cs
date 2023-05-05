@@ -10,7 +10,7 @@ namespace PluginFileReader.API.Discover
         public static Schema GetFileInfoSchema()
         {
             var schema = FileInfoData.GetFileInfoSchema();
-            Logger.Info($"File Info Schema returned: {JsonConvert.SerializeObject(schema, Formatting.Indented)}");
+            Logger.Debug($"File Info Schema returned: {JsonConvert.SerializeObject(schema, Formatting.Indented)}");
             return schema;
         }
     }
