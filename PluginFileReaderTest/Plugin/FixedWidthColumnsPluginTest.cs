@@ -706,7 +706,7 @@ namespace PluginFileReaderTest.Plugin
             // act
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(schemaRequest);
-            request.Schema = schemasResponse.Schemas[0];
+            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FluentFTP;
@@ -55,6 +56,32 @@ namespace PluginFileReader.API.Utility
                    Logger.Error(e, e.StackTrace);
                 }
             }
+        }
+
+        public string PrintStreamLength()
+        {
+            var result = "";
+
+            // calculate file size
+            var totalBytes = this.Stream.Length;
+            var suffixes = new List<string>
+            {
+                "B", "KB", "MB", "GB", "TB", "PB", "EB"
+            };
+            
+            if (totalBytes == 0)
+            {
+                result = "0 B";
+            }
+            else
+            {
+                var bytes = Math.Abs(totalBytes);
+                var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
+                var num = Math.Round(bytes / Math.Pow(1024, place), 1);
+                result = $"{Math.Sign(totalBytes) * num}{suffixes[place]}";
+            }
+
+            return result;
         }
     }
     

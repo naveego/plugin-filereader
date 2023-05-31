@@ -5,27 +5,24 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
-using PluginFileReader.API.Utility;
-using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
 using Xunit;
 using Record = Naveego.Sdk.Plugins.Record;
 
 namespace PluginFileReaderTest.Plugin
 {
-    public class XMLPluginTest
+    public class FileInfoPluginTest
     {
         private const string BasePath = "../../../MockData/XMLData";
         private const string ReadPath = "../../../MockData/ReadDirectory";
+        private const string ReadSFTPPath = "";
         private const string ReadDifferentPath = "../../../MockData/ReadDirectoryDifferent";
+        private const string ReadSFTPDifferentPath = "";
         private const string ArchivePath = "../../../MockData/ArchiveDirectory";
-        private const string ReplicationPath = "../../../MockData/ReplicationDirectory";
-        private const string TargetWriteFile = "target.csv";
-        private const string GoldenReplicationFile = "golden.csv";
-        private const string VersionReplicationFile = "version.csv";
+        private const string ArchiveSFTPPath = "";
         private const string DefaultCleanupAction = "none";
         private const string DefaultFilter = "*.xml";
-        private const string XMLMode = "XML";
+        private const string FileCopyMode = "File Copy";
 
         private void PrepareTestEnvironment(bool configureInvalid = false, bool configureArchiveFull = false,
             bool configureEmpty = false)
@@ -78,12 +75,12 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private Settings GetSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, bool sftp = false, bool includeFileNameAsField = false)
+            string filter = null, bool multiRoot = false, bool sftp = false, int delayMS = 0, string oldRegexReplace = "", string newRegexReplace = "")
         {
             return new Settings
             {
                 FtpHostname = "",
-                FtpPort = 2222,
+                FtpPort = 22,
                 FtpUsername = "",
                 FtpPassword = "",
                 RootPaths = multiRoot
@@ -91,61 +88,57 @@ namespace PluginFileReaderTest.Plugin
                     {
                         new RootPathObject
                         {
-                            RootPath = sftp ? "/sftp/xmltest" : ReadPath,
+                            RootPath = sftp ? ReadSFTPPath : ReadPath,
                             Filter = filter ?? DefaultFilter,
-                            Mode = XMLMode,
+                            Mode = FileCopyMode,
                             SkipLines = skipLines,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = ArchivePath,
+                            ArchivePath = sftp ? ArchiveSFTPPath : ArchivePath,
                             FileReadMode = sftp ? "SFTP" : "Local",
                             ModeSettings = new ModeSettings
                             {
-                                XMLSettings = new XmlSettings
+                                FileCopySettings = new FileCopySettings
                                 {
-                                    IncludeFileNameAsField = includeFileNameAsField,
-                                    XmlKeys = new List<XmlKey>
-                                    {
-                                        new XmlKey
-                                        {
-                                            ElementId = "CONSUMER",
-                                            AttributeId = "ssn",
-                                        }
-                                    },
-                                    XsdFilePathAndName =
-                                        sftp
-                                            ? "/sftp/xmltest/xsd/VL_CREDITREPORT.xsd"
-                                            : "../../../MockData/XMLData/VL_CREDITREPORT.xsd"
+                                    FtpHostname = "",
+                                    FtpPort = 22,
+                                    FtpUsername = "",
+                                    FtpPassword = "",
+                                    FtpSshKey = @"",
+                                    TargetFileMode = "SFTP",
+                                    TargetDirectoryPath = "",
+                                    OverwriteTarget = true,
+                                    MinimumSendDelayMS = delayMS,
+                                    OldRegexReplace = oldRegexReplace,
+                                    NewRegexReplace = newRegexReplace
                                 }
                             }
                         },
                         new RootPathObject
                         {
-                            RootPath = sftp ? "/sftp/xmltest" : ReadDifferentPath,
+                            RootPath = sftp ? ReadSFTPDifferentPath : ReadDifferentPath,
                             Filter = filter ?? DefaultFilter,
-                            Mode = XMLMode,
+                            Mode = FileCopyMode,
                             SkipLines = skipLines,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = ArchivePath,
+                            ArchivePath = sftp ? ArchiveSFTPPath : ArchivePath,
                             FileReadMode = sftp ? "SFTP" : "Local",
                             ModeSettings = new ModeSettings
                             {
-                                XMLSettings = new XmlSettings
+                                FileCopySettings = new FileCopySettings
                                 {
-                                    IncludeFileNameAsField = includeFileNameAsField,
-                                    XmlKeys = new List<XmlKey>
-                                    {
-                                        new XmlKey
-                                        {
-                                            ElementId = "CONSUMER",
-                                            AttributeId = "ssn",
-                                        }
-                                    },
-                                    XsdFilePathAndName =
-                                        sftp
-                                            ? "/sftp/xmltest/xsd/VL_CREDITREPORT.xsd"
-                                            : "../../../MockData/XMLData/VL_CREDITREPORT.xsd"
+                                    FtpHostname = "",
+                                    FtpPort = 22,
+                                    FtpUsername = "",
+                                    FtpPassword = "",
+                                    FtpSshKey = @"",
+                                    TargetFileMode = "SFTP",
+                                    TargetDirectoryPath = "",
+                                    OverwriteTarget = true,
+                                    MinimumSendDelayMS = delayMS,
+                                    OldRegexReplace = oldRegexReplace,
+                                    NewRegexReplace = newRegexReplace
                                 }
                             }
                         }
@@ -154,31 +147,29 @@ namespace PluginFileReaderTest.Plugin
                     {
                         new RootPathObject
                         {
-                            RootPath = sftp ? "/sftp/xmltest" : ReadPath,
+                            RootPath = sftp ? ReadSFTPPath : ReadPath,
                             Filter = filter ?? DefaultFilter,
                             SkipLines = skipLines,
-                            Mode = XMLMode,
+                            Mode = FileCopyMode,
                             HasHeader = true,
                             CleanupAction = cleanupAction ?? DefaultCleanupAction,
-                            ArchivePath = ArchivePath,
+                            ArchivePath = sftp ? ArchiveSFTPPath : ArchivePath,
                             FileReadMode = sftp ? "SFTP" : "Local",
                             ModeSettings = new ModeSettings
                             {
-                                XMLSettings = new XmlSettings
+                                FileCopySettings = new FileCopySettings
                                 {
-                                    IncludeFileNameAsField = includeFileNameAsField,
-                                    XmlKeys = new List<XmlKey>
-                                    {
-                                        new XmlKey
-                                        {
-                                            ElementId = "CONSUMER",
-                                            AttributeId = "ssn",
-                                        }
-                                    },
-                                    XsdFilePathAndName =
-                                        sftp
-                                            ? "/sftp/xmltest/xsd/VL_CREDITREPORT.xsd"
-                                            : "../../../MockData/XMLData/VL_CREDITREPORT.xsd"
+                                    FtpHostname = "",
+                                    FtpPort = 22,
+                                    FtpUsername = "",
+                                    FtpPassword = "",
+                                    FtpSshKey = @"",
+                                    TargetFileMode = sftp ? "SFTP" : "Local",
+                                    TargetDirectoryPath = sftp ? "" : ArchivePath,
+                                    OverwriteTarget = true,
+                                    MinimumSendDelayMS = delayMS,
+                                    OldRegexReplace = oldRegexReplace,
+                                    NewRegexReplace = newRegexReplace
                                 }
                             }
                         }
@@ -187,7 +178,8 @@ namespace PluginFileReaderTest.Plugin
         }
 
         private ConnectRequest GetConnectSettings(string cleanupAction = null, int skipLines = 0,
-            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false)
+            string filter = null, bool multiRoot = false, bool empty = false, bool sftp = false, int delayMS = 0, string oldRegexReplace = "",
+            string newRegexReplace = "", bool noRootPaths = false)
         {
             if (empty)
             {
@@ -202,6 +194,10 @@ namespace PluginFileReaderTest.Plugin
             }
 
             var settings = GetSettings(cleanupAction, skipLines, filter, multiRoot, sftp);
+            if (noRootPaths)
+            {
+                settings.RootPaths = new List<RootPathObject>();
+            }
 
             return new ConnectRequest
             {
@@ -292,7 +288,7 @@ namespace PluginFileReaderTest.Plugin
         }
 
         [Fact]
-        public async Task DiscoverSchemasAllTest()
+        public async Task ReadStreamEmptyTest()
         {
             // setup
             PrepareTestEnvironment(false);
@@ -307,226 +303,57 @@ namespace PluginFileReaderTest.Plugin
 
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
-
-            var connectRequest = GetConnectSettings();
-
-            var request = new DiscoverSchemasRequest
-            {
-                Mode = DiscoverSchemasRequest.Types.Mode.All,
-                SampleSize = 10
-            };
-
-            // act
-            client.Connect(connectRequest);
-            var response = client.DiscoverSchemas(request);
-
-            // assert
-            Assert.IsType<DiscoverSchemasResponse>(response);
-            Assert.Equal(19, response.Schemas.Count);
-
-            var schema = response.Schemas[0];
-            Assert.Equal($"[{Constants.SchemaName}].[ReadDirectory_HEADER]", schema.Id);
-            Assert.Equal("ReadDirectory_HEADER", schema.Name);
-            Assert.Equal($"", schema.Query);
-            // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
-            // Assert.Equal(1000, schema.Count.Value);
-            Assert.Equal(1, schema.Sample.Count);
-            Assert.Equal(19, schema.Properties.Count);
-
-            var property = schema.Properties[0];
-            Assert.Equal("report_date", property.Id);
-            Assert.Equal("report_date", property.Name);
-            Assert.Equal("", property.Description);
-            Assert.Equal(PropertyType.String, property.Type);
-            Assert.False(property.IsKey);
-            Assert.True(property.IsNullable);
-
-            // cleanup
-            await channel.ShutdownAsync();
-            await server.ShutdownAsync();
-        }
-
-        [Fact]
-        public async Task DiscoverSchemasAllSftpTest()
-        {
-            // setup
-            PrepareTestEnvironment(false);
-            Server server = new Server
-            {
-                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
-                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
-            };
-            server.Start();
-
-            var port = server.Ports.First().BoundPort;
-
-            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
-            var client = new Publisher.PublisherClient(channel);
-
-            var connectRequest = GetConnectSettings(null, 0, null, false, false, true);
-
-            var request = new DiscoverSchemasRequest
-            {
-                Mode = DiscoverSchemasRequest.Types.Mode.All,
-                SampleSize = 10
-            };
-
-            // act
-            client.Connect(connectRequest);
-            var response = client.DiscoverSchemas(request);
-
-            // assert
-            Assert.IsType<DiscoverSchemasResponse>(response);
-            Assert.Equal(19, response.Schemas.Count);
-
-            var schema = response.Schemas[0];
-            Assert.Equal($"[{Constants.SchemaName}].[xmltest_HEADER]", schema.Id);
-            Assert.Equal("xmltest_HEADER", schema.Name);
-            Assert.Equal($"", schema.Query);
-            // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
-            // Assert.Equal(1000, schema.Count.Value);
-            Assert.Equal(1, schema.Sample.Count);
-            Assert.Equal(19, schema.Properties.Count);
-
-            var property = schema.Properties[0];
-            Assert.Equal("report_date", property.Id);
-            Assert.Equal("report_date", property.Name);
-            Assert.Equal("", property.Description);
-            Assert.Equal(PropertyType.String, property.Type);
-            Assert.False(property.IsKey);
-            Assert.True(property.IsNullable);
-
-            // cleanup
-            await channel.ShutdownAsync();
-            await server.ShutdownAsync();
-        }
-
-        [Fact]
-        public async Task DiscoverSchemasRefreshTest()
-        {
-            // setup
-            PrepareTestEnvironment(false);
-            Server server = new Server
-            {
-                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
-                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
-            };
-            server.Start();
-
-            var port = server.Ports.First().BoundPort;
-
-            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
-            var client = new Publisher.PublisherClient(channel);
-
-            var connectRequest = GetConnectSettings();
-
-            var query = $@"SELECT
-h.firstname,
-m.risk_score,
-r.factor_code,
-r.factor_text
-FROM ReadDirectory_CONSUMER h
-LEFT OUTER JOIN ReadDirectory_RISK_MODEL m
-ON h.GLOBAL_KEY = m.GLOBAL_KEY
-LEFT OUTER JOIN ReadDirectory_RISK_FACTOR r
-ON m.GLOBAL_KEY = r.GLOBAL_KEY";
-
-            var request = new DiscoverSchemasRequest
-            {
-                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
-                ToRefresh = {GetTestSchema(query)},
-            };
-
-            // act
-            client.Connect(connectRequest);
-            var response = client.DiscoverSchemas(request);
-
-            // assert
-            Assert.IsType<DiscoverSchemasResponse>(response);
-            Assert.Single(response.Schemas);
-
-            var schema = response.Schemas[0];
-            Assert.Equal($"test", schema.Id);
-            Assert.Equal("test", schema.Name);
-            Assert.Equal(query, schema.Query);
-            // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
-            // Assert.Equal(1000, schema.Count.Value);
-            Assert.Equal(3, schema.Sample.Count);
-            Assert.Equal(4, schema.Properties.Count);
-
-            var property = schema.Properties[0];
-            Assert.Equal("firstname", property.Id);
-            Assert.Equal("firstname", property.Name);
-            Assert.Equal("", property.Description);
-            Assert.Equal(PropertyType.String, property.Type);
-            Assert.False(property.IsKey);
-            Assert.True(property.IsNullable);
-
-            // cleanup
-            await channel.ShutdownAsync();
-            await server.ShutdownAsync();
-        }
-
-               [Fact]
-        public async Task DiscoverSchemasRefreshSftpTest()
-        {
-            // setup
-            PrepareTestEnvironment(false);
-            Server server = new Server
-            {
-                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
-                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
-            };
-            server.Start();
-
-            var port = server.Ports.First().BoundPort;
-
-            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
-            var client = new Publisher.PublisherClient(channel);
-
-            var connectRequest = GetConnectSettings(null, 0, null, false, false, true);
             
-            var query = $@"SELECT
-h.firstname,
-m.risk_score,
-r.factor_code,
-r.factor_text
-FROM xmltest_CONSUMER h
-LEFT OUTER JOIN xmltest_RISK_MODEL m
-ON h.GLOBAL_KEY = m.GLOBAL_KEY
-LEFT OUTER JOIN xmltest_RISK_FACTOR r
-ON m.GLOBAL_KEY = r.GLOBAL_KEY";
-
-            var request = new DiscoverSchemasRequest
+            var configureRequest = new ConfigureRequest
             {
-                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
-                ToRefresh = {GetTestSchema(query)},
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
             };
 
-            // act
+            var connectRequest = GetConnectSettings(null, 0, "*.nvld", false, false, false, noRootPaths: true);
+
+            var discoverRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
+            };
+            
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act - find AU_FileInformation schema, then read table
+            client.Configure(configureRequest);
             client.Connect(connectRequest);
-            var response = client.DiscoverSchemas(request);
+            var schemasResponse = client.DiscoverSchemas(discoverRequest);
+
+            var fileInfoSchema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
+            Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
+            Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
+            Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+
+            request.Schema = fileInfoSchema;
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
 
             // assert
-            Assert.IsType<DiscoverSchemasResponse>(response);
-            Assert.Single(response.Schemas);
-
-            var schema = response.Schemas[0];
-            Assert.Equal($"test", schema.Id);
-            Assert.Equal("test", schema.Name);
-            Assert.Equal(query, schema.Query);
-            // Assert.Equal(Count.Types.Kind.Exact, schema.Count.Kind);
-            // Assert.Equal(1000, schema.Count.Value);
-            Assert.Equal(4, schema.Sample.Count);
-            Assert.Equal(4, schema.Properties.Count);
-
-            var property = schema.Properties[0];
-            Assert.Equal("firstname", property.Id);
-            Assert.Equal("firstname", property.Name);
-            Assert.Equal("", property.Description);
-            Assert.Equal(PropertyType.String, property.Type);
-            Assert.False(property.IsKey);
-            Assert.True(property.IsNullable);
+            Assert.Equal(0, records.Count);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -549,25 +376,21 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
 
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
-
-            var connectRequest = GetConnectSettings();
             
-            var query = $@"SELECT
-h.ssn,
-h.firstname,
-m.risk_score,
-r.factor_code,
-r.factor_text
-FROM ReadDirectory_CONSUMER h
-LEFT OUTER JOIN ReadDirectory_RISK_MODEL m
-ON h.GLOBAL_KEY = m.GLOBAL_KEY
-LEFT OUTER JOIN ReadDirectory_RISK_FACTOR r
-ON m.GLOBAL_KEY = r.GLOBAL_KEY";
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*", false, false, false);
 
             var discoverRequest = new DiscoverSchemasRequest
             {
-                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
-                ToRefresh = {GetTestSchema(query)},
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
             
             var request = new ReadRequest()
@@ -579,10 +402,19 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
                 JobId = "test",
             };
 
-            // act
+            // act - find AU_FileInformation schema, then read table
+            client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
+
+            var fileInfoSchema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
+            Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
+            Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
+            Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+
+            request.Schema = fileInfoSchema;
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -594,17 +426,188 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             }
 
             // assert
-            Assert.Equal( 7, records.Count);
+            Assert.Equal(3, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            Assert.Equal("5164", record["ssn"]);
-            Assert.Equal("string", record["firstname"]);
+            Assert.Equal(ReadPath, record["RootPath"]);
+            Assert.Equal("<xsd-file>", record["FileName"]);
+            Assert.Equal("XSD file", record["FileExtension"]);
+            Assert.Equal("<xsd-filesize>", record["FileSize"]);
 
             // cleanup
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
+        [Fact]
+        public async Task ReadStreamRefreshTest()
+        {
+            // setup
+            PrepareTestEnvironment(true);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*", false, false, false);
+
+            var discoverRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                ToRefresh =
+                {
+                    FileInfoData.GetFileInfoSchema()
+                },
+                SampleSize = 10
+            };
+            
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            // act - find AU_FileInformation schema, then read table
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var schemasResponse = client.DiscoverSchemas(discoverRequest);
+
+            Assert.Single(schemasResponse.Schemas);
+
+            var fileInfoSchema = schemasResponse.Schemas.First();
+            Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
+            Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
+            Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+
+            request.Schema = fileInfoSchema;
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(3, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal(ReadPath, record["RootPath"]);
+            Assert.Equal("<xsd-file>", record["FileName"]);
+            Assert.Equal("XSD file", record["FileExtension"]);
+            Assert.Equal("<xsd-filesize>", record["FileSize"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+        [Fact]
+        public async Task ReadStreamRefreshTest2()
+        {
+            // setup
+            PrepareTestEnvironment(true);
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginFileReader.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+            
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*", false, false, false);
+
+            // act - find AU_FileInformation schema, then read table
+            client.Configure(configureRequest);
+            client.Connect(connectRequest);
+            var allSchemasResponse = client.DiscoverSchemas(
+                new DiscoverSchemasRequest
+                {
+                    Mode = DiscoverSchemasRequest.Types.Mode.All
+                }
+            );
+
+            var discoverRequest = new DiscoverSchemasRequest
+            {
+                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
+                SampleSize = 10,
+                ToRefresh =
+                {
+                    allSchemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s))
+                }
+            };
+            var schemasResponse = client.DiscoverSchemas(discoverRequest);
+
+            Assert.Single(schemasResponse.Schemas);
+
+            var request = new ReadRequest()
+            {
+                DataVersions = new DataVersions
+                {
+                    JobId = "test"
+                },
+                JobId = "test",
+            };
+
+            request.Schema = schemasResponse.Schemas.First();
+
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(3, records.Count);
+
+            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
+            Assert.Equal("True", record["RUN_SUCCESS"]);
+            Assert.Equal("", record["RUN_ERROR"]);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
         [Fact]
         public async Task ReadStreamSftpTest()
         {
@@ -631,24 +634,11 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
                 LogLevel = LogLevel.Debug
             };
 
-            var connectRequest = GetConnectSettings(null, 0, null, false, false, true);
-            
-            var query = $@"SELECT
-h.ssn,
-h.firstname,
-m.risk_score,
-r.factor_code,
-r.factor_text
-FROM xmltest_CONSUMER h
-LEFT OUTER JOIN xmltest_RISK_MODEL m
-ON h.GLOBAL_KEY = m.GLOBAL_KEY
-LEFT OUTER JOIN xmltest_RISK_FACTOR r
-ON m.GLOBAL_KEY = r.GLOBAL_KEY";
+            var connectRequest = GetConnectSettings(null, 0, "*", false, false, true);
 
             var discoverRequest = new DiscoverSchemasRequest
             {
-                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
-                ToRefresh = {GetTestSchema(query)},
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
             
             var request = new ReadRequest()
@@ -664,7 +654,15 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
+
+            var fileInfoSchema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
+            Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
+            Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
+            Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+
+            request.Schema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -676,11 +674,13 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             }
 
             // assert
-            Assert.Equal( 7, records.Count);
+            Assert.Equal(3, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            Assert.Equal("6075", record["ssn"]);
-            Assert.Equal("string", record["firstname"]);
+            Assert.Equal(ReadSFTPPath, record["RootPath"]);
+            Assert.Equal("<xml-file>", record["FileName"]);
+            Assert.Equal("XML file", record["FileExtension"]);
+            Assert.Equal("<xml-filesize>", record["FileSize"]);
 
             // cleanup
             await channel.ShutdownAsync();
@@ -688,7 +688,7 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
         }
 
         [Fact]
-        public async Task ReadStreamLimitTest()
+        public async Task ReadStreamSftpMultirootTest()
         {
             // setup
             PrepareTestEnvironment(false);
@@ -703,30 +703,25 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
 
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
-
-            var connectRequest = GetConnectSettings();
             
-            var query = $@"SELECT
-h.ssn,
-h.firstname,
-m.risk_score,
-r.factor_code,
-r.factor_text
-FROM ReadDirectory_CONSUMER h
-LEFT OUTER JOIN ReadDirectory_RISK_MODEL m
-ON h.GLOBAL_KEY = m.GLOBAL_KEY
-LEFT OUTER JOIN ReadDirectory_RISK_FACTOR r
-ON m.GLOBAL_KEY = r.GLOBAL_KEY";
+            var configureRequest = new ConfigureRequest
+            {
+                TemporaryDirectory = "../../../Temp",
+                PermanentDirectory = "../../../Perm",
+                LogDirectory = "../../../Logs",
+                DataVersions = new DataVersions(),
+                LogLevel = LogLevel.Debug
+            };
+
+            var connectRequest = GetConnectSettings(null, 0, "*", true, false, true);
 
             var discoverRequest = new DiscoverSchemasRequest
             {
-                Mode = DiscoverSchemasRequest.Types.Mode.Refresh,
-                ToRefresh = {GetTestSchema(query)},
+                Mode = DiscoverSchemasRequest.Types.Mode.All,
             };
             
             var request = new ReadRequest()
             {
-                Limit = 1,
                 DataVersions = new DataVersions
                 {
                     JobId = "test"
@@ -735,9 +730,18 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             };
 
             // act
+            client.Configure(configureRequest);
             client.Connect(connectRequest);
             var schemasResponse = client.DiscoverSchemas(discoverRequest);
-            request.Schema = schemasResponse.Schemas.First(s => !FileInfoData.IsFileInfoSchema(s));
+
+            var fileInfoSchema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
+            Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
+            Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
+            Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+
+            request.Schema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
 
             var response = client.ReadStream(request);
             var responseStream = response.ResponseStream;
@@ -749,11 +753,19 @@ ON m.GLOBAL_KEY = r.GLOBAL_KEY";
             }
 
             // assert
-            Assert.Equal( 1, records.Count);
+            Assert.Equal(5, records.Count);
 
-            var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            Assert.Equal("5164", record["ssn"]);
-            Assert.Equal("string", record["firstname"]);
+            var recordData = records.Select(r => JsonConvert.DeserializeObject<Dictionary<string, object>>(r.DataJson));
+
+            var recordXML = recordData.First(d => (string)d["RootPath"] == ReadSFTPPath);
+            Assert.Equal("<xml-file>", recordXML["FileName"]);
+            Assert.Equal("XML file", recordXML["FileExtension"]);
+            Assert.Equal("<xml-filesize>", recordXML["FileSize"]);
+
+            var recordCSV = recordData.First(d => (string)d["RootPath"] == ReadSFTPDifferentPath);
+            Assert.Equal("<csv-file>", recordCSV["FileName"]);
+            Assert.Equal("CSV file", recordCSV["FileExtension"]);
+            Assert.Equal("<csv-filesize>", recordCSV["FileSize"]);
 
             // cleanup
             await channel.ShutdownAsync();

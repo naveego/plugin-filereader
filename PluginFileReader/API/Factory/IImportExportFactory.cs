@@ -9,7 +9,7 @@ namespace PluginFileReader.API.Factory
         /// <summary>
         /// Indicates if the factory uses a custom discovery method
         /// </summary>
-        bool CustomDiscover { get; set; } 
+        bool CustomDiscover { get; set; }
 
         /// <summary>
         /// Discover and Read Surface

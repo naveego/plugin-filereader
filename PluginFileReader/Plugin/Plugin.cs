@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using Grpc.Core;
 using Naveego.Sdk.Logging;
 using Naveego.Sdk.Plugins;
@@ -15,6 +16,8 @@ using PluginFileReader.API.Utility;
 using PluginFileReader.API.Write;
 using PluginFileReader.DataContracts;
 using PluginFileReader.Helper;
+using SQLDatabase.Net.SQLDatabaseClient;
+using PluginFileReader.API.Factory.Implementations.FileInfo;
 
 namespace PluginFileReader.Plugin
 {
@@ -162,13 +165,18 @@ namespace PluginFileReader.Plugin
                     await DiscoverSemaphoreSlim.WaitAsync();
 
                     var files = _server.Settings.GetAllFilesByRootPath();
+
                     Logger.Info($"Files attempted: {files.Count}");
-                    
-                    var schemas = _server.Settings.RootPaths.Select(p =>
-                            Discover.GetSchemasForDirectory(context, Utility.GetImportExportFactory(p.Mode), p,
-                                files[p.RootPathName()],
-                                sampleSize)).Select(l => l.Where(s => s != null))
-                        .ToList();
+
+                    // attach a file information schema
+                    var fileInfoSchema = Discover.GetFileInfoSchema();
+                    discoverSchemasResponse.Schemas.Add(fileInfoSchema);
+
+                    // discover all schemas
+                    var schemas = _server.Settings.RootPaths.Select((p, i) =>
+                        Discover.GetSchemasForDirectory(context, Utility.GetImportExportFactory(p.Mode),
+                            p, files[p.RootPathName()],
+                            sampleSize)).Select(l => l.Where(s => s != null)).ToList();
 
                     discoverSchemasResponse.Schemas.AddRange(schemas.SelectMany(s => s));
 
@@ -192,6 +200,13 @@ namespace PluginFileReader.Plugin
                 await DiscoverSemaphoreSlim.WaitAsync();
 
                 var refreshSchemas = request.ToRefresh;
+                var fileInfoSchemas = new List<Schema>();
+                var dataSchemas = new List<Schema>();
+                foreach (var s in refreshSchemas.ToArray())
+                {
+                    if (FileInfoData.IsFileInfoSchema(s)) fileInfoSchemas.Add(s);
+                    else dataSchemas.Add(s);
+                }
 
                 Logger.Info($"Refresh schemas attempted: {refreshSchemas.Count}");
 
@@ -203,32 +218,52 @@ namespace PluginFileReader.Plugin
                     sampleSize = 5;
                 }
 
-                if (Discover.ShouldLoadAll(refreshSchemas.ToList()))
+                if (fileInfoSchemas.Any())
                 {
+                    Logger.Debug($"Refreshing file info schemas...");
+
+                    // exclude file info schema from normal discover operation
+                    var deleteAllOnStart = true;
                     foreach (var rootPath in _server.Settings.RootPaths)
                     {
                         var schemaName = Constants.SchemaName;
-                        var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
-                            ? new DirectoryInfo(rootPath.RootPath).Name
-                            : rootPath.Name;
-
-                        Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn,
-                            rootPath,
-                            tableName, schemaName, files[rootPath.RootPathName()], true);
+                        Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
+                            conn, rootPath, FileInfoData.FileInfoSchemaId, schemaName, files[rootPath.RootPathName()], false, sampleSize,
+                            deleteAllOnStart: deleteAllOnStart);
+                        deleteAllOnStart = false;
                     }
                 }
-                else
-                {
-                    foreach (var rootPath in _server.Settings.RootPaths)
-                    {
-                        var schemaName = Constants.SchemaName;
-                        var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
-                            ? new DirectoryInfo(rootPath.RootPath).Name
-                            : rootPath.Name;
 
-                        Utility.LoadDirectoryFilesIntoDb(
-                            Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
-                            tableName, schemaName, files[rootPath.RootPathName()], false, sampleSize, 1);
+                if (dataSchemas.Any())
+                {
+                    Logger.Debug($"Refreshing data schemas...");
+
+                    // discover other schemas
+                    if (Discover.ShouldLoadAll(dataSchemas))
+                    {
+                        foreach (var rootPath in _server.Settings.RootPaths)
+                        {
+                            var schemaName = Constants.SchemaName;
+                            var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                                ? new DirectoryInfo(rootPath.RootPath).Name
+                                : rootPath.Name;
+
+                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode),
+                                conn, rootPath, tableName, schemaName, files[rootPath.RootPathName()], true);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var rootPath in _server.Settings.RootPaths)
+                        {
+                            var schemaName = Constants.SchemaName;
+                            var tableName = string.IsNullOrWhiteSpace(rootPath.Name)
+                                ? new DirectoryInfo(rootPath.RootPath).Name
+                                : rootPath.Name;
+
+                            Utility.LoadDirectoryFilesIntoDb(Utility.GetImportExportFactory(rootPath.Mode), conn, rootPath,
+                                tableName, schemaName, files[rootPath.RootPathName()], false, sampleSize, 1);
+                        }
                     }
                 }
 
@@ -237,7 +272,7 @@ namespace PluginFileReader.Plugin
 
                 discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => x != null));
 
-                // return all schemas 
+                // return all schemas
                 Logger.Info($"Schemas returned: {discoverSchemasResponse.Schemas.Count}");
                 return discoverSchemasResponse;
             }
@@ -249,6 +284,58 @@ namespace PluginFileReader.Plugin
             finally
             {
                 DiscoverSemaphoreSlim.Release();
+            }
+        }
+
+        private async Task ReadStreamFileInfo(ReadRequest request, IServerStreamWriter<Record> responseStream,
+            ServerCallContext context, Schema schema, Dictionary<string, List<string>> filesByRootPath,
+            SqlDatabaseConnection conn)
+        {
+            var limit = request.Limit;
+            var limitFlag = request.Limit != 0;
+            var jobId = request.JobId;
+            long recordsCount = 0;
+
+            try
+            {
+                var schemaName = Constants.SchemaName;
+                var tableName = schema.Id;
+                var deleteAllOnStart = true;
+
+                if (_server.Settings.RootPaths.Count > 0)
+                {
+                    foreach (var rootPath in _server.Settings.RootPaths)
+                    {
+                        List<string> files = null;
+                        filesByRootPath.TryGetValue(rootPath.RootPathName(), out files);
+
+                        Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
+                            conn, rootPath, tableName, schemaName, files, true, deleteAllOnStart: deleteAllOnStart);
+                        
+                        if (deleteAllOnStart) deleteAllOnStart = false;
+                    }
+                }
+                else
+                {
+                    Utility.LoadFileInfoTableIntoDb(Utility.GetImportExportFactory(Constants.ModeFileInfo) as FileInfoFactory,
+                        conn, null, tableName, schemaName, new List<string>(), true);
+                }
+
+                var records = Read.ReadRecords(context, schema, jobId);
+
+                foreach (var record in records)
+                {
+                    // stop publishing if the limit flag is enabled and the limit has been reached or the server is disconnected
+                    if ((limitFlag && recordsCount == limit) || !_server.Connected) break;
+
+                    // publish record
+                    await responseStream.WriteAsync(record);
+                    recordsCount++;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, e.Message);
             }
         }
 
@@ -274,11 +361,18 @@ namespace PluginFileReader.Plugin
 
             try
             {
-                var conn = Utility.GetSqlConnection(jobId);
                 var filesByRootPath = _server.Settings.GetAllFilesByRootPath();
+                var conn = Utility.GetSqlConnection(jobId);
 
                 if (string.IsNullOrWhiteSpace(schema.Query))
                 {
+                    if (FileInfoData.IsFileInfoSchema(schema))
+                    {
+                        await ReadStreamFileInfo(request, responseStream, context, schema, filesByRootPath, conn);
+                        await conn.CloseAsync();
+                        return;
+                    }
+
                     // schema is not query based so we can stream each file as it is loaded
                     rootPaths = _server.Settings.GetRootPathsFromQuery(Utility.GetDefaultQuery(schema));
                     var rootPath = rootPaths.First();

@@ -3,8 +3,9 @@ using PluginFileReader.API.Factory.Implementations.AS400;
 using PluginFileReader.API.Factory.Implementations.Delimited;
 using PluginFileReader.API.Factory.Implementations.Excel;
 using PluginFileReader.API.Factory.Implementations.FileCopy;
-using PluginFileReader.API.Factory.Implementations.XML;
+using PluginFileReader.API.Factory.Implementations.FileInfo;
 using PluginFileReader.API.Factory.Implementations.FixedWidthColumns;
+using PluginFileReader.API.Factory.Implementations.XML;
 
 namespace PluginFileReader.API.Utility
 {
@@ -31,6 +32,8 @@ namespace PluginFileReader.API.Utility
                     return new XmlImportExportFactory();
                 case Constants.ModeFileCopy:
                     return new FileCopyFactory();
+                case Constants.ModeFileInfo:
+                    return new FileInfoFactory();
                 default:
                     return null;
             }
