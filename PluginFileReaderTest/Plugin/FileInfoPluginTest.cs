@@ -410,10 +410,25 @@ namespace PluginFileReaderTest.Plugin
             var fileInfoSchema = schemasResponse.Schemas.First(s => FileInfoData.IsFileInfoSchema(s));
             Assert.Equal(fileInfoSchema.Id, FileInfoData.FileInfoSchemaId);
             Assert.Equal(fileInfoSchema.Name, FileInfoData.FileInfoSchemaId);
+            Assert.Equal(fileInfoSchema.Description, FileInfoData.FileInfoSchemaDescription);
+            // assert description
             Assert.True(string.IsNullOrWhiteSpace(fileInfoSchema.Query));
             Assert.Equal(fileInfoSchema.DataFlowDirection, Schema.Types.DataFlowDirection.Read);
             Assert.Equal(fileInfoSchema.Properties.Count, FileInfoData.FileInfoProperties.Count);
+     
+            // assert properties and descriptions are correct
+            var rootpathProp = fileInfoSchema.Properties.First(p => p.Id.Equals("RootPath"));
+            Assert.Equal(rootpathProp.Id, "RootPath");
+            Assert.Equal(rootpathProp.Description, "The location of the file as per the system's file structure.");
 
+            var filenameProp = fileInfoSchema.Properties.First(p => p.Id.Equals("FileName"));
+            Assert.Equal(filenameProp.Id, "FileName");
+            Assert.Equal(filenameProp.Description, "Name of the file as present in the root directory.");
+
+            var filesizeProp = fileInfoSchema.Properties.First(p => p.Id.Equals("FileSize"));
+            Assert.Equal(filesizeProp.Id, "FileSize");
+            Assert.Equal(filesizeProp.Description, "Information on how many bytes of data the file contains.");
+ 
             request.Schema = fileInfoSchema;
 
             var response = client.ReadStream(request);
@@ -430,9 +445,9 @@ namespace PluginFileReaderTest.Plugin
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
             Assert.Equal(ReadPath, record["RootPath"]);
-            Assert.Equal("<xsd-file>", record["FileName"]);
+            Assert.Equal("VL_CREDITREPORT.xsd", record["FileName"]);
             Assert.Equal("XSD file", record["FileExtension"]);
-            Assert.Equal("<xsd-filesize>", record["FileSize"]);
+            Assert.Equal("22.8KB", record["FileSize"]);
 
             // cleanup
             await channel.ShutdownAsync();
