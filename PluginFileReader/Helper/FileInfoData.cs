@@ -7,8 +7,11 @@ namespace PluginFileReader.Helper
     {
         public const string FileInfoSchemaId = "AU_FileInformation";
 
-           public const string FileInfoSchemaDescription = "A .csv file which contains a list of all the file names " + 
+        public const string FileInfoSchemaDescription = "A .csv file which contains a list of all the file names " + 
              "present in the directory along with their root path and size.";
+        public const string RootPathDescription = "The location of the file as per the system's file structure.";
+        public const string FileNameDescription = "Name of the file as present in the root directory.";
+        public const string FileSizeDescription = "Information on how many bytes of data the file contains.";
 
         public static Schema GetFileInfoSchema()
         {
@@ -36,7 +39,7 @@ namespace PluginFileReader.Helper
             {
                 Id = "RootPath",
                 Name = "Root Path",
-                Description = "The location of the file as per the system's file structure.",
+                Description = RootPathDescription,
                 IsKey = true,
                 IsNullable = false,
                 Type = PropertyType.String,
@@ -46,7 +49,7 @@ namespace PluginFileReader.Helper
             {
                 Id = "FileName",
                 Name = "File Name",
-                Description = "Name of the file as present in the root directory.",
+                Description = FileNameDescription,
                 IsKey = true,
                 IsNullable = false,
                 Type = PropertyType.String,
@@ -65,7 +68,7 @@ namespace PluginFileReader.Helper
             {
                 Id = "FileSize",
                 Name = "File Size",
-                Description = "Information on how many bytes of data the file contains.",
+                Description = FileSizeDescription,
                 IsKey = false,
                 IsNullable = false,
                 Type = PropertyType.String,

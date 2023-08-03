@@ -419,15 +419,15 @@ namespace PluginFileReaderTest.Plugin
             // assert properties and descriptions are correct
             var rootpathProp = fileInfoSchema.Properties.First(p => p.Id.Equals("RootPath"));
             Assert.Equal(rootpathProp.Id, "RootPath");
-            Assert.Equal(rootpathProp.Description, "The location of the file as per the system's file structure.");
+            Assert.Equal(rootpathProp.Description, FileInfoData.RootPathDescription);
 
             var filenameProp = fileInfoSchema.Properties.First(p => p.Id.Equals("FileName"));
             Assert.Equal(filenameProp.Id, "FileName");
-            Assert.Equal(filenameProp.Description, "Name of the file as present in the root directory.");
+            Assert.Equal(filenameProp.Description, FileInfoData.FileNameDescription);
 
             var filesizeProp = fileInfoSchema.Properties.First(p => p.Id.Equals("FileSize"));
             Assert.Equal(filesizeProp.Id, "FileSize");
-            Assert.Equal(filesizeProp.Description, "Information on how many bytes of data the file contains.");
+            Assert.Equal(filesizeProp.Description, FileInfoData.FileSizeDescription);
  
             request.Schema = fileInfoSchema;
 
