@@ -4,7 +4,7 @@
   "description": "Publisher which extracts data from files.",
   "apiVersion": "2",
   "versionDescription": "Version 4",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "iconFile": "icon.png",
   "executable": "PluginFileReader",
   "kind": "publisher",
